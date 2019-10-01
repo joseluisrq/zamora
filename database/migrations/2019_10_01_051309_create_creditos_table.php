@@ -17,13 +17,13 @@ class CreateCreditosTable extends Migration
             $table->increments('id');
 
             $table->integer('idsocio')->unsigned();
-            $table->foreign('idsocio')->references('id')->on('socios')->onDelete('cascade');
+            $table->foreign('idsocio')->references('id')->on('personas')->onDelete('cascade');
 
             $table->integer('idgarante')->unsigned();
-            $table->foreign('idgarante')->references('id')->on('socios')->onDelete('cascade');
+            $table->foreign('idgarante')->references('id')->on('personas')->onDelete('cascade');
 
             $table->integer('idusuario')->unsigned();
-            $table->foreign('idusuario')->references('id')->on('users')->onDelete('cascade');;
+            $table->foreign('idusuario')->references('id')->on('personas')->onDelete('cascade');;
 
             $table->string('numeroprestamo',12);
            

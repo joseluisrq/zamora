@@ -1854,10 +1854,171 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     console.log('Component mounted.');
   }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/NuevoCredito.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/NuevoCredito.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      //datos de nuevo credito
+      idcliente: 0,
+      numcredito: 0,
+      monto: 0.0,
+      ncuotas: 0,
+      tasa: 0,
+      periodo: 0,
+      //arrary Credito
+      newCredito: [],
+      //array Cuotas
+      newCuotas: [],
+      //control de vistas
+      viewAgregar: true
+    };
+  },
+  methods: {}
 });
 
 /***/ }),
@@ -37163,18 +37324,359 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row justify-content-center" }, [
-        _c("div", { staticClass: "col-md-8" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-header" }, [
-              _vm._v("Example Component")
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
+        _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-body" }, [
+            _c("div", { staticClass: "row bg bg-dark" }, [
+              _c("div", { staticClass: "col-md-12 mt-2 text-white" }, [
+                _c("h4", [_vm._v("Registar a un nuevo Socio")])
+              ])
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _vm._v(
-                "\n                    I'm an example component.\n                "
-              )
+            _c("form", { staticClass: "forms-sample mt-4" }, [
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-md-2 form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputUsername1" } }, [
+                    _vm._v("DNI")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "text",
+                      id: "exampleInputUsername1",
+                      placeholder: "N° DNI"
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-3 form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputUsername1" } }, [
+                    _vm._v("Nombres")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "text",
+                      id: "exampleInputUsername1",
+                      placeholder: "Nombres Completos"
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: " col-md-4 form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                    _vm._v("Apellidos")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "text",
+                      id: "exampleInputEmail1",
+                      placeholder: "Apellido paterno y materno"
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: " col-md-3 form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                    _vm._v("Fecha de Nacimiento")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "date",
+                      id: "exampleInputEmail1",
+                      placeholder: "Apellido paterno y materno"
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: " col-md-4 form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                    _vm._v("Dirección")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "text",
+                      id: "exampleInputEmail1",
+                      placeholder: "Apellido paterno y materno"
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: " col-md-4 form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                    _vm._v("Teléfono/Celular")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "text",
+                      id: "exampleInputEmail1",
+                      placeholder: "Número de Telefono"
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: " col-md-4 form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                    _vm._v("Coreo Electrónico")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "text",
+                      id: "exampleInputEmail1",
+                      placeholder: "Correo Electrónico"
+                    }
+                  })
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary mr-2",
+                  attrs: { type: "submit" }
+                },
+                [_vm._v("Registrar ")]
+              ),
+              _vm._v(" "),
+              _c("button", { staticClass: "btn btn-light" }, [
+                _vm._v("Cancelar")
+              ])
+            ])
+          ])
+        ])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/NuevoCredito.vue?vue&type=template&id=1dd5ba4a&":
+/*!***************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/NuevoCredito.vue?vue&type=template&id=1dd5ba4a& ***!
+  \***************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm.viewAgregar
+    ? _c("div", { staticClass: "row" }, [_vm._m(0)])
+    : _vm._e()
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
+      _c("div", { staticClass: "card" }, [
+        _c("div", { staticClass: "card-body" }, [
+          _c("div", { staticClass: "row bg bg-dark" }, [
+            _c("div", { staticClass: "col-md-12 mt-2 text-white" }, [
+              _c("h4", [
+                _c("i", {
+                  staticClass: "mdi mdi-package-variant-closed mdi-36px"
+                }),
+                _vm._v(" Nuevo Crédito")
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("form", { staticClass: "forms-sample mt-4" }, [
+            _c("div", { staticClass: "row" }, [
+              _c("div", { staticClass: "col-md-6 form-group" }, [
+                _c("label", { attrs: { for: "exampleInputUsername1" } }, [
+                  _vm._v("Ingrese DNI \n                            ")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    id: "exampleInputUsername1",
+                    placeholder: "N° DNI"
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-3" }),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-3 form-group" }, [
+                _c("label", { attrs: { for: "exampleInputUsername1" } }, [
+                  _vm._v("Si el socio no esta registrado ")
+                ]),
+                _vm._v(" "),
+                _c("br"),
+                _c("button", { staticClass: "btn btn-success " }, [
+                  _c("i", { staticClass: "mdi mdi-clipboard-account" }),
+                  _vm._v("  Agregar Socio")
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-2 form-group" }, [
+                _c("label", { attrs: { for: "exampleInputUsername1" } }, [
+                  _vm._v("Codigo de Crédito")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    id: "exampleInputUsername1",
+                    placeholder: "Codigo de Credito"
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: " col-md-2 form-group" }, [
+                _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                  _vm._v("Monto")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    id: "exampleInputEmail1",
+                    placeholder: "Monto en Soles"
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: " col-md-2 form-group" }, [
+                _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                  _vm._v("N° Cuotas")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    id: "exampleInputEmail1",
+                    placeholder: "Número de Cuotas"
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: " col-md-2 form-group" }, [
+                _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                  _vm._v("Tasa de Interés")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    id: "exampleInputEmail1",
+                    placeholder: "Número de Telefono"
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: " col-md-2 form-group" }, [
+                _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                  _vm._v("Periodo")
+                ]),
+                _vm._v(" "),
+                _c("select", { staticClass: "form-control " }, [
+                  _c("option", [_vm._v("Mensual")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("Bimestral")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("Trimestral")]),
+                  _vm._v(" "),
+                  _c("option", [_vm._v("Anual")])
+                ])
+              ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary mr-2 ",
+                attrs: { type: "submit " }
+              },
+              [_vm._v("Generar Cotas ")]
+            ),
+            _vm._v(" "),
+            _c("button", { staticClass: "btn btn-light " }, [
+              _vm._v("Cancelar")
+            ]),
+            _c("br"),
+            _c("br"),
+            _vm._v(" "),
+            _c("div", { staticClass: "table-responsive" }, [
+              _c("table", { staticClass: "table  table-bordered" }, [
+                _c("thead", { staticClass: "table-info text-white" }, [
+                  _c("tr", [
+                    _c("th", [_vm._v("Cuota ")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Fecha de Pago ")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Monto de Cuota ")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v(" Capital ")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v(" Interés ")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v(" Saldo ")])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("tbody", [
+                  _c("tr", [
+                    _c("td", { staticClass: "py-1" }, [_vm._v(" 1")]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v("12/05/2019")]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v("650")]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v("600")]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v("50")]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v("1200")])
+                  ])
+                ])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("hr"),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary mr-2 ",
+                attrs: { type: "submit " }
+              },
+              [_vm._v("Registrar ")]
+            ),
+            _vm._v(" "),
+            _c("button", { staticClass: "btn btn-light " }, [
+              _vm._v("Cancelar")
             ])
           ])
         ])
@@ -49350,6 +49852,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue")["default"]);
+Vue.component('nuevocredito', __webpack_require__(/*! ./components/NuevoCredito.vue */ "./resources/js/components/NuevoCredito.vue")["default"]);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -49492,6 +49995,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/NuevoCredito.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/components/NuevoCredito.vue ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _NuevoCredito_vue_vue_type_template_id_1dd5ba4a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./NuevoCredito.vue?vue&type=template&id=1dd5ba4a& */ "./resources/js/components/NuevoCredito.vue?vue&type=template&id=1dd5ba4a&");
+/* harmony import */ var _NuevoCredito_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./NuevoCredito.vue?vue&type=script&lang=js& */ "./resources/js/components/NuevoCredito.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _NuevoCredito_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _NuevoCredito_vue_vue_type_template_id_1dd5ba4a___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _NuevoCredito_vue_vue_type_template_id_1dd5ba4a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/NuevoCredito.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/NuevoCredito.vue?vue&type=script&lang=js&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/components/NuevoCredito.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NuevoCredito_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./NuevoCredito.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/NuevoCredito.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NuevoCredito_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/NuevoCredito.vue?vue&type=template&id=1dd5ba4a&":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/NuevoCredito.vue?vue&type=template&id=1dd5ba4a& ***!
+  \*********************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_NuevoCredito_vue_vue_type_template_id_1dd5ba4a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./NuevoCredito.vue?vue&type=template&id=1dd5ba4a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/NuevoCredito.vue?vue&type=template&id=1dd5ba4a&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_NuevoCredito_vue_vue_type_template_id_1dd5ba4a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_NuevoCredito_vue_vue_type_template_id_1dd5ba4a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ 0:
 /*!***********************************!*\
   !*** multi ./resources/js/app.js ***!
@@ -49499,7 +50071,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

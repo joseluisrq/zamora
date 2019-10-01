@@ -10,6 +10,11 @@
                    <example-component></example-component>
             </template>
 
+            <template v-if="menu==3">
+                    <nuevocredito></nuevocredito>
+             </template>
+
+
             <template v-if="menu==15">
                     <h1>Caja</h1>
              </template>

@@ -16,7 +16,7 @@ class CreateMovimientosTable extends Migration
         Schema::create('movimientos', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('idusuario')->unsigned();
-            $table->foreign('idusuario')->references('id')->on('users');
+            $table->foreign('idusuario')->references('id')->on('personas');
             $table->integer('idahorro')->unsigned();
             $table->foreign('idahorro')->references('id')->on('ahorros')->onDelete('cascade');          
             $table->dateTime('fecharegistro');            
