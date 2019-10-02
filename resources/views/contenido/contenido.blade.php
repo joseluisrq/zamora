@@ -13,6 +13,9 @@
             <template v-if="menu==3">
                     <nuevocredito></nuevocredito>
              </template>
+             <template v-if="menu==4">
+                    <listarcredito :ruta="ruta"></listarcredito>
+             </template>
 
 
             <template v-if="menu==15">

@@ -21,6 +21,8 @@ window.Vue = require('vue');
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('nuevocredito', require('./components/NuevoCredito.vue').default);
+Vue.component('listarcredito', require('./components/ListarCredito.vue').default);
+Vue.component('detallecredito', require('./components/DetalleCredito.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -31,6 +33,10 @@ Vue.component('nuevocredito', require('./components/NuevoCredito.vue').default);
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 0,
-    }
+        menu: 3,
+
+        ruta: 'http://localhost/zamora/public',
+
+    },
+
 });

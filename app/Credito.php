@@ -22,13 +22,13 @@ class Credito extends Model
         'estado',
         'periodo'
     ];
-//usuario que ha registrado el credito
-    public function usuario(){
-        return  $this->belongsTo('App\User');
+//usuario, socio que ha registrado el credito
+    public function personas(){
+        return  $this->belongsTo('App\Persona');
     }
 //cliente que saco el credito
-    public function socio(){
+   /* public function socio(){
         return  $this->belongsTo('App\Socio');
-    }
+    }*/
 
 }

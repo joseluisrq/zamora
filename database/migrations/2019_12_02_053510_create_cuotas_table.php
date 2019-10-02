@@ -13,17 +13,20 @@ class CreateCuotasTable extends Migration
      */
     public function up()
     {
-        Schema::create('movimientos', function (Blueprint $table) {
+        Schema::create('cuotas', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idusuario')->unsigned();
-            $table->foreign('idusuario')->references('id')->on('personas');
-            $table->integer('idahorro')->unsigned();
-            $table->foreign('idahorro')->references('id')->on('ahorros')->onDelete('cascade');          
-            $table->dateTime('fecharegistro');            
+            $table->integer('numerodecuota');
+            $table->integer('idcajero')->unsigned();
+            $table->foreign('idcajero')->references('id')->on('personas');
+            $table->integer('idcredito')->unsigned();
+            $table->foreign('idcredito')->references('id')->on('creditos')->onDelete('cascade');          
+            $table->date('fechapago');       
+            $table->dateTime('fechacancelo');            
             $table->decimal('monto',7,2);
-            $table->decimal('saldopendiente',12,2);    
+            $table->decimal('saldopendiente',12,2);  
+            $table->decimal('mora',12,2)->default(0.0);    
             $table->string('descripcion',120)->nullable();
-            $table->char('tipomovimiento',1);
+          
             $table->char('estado',1);
 
             $table->timestamps();

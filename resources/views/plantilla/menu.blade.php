@@ -21,7 +21,7 @@
                         <ul>
                             <li class="nav-item"><a class="nav-link" href="">Pagar Cuota</a></li>
                             <li  @click="menu=3" class="nav-item"><a class="nav-link" href="#">Agregar Credito</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Historial de Creditos</a></li>
+                            <li @click="menu=4"><a class="nav-link" href="#">Historial de Creditos</a></li>
                             <li class="nav-item"><a class="nav-link" href="#">Configuracion</a></li>
                         </ul>
                     </div>

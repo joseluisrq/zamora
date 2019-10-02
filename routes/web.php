@@ -10,6 +10,10 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+//CREDITOS
+Route::get('/credito', 'CreditoController@index');//listar creditos
+Route::get('/credito/detallecredito','CreditoController@detallecredito');//detalle credito
+
 
 Route::get('/', function () {
     return view('contenido/contenido');
