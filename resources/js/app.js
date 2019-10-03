@@ -21,9 +21,9 @@ window.Vue = require('vue');
 
 //creditos
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('nuevocredito', require('./components/NuevoCredito.vue').default);
-Vue.component('listarcredito', require('./components/ListarCredito.vue').default);
-Vue.component('detallecredito', require('./components/DetalleCredito.vue').default);
+Vue.component('nuevocredito', require('./components/creditos/NuevoCredito.vue').default);
+Vue.component('listarcredito', require('./components/creditos/ListarCredito.vue').default);
+Vue.component('detallecredito', require('./components/creditos/DetalleCredito.vue').default);
 
 
 
