@@ -19,10 +19,19 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
+//creditos
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('nuevocredito', require('./components/NuevoCredito.vue').default);
 Vue.component('listarcredito', require('./components/ListarCredito.vue').default);
 Vue.component('detallecredito', require('./components/DetalleCredito.vue').default);
+
+
+
+//Personas
+Vue.component('registrarpersona', require('./components/personas/PersonaRegistro.vue').default);
+Vue.component('listarpersonas', require('./components/personas/PersonaLista.vue').default);
+Vue.component('detallepersona', require('./components/personas/PersonaDetalle.vue').default);
+Vue.component('listaroles', require('./components/personas/RolesLista.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -34,7 +43,6 @@ const app = new Vue({
     el: '#app',
     data: {
         menu: 3,
-
         ruta: 'http://localhost/zamora/public',
 
     },

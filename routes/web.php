@@ -14,6 +14,17 @@
 Route::get('/credito', 'CreditoController@index');//listar creditos
 Route::get('/credito/detallecredito','CreditoController@detallecredito');//detalle credito
 
+// PERSONAS
+Route::get('/listapersonas', 'PersonaController@index');
+Route::get('/detallepersona', 'PersonaController@detalle');
+Route::post('/registrarpersona', 'PersonaController@store');
+Route::put('/actualizarpersona', 'PersonaController@update');
+Route::delete('/eliminarpersona', 'PersonaController@delete');
+
+// ROLES
+Route::get('/listaroles', 'RolController@index');
+
+
 
 Route::get('/', function () {
     return view('contenido/contenido');

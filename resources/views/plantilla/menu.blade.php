@@ -20,8 +20,8 @@
                     <div class="submenu">
                         <ul>
                             <li class="nav-item"><a class="nav-link" href="">Pagar Cuota</a></li>
-                            <li  @click="menu=3" class="nav-item"><a class="nav-link" href="#">Agregar Credito</a></li>
-                            <li @click="menu=4"><a class="nav-link" href="#">Historial de Creditos</a></li>
+                            <li  @click="menu=30" class="nav-item"><a class="nav-link" href="#">Agregar Credito</a></li>
+                            <li @click="menu=40"><a class="nav-link" href="#">Historial de Creditos</a></li>
                             <li class="nav-item"><a class="nav-link" href="#">Configuracion</a></li>
                         </ul>
                     </div>
@@ -53,11 +53,11 @@
                     </a>
                     <div class="submenu">
                           <ul>
-                              <li class="nav-item"><a class="nav-link"  href="#">Lista de Socios</a></li>
-                              <li class="nav-item"><a class="nav-link" href="#">Agregar Socios</a></li>
-                              <li class="nav-item"><a class="nav-link"  href="#">Agregar Aporte</a></li>
-                              <li class="nav-item"><a class="nav-link"  href="#">Historial de Cambios</a></li>
-                              <li class="nav-item"><a class="nav-link" href="#">Configuracion</a></li>
+                              <li class="nav-item" @click="menu=2"><a class="nav-link"  href="#">Lista de Socios</a></li>
+                              <li class="nav-item" @click="menu=3"><a class="nav-link" href="#">Agregar Socios</a></li>
+                              <li class="nav-item" @click="menu=4"><a class="nav-link"  href="#">Agregar Aporte</a></li>
+                              <li class="nav-item" @click="menu=5"><a class="nav-link"  href="#">Historial de Cambios</a></li>
+                              <li class="nav-item" @click="menu=6"><a class="nav-link" href="#">Configuracion</a></li>
                           </ul>
                       </div>
                 </li>
@@ -89,13 +89,12 @@
                     </a>
                     <div class="submenu">
                         <ul class="submenu-item">
-                            <li class="nav-item"><a class="nav-link" href="pages/samples/login.html">Usuarios</a></li>
-                            <li class="nav-item"><a class="nav-link" href="pages/samples/login-2.html">Roles</a></li>
-                           
+                            <li @click="menu=20" class="nav-item"><a class="nav-link" href="#">Lista de Usuarios</a></li>
+                            <li @click="menu=21" class="nav-item"><a class="nav-link" href="#">Agregar de Usuarios</a></li>
+                            <li @click="menu=22" class="nav-item"><a class="nav-link" href="#">Roles</a></li>
                         </ul>
                     </div>
                 </li>
-                
               </ul>
           </div>
         </nav>
