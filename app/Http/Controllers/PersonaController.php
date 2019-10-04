@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Persona;
 use App\Socio;
 use App\User;
+use Faker\Provider\date;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -49,7 +50,8 @@ class PersonaController extends Controller
                 'personas.apellidos',
                 'personas.telefono',
                 'socios.estadoahorro',
-                'socios.estadocredito'
+                'socios.estadocredito',
+                DB::raw('(select count(*) from cuotas inner join creditos on creditos.id = cuotas.idcredito where personas.id = creditos.idsocio and cuotas.fechacancelo is null and cuotas.fechapago < "' . date('Y-m-d') . '") as cuotasvencidas')
             )
             ->where('socios.estado', '=', 1)
             ->orderBy('personas.id', 'desc')->paginate(15);
@@ -169,17 +171,21 @@ class PersonaController extends Controller
 	public function store(Request $request)
     {
 		if (!$request->ajax()) return redirect('/');
-         
+
+        $registros = Persona::where('personas.dni', '=', $request->dni)->get();
+
+        if(sizeof($registros) > 0) return ["existe" => true];
+
         try{
             DB::beginTransaction();
             $persona = new Persona();
             $persona->dni = $request->dni;//OCURRIRÁ ERROR CUANDO EL DNI SEA REPETIDO
-			$persona->nombre = $request->nombres;
-			$persona->apellidos = $request->apellidos;
-			$persona->fechanacimiento = $request->fec_nac;
-			$persona->direccion = $request->direccion;
-			$persona->telefono = $request->tel_cel;
-			$persona->email = $request->correo;
+            $persona->nombre = $request->nombres;
+            $persona->apellidos = $request->apellidos;
+            $persona->fechanacimiento = $request->fec_nac;
+            $persona->direccion = $request->direccion;
+            $persona->telefono = $request->tel_cel;
+            $persona->email = $request->correo;
             $persona->save();
 
             $tipo = $request->tipo;
@@ -206,12 +212,15 @@ class PersonaController extends Controller
             }            
  
             DB::commit();
-
-            return $persona->id;
  
         } catch (Exception $e){
             DB::rollBack(); //DESHACER TODO SI HUBIERA ALGÚN ERROR
         }
+
+        return [
+                "existe" => false,
+                "id" => $persona->id
+            ];
 	}
 
 	public function update(Request $request)
