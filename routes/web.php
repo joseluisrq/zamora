@@ -32,6 +32,8 @@ Route::get('/socios/selectCliente', 'CreditoController@selectCliente');
 Route::get('/cuota', 'CuotaController@index');//listar creditos
 
 
+//pdf
+Route::get('/credito/pdfDetallecredito/{id}', 'CreditoController@pdfDetallecredito')->name('detallecredito_pdf');
 
 Route::get('/', function () {
     return view('contenido/contenido');

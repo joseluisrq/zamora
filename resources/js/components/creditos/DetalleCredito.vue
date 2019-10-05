@@ -23,7 +23,7 @@
                                             <hr>
                                         </div>
                                         <div class="col-md-3 ">
-                                            <button type="button" @click="cronogramaPdf(c.id)" class="btn btn-danger btn-icon-text">
+                                            <button type="button" @click="pdfCronograma()" class="btn btn-danger btn-icon-text">
                                                 <i class="mdi mdi-file-pdf btn-icon-prepend"></i>                                                    
                                                 Descargar Cronograma
                                             </button>
@@ -179,6 +179,7 @@ export default {
     props : ['id'],
     data(){
         return{
+            ruta:'http://127.0.0.1:8000',
             arrayCreditos:[],
             arrayCuotas:[],
 
@@ -193,7 +194,7 @@ export default {
            detalleCredito()
             {
                 let me=this;                
-                var url= 'http://127.0.0.1:8000/credito/detallecredito?id='+this.id;
+                var url= this.ruta+'/credito/detallecredito?id='+this.id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayCreditos = respuesta.detallecredito;
@@ -204,6 +205,10 @@ export default {
                     console.log(error);
                 });
             },
+            pdfCronograma(idcredito){
+                 window.open(this.ruta + '/credito/pdfDetallecredito/'+this.id,'_blank');
+            },
+           
             fechaactual() 
             {
                 let date = new Date()

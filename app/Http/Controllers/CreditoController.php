@@ -227,9 +227,67 @@ class CreditoController extends Controller
             $cliente->save();
          
             DB::commit();
+            return ['idcredito' =>  $credito->id];
         } catch (Exception $e){
             DB::rollBack();
         }
     }
+
+
+    //pdf contrato y cronograma decuiotas
+   
+      public function pdfDetallecredito(Request $request, $id){
+        $credito = Credito::join('personas as socio','creditos.idsocio','=','socio.id')       
+        ->join('personas as usuario','creditos.idusuario','=','usuario.id')
+        ->select(
+            'creditos.id', 
+            'creditos.numeroprestamo',           
+            'creditos.montodesembolsado',
+            'creditos.fechadesembolso',
+            'creditos.numerocuotas',
+            'creditos.tipocambio',
+            'creditos.tasa',
+            'creditos.estado',
+            'creditos.periodo',
+
+            'socio.nombre',
+            'socio.dni',
+            'socio.direccion',
+            'socio.telefono',
+            'socio.email',
+            'socio.apellidos',
+            
+            'usuario.nombre as usuario')
+            ->where('creditos.id','=',$id)->take(1)->get();
+
+            $cuotas = Cuota::
+            select(
+                'cuotas.numerodecuota',
+                'cuotas.fechapago',
+                'cuotas.fechacancelo',
+                'cuotas.saldopendiente',
+                'cuotas.monto',
+                'cuotas.mora',
+                'cuotas.descripcion',
+                'cuotas.estado')
+            ->where('cuotas.idcredito','=',$id)
+            ->orderBy('cuotas.id', 'asc')->get();
+
+          /*  return[
+                "credito"=>$credito,
+                "cuotas"=>$cuotas
+            ];*/
+
+          $numerocredito=Credito::select('numeroprestamo')
+            ->where('id',$id)->get();
+
+          
+            $pdf= \PDF::loadView('pdf.detallecredito',[
+                'credito'=>$credito,
+                'cuotas'=>$cuotas]);
+            return $pdf->download('Credito-'.$numerocredito[0]->numeroprestamo.'.pdf');
+        
+    }
+
     
 }

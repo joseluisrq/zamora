@@ -128,7 +128,7 @@
 
      <!--Detalle de un credito-->
     <template v-if="!viewAgregar">
-        <button type="button" class="btn btn-warning" @click="viewAgregar==true;limpiar()">
+        <button type="button" class="btn btn-warning" @click="viewAgregar=true;limpiar()">
            <i class="mdi mdi-arrow-left-bold"></i> Agregar nuevo Crédito
         </button>   
         <detallecredito  v-bind:id="idcredito" ></detallecredito>
@@ -176,7 +176,12 @@
                 
                 //Control de errores
                  errorCredito:0,
-                errorMostrarMsjCredito :[]
+                errorMostrarMsjCredito :[],
+
+
+
+                arrayAuxliar:[],
+                idcredito:0
                 }
         },
           components:{
@@ -277,6 +282,7 @@
                 this.tasa=0;               
                 this.periodo=0;            
                 this.fechadesembolso='';
+                this.idcliente=0,
                 this.viewCuotas=false
 
             },
@@ -338,6 +344,8 @@
                         'CREDITO REGISTRADO', 'El credito ha sido registrado correctamente',
                         'success'
                         )  
+                          let respuesta= response.data;
+                          me.idcredito=respuesta.idcredito;
                          me.viewAgregar=false;
                                
                       }).catch(function (error) {

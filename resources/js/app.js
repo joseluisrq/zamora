@@ -33,6 +33,8 @@ Vue.component('listarpersonas', require('./components/personas/PersonaLista.vue'
 Vue.component('detallepersona', require('./components/personas/PersonaDetalle.vue').default);
 Vue.component('listaroles', require('./components/personas/RolesLista.vue').default);
 
+
+Vue.component('pagarcuota', require('./components/creditos/PagarCuota.vue').default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
