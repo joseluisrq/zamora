@@ -13,7 +13,7 @@
 //CREDITOS
 Route::get('/credito', 'CreditoController@index');//listar creditos
 Route::get('/credito/detallecredito','CreditoController@detallecredito');//detalle credito
-
+Route::post('/credito/registrar', 'CreditoController@store');//registrar un nuevo credito
 // PERSONAS
 Route::get('/listapersonas', 'PersonaController@index');
 Route::get('/detallepersona', 'PersonaController@detalle');
@@ -23,6 +23,13 @@ Route::delete('/eliminarpersona', 'PersonaController@delete');
 
 // ROLES
 Route::get('/listaroles', 'RolController@index');
+
+
+Route::get('/socios/selectCliente', 'CreditoController@selectCliente');
+
+
+//cuotas
+Route::get('/cuota', 'CuotaController@index');//listar creditos
 
 
 

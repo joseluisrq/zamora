@@ -176,7 +176,7 @@ export default {
             {
                 let me=this;
                 me.listado=2;
-                var url= 'http://localhost/zamora/public/credito?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= 'http://127.0.0.1:8000/credito?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayCreditos = respuesta.creditos.data;

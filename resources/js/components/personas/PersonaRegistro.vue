@@ -1,6 +1,6 @@
 <template>
 	<div class="">
-		<button v-if="showdetalle && tipo==0" class="btn btn-success mr-2" @click="showdetalle=false">volver</button>
+		<button v-if="showdetalle && tipo==0 && registrar==1" class="btn btn-success mr-2" @click="showdetalle=false">volver</button>
 		<div v-show="!showdetalle || tipo==1" class="row">
 			<div class="col-md-12 grid-margin stretch-card">
 				<div class="card">
@@ -11,7 +11,7 @@
 							</div>
 						</div>
 						
-						<form id="formRegistro" class="forms-sample mt-4">
+						<form id="formRegistro" @submit="validarform" class="forms-sample mt-4">
 							<div class="row">
 								<div id="formdni" class="col-md-2 form-group">
 										<label for="formdni">DNI</label>
@@ -27,7 +27,7 @@
 								</div>
 								<div class=" col-md-3 form-group">
 									<label for="formfechanacimiento">Fecha de Nacimiento</label>
-									<input id="formfechanacimiento" type="date" v-model="fec_nac" class="form-control" placeholder="" oninvalid="this.setCustomValidity('ingrese la fecha de nacimiento')" oninput="this.setCustomValidity('')" required>
+									<input id="formfechanacimiento" type="date" data-date-format="DD/MM/YYYY" min="1800-01-01" max="3000-12-31" v-model="fec_nac" class="form-control" placeholder="" oninvalid="this.setCustomValidity('ingrese una fecha válida')" oninput="this.setCustomValidity('')" required>
 								</div>
 								<div class=" col-md-4 form-group">
 									<label for="formdireccion">Dirección</label>
@@ -54,13 +54,13 @@
 									<label for="formusuario">Usuario</label>
 									<input id="formusuario" type="text" v-model="usuario" class="form-control upper" placeholder="Usuario" oninvalid="this.setCustomValidity('ingrese un nombre de usuario')" oninput="this.setCustomValidity('')" :required="tipo==1">
 								</div>
-								<div v-show="tipo==1" class=" col-md-3 form-group">
+								<div v-show="tipo==1 && registrar==1" class=" col-md-3 form-group">
 									<label for="formpassword">Contraseña</label>
-									<input id="formpassword" type="password" v-model="password" class="form-control" placeholder="******" oninvalid="this.setCustomValidity('ingrese una contraseña')" oninput="this.setCustomValidity('')" :required="tipo==1">
+									<input id="formpassword" type="password" v-model="password" class="form-control" placeholder="******" oninvalid="this.setCustomValidity('ingrese una contraseña')" oninput="this.setCustomValidity('')" :required="tipo==1 && registrar==1" :disabled="registrar==0">
 								</div>
-								<div v-show="tipo==1" class=" col-md-3 form-group">
+								<div v-show="tipo==1 && registrar==1" class=" col-md-3 form-group">
 									<label for="formrepeatpassword">Repita Contraseña</label>
-									<input id="formrepeatpassword"  type="password" v-model="reppassword" class="form-control" placeholder="*******" oninput="this.setCustomValidity(this.value === '' ? 'repita la contraseña' : (this.value !== formpassword.value ? 'las contraseñas no coinciden' : ''))" :required="tipo==1">
+									<input id="formrepeatpassword"  type="password" v-model="reppassword" class="form-control" placeholder="*******" oninput="this.setCustomValidity(this.value === '' ? 'repita la contraseña' : (this.value !== formpassword.value ? 'las contraseñas no coinciden' : ''))" :required="tipo==1 && registrar==1" :disabled="registrar==0">
 								</div>
 								<div v-show="tipo==1 && registrar==0" class=" col-md-3 form-group">
 									<label for="activarusuario">Activar usuario</label>
@@ -69,7 +69,7 @@
 								<!-- FIN OPCIONES USUARIO -->
 							</div>
 							<input v-show="registrar==1" type="submit" value="Registrar" class="btn btn-primary mr-2" @click="registrarpersona"></input>
-							<a v-show="registrar==0" class="btn btn-primary mr-2" @click="actualizarpersona">Actualizar</a>
+							<input v-show="registrar==0" type="submit" value="Actualizar" class="btn btn-primary mr-2" @click="actualizarpersona"></input>
 							<a class="btn btn-light" @click="limpiarformulario">Cancelar</a>
 						</form>
 					</div>
@@ -151,6 +151,9 @@
                 let form = document.getElementById("formRegistro");
                 form.classList.remove('was-validated');
     		},
+    		validarform: function (e) {
+    			e.preventDefault();//Esto evita que que el formulario recargue la página cunado se envía la info
+		    },
     		cargaroles: function(){
     			let me = this;
     			axios.get(me.ruta + '/listaroles')
@@ -182,10 +185,10 @@
 		    			'fec_nac' : me.fec_nac,
 		    			'direccion' : me.direccion.toUpperCase(),
 		    			'tel_cel' : me.tel_cel,
-		    			'correo' : me.correo.toLowerCase(),
+		    			'correo' : me.correo?me.correo.toLowerCase():'',
 		    			'tipo': me.tipo,
 
-		    			'usuario' : me.usuario.toUpperCase(),
+		    			'usuario' : me.usuario?me.usuario.toUpperCase():'',
 		                'password' : me.password,
 		                'idrol' : me.idrol
 	    			};
@@ -251,11 +254,11 @@
 		    			'fec_nac' : me.fec_nac,
 		    			'direccion' : me.direccion.toUpperCase(),
 		    			'tel_cel' : me.tel_cel,
-		    			'correo' : me.correo.toLowerCase(),
+		    			'correo' : me.correo?me.correo.toLowerCase():'',
 		    			'tipo': me.tipo,
 
-		    			'usuario' : me.usuario.toUpperCase(),
-		                'password' : me.password,
+		    			'usuario' : me.usuario?me.usuario.toUpperCase():'',
+		                // 'password' : me.password, //DESDE ESTE COMPONENTE NO SE PUEDE ACTUALIZAR LAS CONTRASEÑAS
 		                'idrol' : me.idrol,
 		                'condicion' : me.condicion
 	    			};
@@ -272,9 +275,6 @@
 			        	me.mostraralerta('top-end', 'error', '¡¡¡ Error, los datos no se actualizaron correctamente !!!', false, 2500);
 			            console.log(err);
 			        });
-				}
-				else{
-					me.mostraralerta('top-end', 'error', '¡¡¡ Debe llenar los campos obligatorios !!!', false, 2500);
 				}
     		},
     		// DETALLE DE LOS SOCIOS

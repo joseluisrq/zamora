@@ -42,8 +42,8 @@ Vue.component('listaroles', require('./components/personas/RolesLista.vue').defa
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 3,
-        ruta: 'http://localhost/zamora/public',
+        menu: 30,
+        ruta: 'http://127.0.0.1:8000',
 
     },
 

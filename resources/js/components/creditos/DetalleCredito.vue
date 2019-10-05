@@ -193,7 +193,7 @@ export default {
            detalleCredito()
             {
                 let me=this;                
-                var url= 'http://localhost/zamora/public/credito/detallecredito?id='+this.id;
+                var url= 'http://127.0.0.1:8000/credito/detallecredito?id='+this.id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayCreditos = respuesta.detallecredito;

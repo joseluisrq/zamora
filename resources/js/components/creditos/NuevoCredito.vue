@@ -1,5 +1,6 @@
 <template>
     <!--agregar un CREDITO-->
+    <main>
     <div class="row" v-if="viewAgregar">
         <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
@@ -16,7 +17,19 @@
                             <div class="col-md-6 form-group">
                                 <label for="exampleInputUsername1">Ingrese DNI 
                                 </label>
-                                <input type="text" class="form-control" id="exampleInputUsername1" placeholder="N° DNI">
+                                <v-select
+                                    :on-search="selectCliente"
+                                            label="dni"
+                                            :options="arrayCliente"
+                                            placeholder="Ingrese DNI del cliente..."
+                                            :onChange="getDatosCliente"     
+                                    >
+                                    </v-select>
+                                    <div v-if="idcliente!=0">
+                                        <label class="badge badge-dark" v-text="nombre+' '+apellidos">
+
+                                        </label>
+                                    </div>
                             </div>
                             <div class="col-md-3"></div>
                             <div class="col-md-3 form-group">
@@ -37,7 +50,7 @@
                             </div>
                             <div class=" col-md-2 form-group">
                                 <label for="exampleInputEmail1">Tasa de Interés</label>
-                                <input type="number" class="form-control" v-model="tasa" placeholder="Número de Telefono">
+                                <input type="text"   class="form-control" v-model="tasa" placeholder="Número de Telefono">
                             </div>
                             <div class=" col-md-2 form-group">
                                 <label for="exampleInputEmail1">Periodo</label>
@@ -54,7 +67,7 @@
                                 <input type="date" class="form-control" v-model="fechadesembolso" placeholder="Número de Telefono">
                             </div>
                         </div>
-                        <button type="submit " class="btn btn-warning mr-2 " @click="agregarCuotas()">
+                        <button type="button " class="btn btn-warning mr-2 " @click.prevent="agregarCuotas()">
                             <i class="mdi mdi-arrange-send-to-back mdi-24px"></i> Generar Cuotas 
                         </button>
                       
@@ -96,29 +109,50 @@
                             </table>
                         </div>
                         <hr>
+                         <div  v-show="errorCredito" class=" form-group col-md-12 mt-2 bg-danger">
+                            <div class="text-center">
+                                <div v-for="error in errorMostrarMsjCredito" :key="error">
+                                  <mark class="bg-danger text-white col-md-12" ><i class="fa fa-exclamation-triangle"></i> {{error}}</mark>
+                                </div>
+                            </div>
+                        </div>
                         <template v-if="viewCuotas">
-                        <button   type="submit " class="btn btn-primary mr-2 ">Registrar </button>
-                        <button class="btn btn-light " @click="viewCuotas=false;limpiar()">Cancelar</button>
+                            <button   type="button " class="btn btn-primary mr-2 " @click.prevent="registrarCredito()">Registrar </button>
+                            <button class="btn btn-light " @click="viewCuotas=false;limpiar()">Cancelar</button>
                         </template>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+     <!--Detalle de un credito-->
+    <template v-if="!viewAgregar">
+        <button type="button" class="btn btn-warning" @click="viewAgregar==true;limpiar()">
+           <i class="mdi mdi-arrow-left-bold"></i> Agregar nuevo Crédito
+        </button>   
+        <detallecredito  v-bind:id="idcredito" ></detallecredito>
+    </template>
+     <!--fin de detalle de credito-->
+    
+    </main>
     <!--fin de agregar un CREDITO-->    
     
 </template>
 
 <script>
+   import vSelect from 'vue-select'
     export default {
+       
         data(){
             return{
                 //datos de nuevo credito
+                ruta:'http://127.0.0.1:8000',
                 idcliente:0,
                 numeroprestamo:'CZ-05',
                 montodesembolsado:1000,
                 numerocuotas:12,
-                tasa:3.15,
+                tasa:13,
                 periodo:1,
                 fechadesembolso:'2019-09-01',
 
@@ -126,12 +160,28 @@
                 newCredito:[],
                 //array Cuotas
                 newCuotas:[],
+                //aarayClientes
+                arrayCliente:[],
+
+
+              
+               dni:'',
+               nombre:'',
+               apellidos:'',
 
 
                 //control de vistas
                 viewAgregar:true,
                 viewCuotas:false,
+                
+                //Control de errores
+                 errorCredito:0,
+                errorMostrarMsjCredito :[]
                 }
+        },
+          components:{
+            vSelect
+        
         },
          methods :{
             editar_fecha(fecha, intervalo, dma, separador)
@@ -229,7 +279,92 @@
                 this.fechadesembolso='';
                 this.viewCuotas=false
 
+            },
+            //SELECIONAR CLIENTE PARA CREDITO
+            selectCliente(search, loading){
+                 let me=this;
+                 loading(true)
+                var url= this.ruta+'/socios/selectCliente?filtro='+search;
+                axios.get(url).then(function (response) {
+                    let respuesta= response.data;
+                    q:search;
+                    me.arrayCliente = respuesta.clientes;
+                    loading(false)
+                    
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            //COGER DTOS DEL CLIENTE PARA VISTA DETALLE
+            getDatosCliente(val1){
+                let me=this;
+                me.loading=true;
+                me.idcliente=val1.id;
+                me.dni=val1.dni;
+                me.nombre=val1.nombre;
+                me.apellidos=val1.apellidos;
+               
+            },
+
+            registrarCredito(){
+                if (this.validarCredito()){ return; }
+                
+                let me = this;
+                Swal.fire({
+                    title: '¿Está seguro que desea AGREGAR UN NUEVO CREDITO?',
+                    text: "",
+                    type: 'success',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                     cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Si'
+                    }).then((result) => {
+                    if (result.value) {
+                       axios.post(this.ruta+'/credito/registrar',{
+                        'numeroprestamo': this.numeroprestamo,                              
+                        'montodesembolsado': this.montodesembolsado,
+                        'fechadesembolso' : this.fechadesembolso,                               
+                        'numerocuotas' : this.numerocuotas,
+                       
+                        'tasa' : this.tasa,
+                        'periodo' : this.periodo,
+                        'idcliente' : this.idcliente,
+                        'data':this.newCuotas    
+                        }).then(function (response) {
+
+                        Swal.fire(
+                        'CREDITO REGISTRADO', 'El credito ha sido registrado correctamente',
+                        'success'
+                        )  
+                         me.viewAgregar=false;
+                               
+                      }).catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+                 })
+            },
+            validarCredito(){
+                this.errorCredito=0;
+                this.errorMostrarMsjCredito =[];
+
+                if (this.idcliente==0) this.errorMostrarMsjCredito.push("Seleccione un Cliente");               
+                if (!this.numeroprestamo) this.errorMostrarMsjCredito.push("Ingrese el Codigo de Crédito");
+                if (this.montodesembolsado==0) this.errorMostrarMsjCredito.push("El monto a desembolsar no puede ser 0");
+                if (!this.fechadesembolso) this.errorMostrarMsjCredito.push("Seleccione una fecha de desembolso");
+                if (this.numerocuotas==0) this.errorMostrarMsjCredito.push("Ingrese el número de cuotas");
+                if (this.tipocambio==0) this.errorMostrarMsjCredito.push("Ingrese el tipo de cambio");
+                if (this.tasa==0) this.errorMostrarMsjCredito.push("La tasa de interes no puede ser 0");
+
+                //si al menos tenemosun error enotnces errorCredito=1
+                if (this.errorMostrarMsjCredito.length) this.errorCredito = 1;
+
+                return this.errorCredito;
+
             }
+            
          }
       
 
