@@ -16,9 +16,7 @@
              <template v-if="menu==40">
                     <listarcredito :ruta="ruta"></listarcredito>
              </template>
-             <template v-if="menu==41">
-                    <pagarcuota :ruta="ruta"></pagarcuota>
-             </template>
+            
 
 
             

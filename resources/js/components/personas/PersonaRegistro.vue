@@ -1,6 +1,6 @@
 <template>
 	<div class="">
-		<button v-if="showdetalle && tipo==0 && registrar==1" class="btn btn-success mr-2" @click="showdetalle=false">volver</button>
+		<button v-if="showdetalle && registrar==1" class="btn btn-success mr-2" @click="ocultardetalle">volver</button>
 		<div v-show="!showdetalle || tipo==1" class="row">
 			<div class="col-md-12 grid-margin stretch-card">
 				<div class="card">
@@ -27,7 +27,7 @@
 								</div>
 								<div class=" col-md-3 form-group">
 									<label for="formfechanacimiento">Fecha de Nacimiento</label>
-									<input id="formfechanacimiento" type="date" data-date-format="DD/MM/YYYY" min="1800-01-01" max="3000-12-31" v-model="fec_nac" class="form-control" placeholder="" oninvalid="this.setCustomValidity('ingrese una fecha válida')" oninput="this.setCustomValidity('')" required>
+									<input id="formfechanacimiento" type="date" data-date-format="DD MMMM YYYY" min="1800-01-01" max="3000-12-31" v-model="fec_nac" class="form-control" placeholder="" oninvalid="this.setCustomValidity('ingrese una fecha válida')" oninput="this.setCustomValidity('')" required>
 								</div>
 								<div class=" col-md-4 form-group">
 									<label for="formdireccion">Dirección</label>
@@ -77,13 +77,13 @@
 			</div>
 		</div>
 
-		<detallepersona v-show="showdetalle && tipo==0" :ruta="ruta" :tipo="tipo" :bus="bus"/><!-- EL BUS PERMITE PASAR INFO ENTRE COMPONENTES -->
+		<detallepersona v-show="showdetalle" :ruta="ruta" :tipo="tipo" :bus="bus"/><!-- EL BUS PERMITE PASAR INFO ENTRE COMPONENTES -->
 	</div>
 </template>
 
 <script>
     export default {
-    	props:['ruta', 'tipo', 'registrar', 'busactualizar'],//LA PROPIEDAD TIPO ES PARA DIFERENCIAR ENTRE SOCIOS Y USUARIOS, 0 SI ES SOCIO Y 1 SI ES USUARIO, LA PROPIEDAD REGISTRAR PERMITE SABER SI SE TRATA DE REGISTRAR O DE ACTUALIZAR
+    	props:['ruta', 'tipo', 'registrar', 'busactualizar'],//LA PROPIEDAD TIPO ES PARA DIFERENCIAR ENTRE SOCIOS Y USUARIOS, 0 SI ES SOCIO Y 1 SI ES USUARIO, LA PROPIEDAD REGISTRAR PERMITE SABER SI SE TRATA DE REGISTRAR O DE ACTUALIZAR 1
     	data: function(){
     		return {
     			bus: new Vue(),
@@ -105,6 +105,9 @@
                 idrol: '',
                 condicion: '',
 
+                dniprevio: '',
+                usuarioprevio: '',
+
     			roles: [],
 
     			showdetalle: false
@@ -113,7 +116,11 @@
     	methods: {
     		iniciar: function(){
     			let me = this;
-    			if(me.busactualizar) me.busactualizar.$on('cargardatosactualpersona', me.cargardatosactualpersona);
+    			if(me.busactualizar) {
+    				me.busactualizar.$on('cargardatosactualpersona', me.cargardatosactualpersona);
+    				me.busactualizar.$on('ocultarDetalle', me.ocultardetalle);
+    				me.busactualizar.$on('limpiarCampos', me.limpiarcampos);
+    			}
 
 	        	if(me.tipo==1) me.cargaroles();//CARGA LOS ROLES SI ES USUARIO
 
@@ -132,7 +139,11 @@
             	});
     		},
     		limpiarformulario: function(){
-				let me =this;
+    			this.limpiarcampos();
+                if(this.busactualizar)this.busactualizar.$emit('volveraLista');//VOLVER A LA LISTA DE PERSONAS
+    		},
+    		limpiarcampos(){
+    			let me =this;
 				me.id = '';
     			me.dni = '';
     			me.nombres = '';
@@ -147,6 +158,11 @@
                 me.reppassword = '';
                 me.idrol = '';
                 me.condicion = '';
+
+                me.dniprevio = '';
+                me.usuarioprevio = '';
+
+                this.bus.$emit('limpiarDetalle');//Limpiar el detalle del cliente
 
                 let form = document.getElementById("formRegistro");
                 form.classList.remove('was-validated');
@@ -189,7 +205,7 @@
 		    			'tipo': me.tipo,
 
 		    			'usuario' : me.usuario?me.usuario.toUpperCase():'',
-		                'password' : me.password,
+		    			// 'password' : me.password, //DESDE ESTE COMPONENTE NO SE PUEDE ACTUALIZAR LAS CONTRASEÑAS
 		                'idrol' : me.idrol
 	    			};
 
@@ -197,11 +213,16 @@
 			        .then(res => {
 			        	if(res.data.existe){//SI EXISTE UN REGISTRO CON EL MISMO DNI
 			        		me.mostraralerta('center', 'error', '¡¡¡ Ya existe una persona registrada con ese DNI  !!!', false, 2000);
-			        	}else {
+			        	}else if(res.data.dobleuser){
+			        		me.mostraralerta('center', 'error', '¡¡¡ El nombre de usuario que intenta registrar, ya se encuentra asignado  !!!', false, 2000);
+			        	}else{
 			        		me.mostraralerta('center', 'success', '¡¡¡ Registro exitoso !!!', false, 1500);
-				        	me.limpiarformulario();
 				        	me.mostrardetalle(res.data.id);//DEVUELVE EL ID PARA MOSTRAR EL DETALLE DE LA NUEVA PERSONA REGISTRADA
-				        	me.showdetalle = true;
+				        	me.showdetalle = (me.tipo == 0);//SOLO SE MUESTRA EL DETALLE para socios
+
+				        	if(me.registrar == 1 && me.tipo == 1) {
+				        		me.limpiarcampos();
+				        	}//SI SE TRATA DE REGISTRAR DATOS DEL USUARIO, NO SE MUESTRA DETALLE
 			        	}
 			        })
 			        .catch(err => {
@@ -233,6 +254,9 @@
 		                me.reppassword = persona.password;
 		                me.idrol = persona.idrol;
 		                me.condicion = persona.condicion;
+
+		                me.dniprevio = persona.dni;
+                		me.usuarioprevio = persona.usuario;
 			        })
 			        .catch(err => {
 			        	me.mostraralerta('top-end', 'error', '¡¡¡ Error, no se logró cargar la información de la persona seleccionada !!!', false, 2500);
@@ -260,22 +284,38 @@
 		    			'usuario' : me.usuario?me.usuario.toUpperCase():'',
 		                // 'password' : me.password, //DESDE ESTE COMPONENTE NO SE PUEDE ACTUALIZAR LAS CONTRASEÑAS
 		                'idrol' : me.idrol,
-		                'condicion' : me.condicion
+		                'condicion' : me.condicion,
+		                'dniprevio' : me.dniprevio,
+						'usuarioprevio' : me.usuarioprevio
 	    			};
 
 					axios.put(me.ruta + '/actualizarpersona', persona)
 			        .then(res => {
-			        	me.mostraralerta('center', 'success', '¡¡¡ Datos actualizados correctamente !!!', false, 1500);
-			        	me.limpiarformulario();
-			        	me.mostrardetalle(res.data);//DEVUELVE EL ID PARA MOSTRAR EL DETALLE CON LOS DATOS ACTUALIZADOS
-			        	me.busactualizar.$emit('listarpersonas');
-			        	me.showdetalle = true;
+			        	if(res.data.existe){//SI EXISTE UN REGISTRO CON EL MISMO DNI
+			        		me.mostraralerta('center', 'error', '¡¡¡ Ya existe una persona registrada con ese DNI  !!!', false, 2000);
+			        	}else if(res.data.dobleuser){
+			        		me.mostraralerta('center', 'error', '¡¡¡ El nombre de usuario que intenta registrar, ya se encuentra asignado  !!!', false, 2000);
+			        	}else{
+			        		me.mostraralerta('center', 'success', '¡¡¡ Datos actualizados correctamente !!!', false, 1500);
+				        	me.mostrardetalle(res.data.id);//DEVUELVE EL ID PARA MOSTRAR EL DETALLE CON LOS DATOS ACTUALIZADOS
+				        	me.busactualizar.$emit('listarpersonas');
+				        	me.showdetalle = (me.tipo == 0);//SOLO SE MUESTRA EL DETALLE para socios
+				        	
+				        	if(me.registrar == 0 && me.tipo == 1 && me.busactualizar){
+				        		me.limpiarcampos();
+				        		me.busactualizar.$emit('volveraLista');
+				        	}//VOLVER A LA LISTA DE PERSONAS;//SI SE TRATA DE ACTUALIZAR DATOS DEL USUARIO, SE DEBE REGRESAR A LA LISTA
+			        	}
 			        })
 			        .catch(err => {
 			        	me.mostraralerta('top-end', 'error', '¡¡¡ Error, los datos no se actualizaron correctamente !!!', false, 2500);
 			            console.log(err);
 			        });
 				}
+    		},
+    		ocultardetalle(){
+    			this.showdetalle = false;
+    			this.limpiarcampos();
     		},
     		// DETALLE DE LOS SOCIOS
             mostrardetalle(id){

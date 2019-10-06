@@ -170,11 +170,19 @@ class PersonaController extends Controller
 
 	public function store(Request $request)
     {
-		if (!$request->ajax()) return redirect('/');
+		if (!$request->ajax()) return redirect('/');        
 
-        $registros = Persona::where('personas.dni', '=', $request->dni)->get();
+        $duplicado_dni = Persona::where('personas.dni', '=', $request->dni)->get();
 
-        if(sizeof($registros) > 0) return ["existe" => true];
+        if(sizeof($duplicado_dni) > 0) return ["existe" => true];
+
+        $tipo = $request->tipo;
+
+        if($tipo == 1){
+            $duplicado_user = User::where('users.usuario', '=', $request->usuario)->get();
+
+            if(sizeof($duplicado_user) > 0) return ["existe" => false, "dobleuser" => true];
+        }
 
         try{
             DB::beginTransaction();
@@ -188,7 +196,6 @@ class PersonaController extends Controller
             $persona->email = $request->correo;
             $persona->save();
 
-            $tipo = $request->tipo;
             // SI TIPO==0, REGISTRAMOS UN SOCIO
             if($tipo == 0)
             {
@@ -219,6 +226,7 @@ class PersonaController extends Controller
 
         return [
                 "existe" => false,
+                "dobleuser" => false,
                 "id" => $persona->id
             ];
 	}
@@ -226,6 +234,24 @@ class PersonaController extends Controller
 	public function update(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
+
+        if($request->dniprevio != $request->dni)//QUIERE DECIR QUE INTENTA CAMBIAR SU NÚMERO DE DNI
+        {
+            $duplicado_dni = Persona::where('personas.dni', '=', $request->dni)->get();//BUSCAMOS SI EXISTE EL DNI QUE INTENTA INGRESAR
+            if(sizeof($duplicado_dni) > 0) return ["dni"=>$request->dni, "prev"=>$request->dniprevio, "existe" => true];
+        }
+
+        $tipo = $request->tipo;
+
+        if($tipo == 1)
+        {
+            if($request->usuarioprevio != $request->usuario)//QUIERE DECIR QUE INTENTA CAMBIAR DE NOMBRE DE USUARIO
+            {
+                $duplicado_user = User::where('users.usuario', '=', $request->usuario)->get();
+
+                if(sizeof($duplicado_user) > 0) return ["existe" => false, "dobleuser" => true];
+            }
+        }
          
         try{
             DB::beginTransaction();
@@ -239,25 +265,27 @@ class PersonaController extends Controller
             $persona->email = $request->correo;
             $persona->save();
 
-            $tipo = $request->tipo;
-
             if($tipo == 1)//SI SE TRATA DE USUARIO, SE PUEDE ACTUALIZAR EL NOMBRE DE USUARIO, EL PASSWORD , EL ROL Y LA CONDICIÓN
             {
                 $user = User::findOrFail($persona->id);
                 $user->usuario = $request->usuario;
-                $user->password = bcrypt($request->password);//PASSWORD ENCRIPTADO
+                // $user->password = bcrypt($request->password);//EL PASSWORD ADMIN NO PUEDE CAMBIAR EL PASSWORD EN ESTE MÓDULO
                 $user->condicion = $request->condicion;//USUARIO ACTIVO
                 $user->idrol = $request->idrol;
                 $user->save();
             }            
  
             DB::commit();
-
-            return $persona->id;
  
         } catch (Exception $e){
             DB::rollBack(); //DESHACER TODO SI HUBIERA ALGÚN ERROR
         }
+
+        return [
+            "existe" => false,
+            "dobleuser" => false,
+            "id" => $persona->id
+        ];
 	}
 
 	public function delete(Request $request)

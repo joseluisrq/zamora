@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <button v-if="!showlista" class="btn btn-success mr-2" @click="showlista=true; showdetalle=showactualizar=false">volver</button>
+        <button v-if="!showlista" class="btn btn-success mr-2" @click="ocultarDetalle">volver</button>
         <div v-show="showlista" class="row">
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
@@ -239,7 +239,19 @@
                 this.showactualizar = true;
                 this.showlista = false;
             },
-
+            ocultarDetalle(){//SIRVE PARA VER LA LISTA DE PERSONAS
+                this.busactualizar.$emit('ocultarDetalle');
+                this.busactualizar.$emit('limpiarCampos');
+                this.bus.$emit('limpiarDetalle');//Limpiar el detalle del cliente
+                this.showlista = true;
+                this.showdetalle = false;
+                this.showactualizar = false;
+            },
+            volveraLista(){
+                this.showlista = true;
+                this.showdetalle = false;
+                this.showactualizar = false;
+            },
             // DETALLE DE LOS SOCIOS(CAMBIAR ESTA PARTE AL COMPONENTE PERSONADETALLE.VUE)
             mostrardetalle(id){
                 this.bus.$emit('cargarDetalle', id);
@@ -251,6 +263,7 @@
             let me = this;
             me.listarPersona(1,'','');
             me.busactualizar.$on('listarpersonas', me.listarpersonas);
+            me.busactualizar.$on('volveraLista', me.volveraLista);
         }
     };
 </script>
