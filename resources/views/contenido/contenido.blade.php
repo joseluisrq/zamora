@@ -16,19 +16,28 @@
              <template v-if="menu==40">
                     <listarcredito :ruta="ruta"></listarcredito>
              </template>
+             <template v-if="menu==90">
+                    <pagar :ruta="ruta"></pagar>
+             </template>
             
-
-
+             {{-- INICIO MENU AHORROS --}}
+             <template v-if="menu==71">
+                <crearcuentaahorro :ruta="ruta"></crearcuentaahorro>
+             </template>             
+             {{-- FIN AHORROS --}}
             
-             {{-- INICIO OPCIÓN SOCIOS --}}
+             {{-- INICIO MENU SOCIOS --}}
             <template v-if="menu==2">
                 <listarpersonas :key="1" :ruta='ruta' :tipo="0"></listarpersonas>
             </template>
             <template v-if="menu==3">
                 <registrarpersona :key="2" :ruta='ruta' :tipo="0" :registrar="1"></registrarpersona>
             </template>
-            {{-- FIN OPCIÓN SOCIOS --}}
-
+            <template v-if="menu==4">
+                <aportes :ruta="ruta"></aportes>
+            </template>
+            {{-- FIN SOCIOS --}}
+            
             <template v-if="menu==15">
                     <h1>Caja</h1>
              </template>
@@ -37,7 +46,7 @@
                     <h1>Reportes</h1>
              </template>
 
-             {{-- INICIO OPCIÓN ACCESO --}}
+             {{-- INICIO MENU ACCESO --}}
              <template v-if="menu==20">
                 <listarpersonas :key="3" :ruta='ruta' :tipo="1"></listarpersonas>
             </template>
@@ -47,7 +56,7 @@
             <template v-if="menu==22">
                 <listaroles :ruta="ruta"/>
             </template>
-             {{-- FIN OPCIÓN ACCESO --}}
+             {{-- FIN ACCESO --}}
 
         </div>
     </div>

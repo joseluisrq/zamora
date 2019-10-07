@@ -35,6 +35,7 @@
                                     <th> N° Credito </th>
                                     <th> Fecha de Desembolso</th>
                                     <th> Monto Capital</th>
+                                    <th> Tasa de Interes</th>
                                     <th> Interes </th>
                                     <th> N° Cuotas </th>
                                     <th> DNI Socio </th>
@@ -67,9 +68,12 @@
                                     </td>
                                     <td v-text="c.numeroprestamo"></td>
                                     <td v-text="c.fechadesembolso"></td>
-                                    <td v-text="c.montodesembolsado"></td>
-                                    <td v-text="c.montodesembolsado"></td>
-                                    <td v-text="c.tasa"></td>
+                                    <td v-text="'S/ '+c.montodesembolsado"></td>
+                                     <td v-text="c.tasa+' %'"></td>
+                                    <td>S/ {{
+                                        parseFloat(c.montodesembolsado)*((c.tasa)/100)
+                                        }}</td>
+                                    <td v-text="c.numerocuotas"></td>
 
                                     <td v-text="c.sociodni"></td>
                                     <td v-text="c.socionombre+' '+c.socioapellido"></td>

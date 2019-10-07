@@ -107,8 +107,8 @@
                                                 <th> Capital </th>
                                                 <th> Interés </th>
                                                 <th> Saldo </th>
-                                                <th> Cajaro</th>
-                                                <th> Esatdo </th>
+                                                <th> Cajero</th>
+                                                <th> Estado </th>
 
 
                                             </tr>
@@ -117,9 +117,17 @@
                                             <tr v-for="cu in arrayCuotas" :key="cu.id">
                                                 <td class="py-1" v-text="cu.numerodecuota"></td>
                                                 <td >
-                                                    <button type="button" @click="bouchercuota(cu.id)" class="btn btn-success btn-rounded btn-icon ">
-                                                        <i class="mdi mdi-file-import mdi-24px"></i>
-                                                    </button>
+                                                    <template v-if="cu.estado==0">
+                                                        <button type="button"  class="btn btn-outline-success btn-rounded btn-icon " disabled>
+                                                            <i class="mdi mdi-file-import mdi-24px"></i>
+                                                        </button>
+                                                    </template>
+                                                    <template v-if="cu.estado==1">
+                                                         <button type="button" @click="bouchercuota(cu.id)" class="btn btn-success btn-rounded btn-icon ">
+                                                            <i class="mdi mdi-file-import mdi-24px"></i>
+                                                        </button>
+                                                    </template>
+                                                   
                                                 </td>
                                                 <template v-if="cu.estado==0">
                                                     <td v-text="cu.fechapago" ></td>

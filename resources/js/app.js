@@ -24,6 +24,8 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 Vue.component('nuevocredito', require('./components/creditos/NuevoCredito.vue').default);
 Vue.component('listarcredito', require('./components/creditos/ListarCredito.vue').default);
 Vue.component('detallecredito', require('./components/creditos/DetalleCredito.vue').default);
+Vue.component('pagar', require('./components/creditos/Pagar.vue').default);
+Vue.component('pagarcuota', require('./components/creditos/PagarCuota.vue').default);
 
 
 
@@ -32,6 +34,10 @@ Vue.component('registrarpersona', require('./components/personas/PersonaRegistro
 Vue.component('listarpersonas', require('./components/personas/PersonaLista.vue').default);
 Vue.component('detallepersona', require('./components/personas/PersonaDetalle.vue').default);
 Vue.component('listaroles', require('./components/personas/RolesLista.vue').default);
+
+
+Vue.component('crearcuentaahorro', require('./components/ahorros/CrearCuentaAhorro.vue').default);
+Vue.component('aportes', require('./components/aportes/Aportes.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -42,7 +48,7 @@ Vue.component('listaroles', require('./components/personas/RolesLista.vue').defa
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 30,
+        menu: 90,
         ruta: 'http://127.0.0.1:8000',
 
     },

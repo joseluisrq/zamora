@@ -30,6 +30,20 @@ Route::get('/socios/selectCliente', 'CreditoController@selectCliente');
 
 //cuotas
 Route::get('/cuota', 'CuotaController@index');//listar creditos
+Route::get('/cuota/cuotassinpagar', 'CuotaController@cuotassinpagar');
+//listar cuotas a pagaR
+
+
+// APORTES
+Route::get('/aporte/listar', 'AporteController@index');
+Route::get('/aporte/selectsocio', 'AporteController@selectSocio');
+Route::get('/aporte/pdfDetalleAporte', 'AporteController@pdfDetalleAporte')->name('detalleaporte_pdf');
+Route::post('/aporte/registrar', 'AporteController@store');
+
+// CUENTA AHORROS
+Route::post('/cuentaahorros/crear', 'CuentaAhorroController@store');
+
+
 
 
 //pdf
