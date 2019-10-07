@@ -30,7 +30,8 @@
                 <!--Ahorros-->
                 <li  class="nav-item">
                     <a href="pages/forms/basic_elements.html" class="nav-link">
-                      <i class="mdi mdi-chart-areaspline menu-icon"></i>
+                     
+                      <i class="mdi mdi-cash-usd menu-icon"></i>
                       <span class="menu-title">Ahorros</span>
                       <i class="menu-arrow"></i>
                     </a>
@@ -47,7 +48,7 @@
                 <!--Socios-->
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                      <i class="mdi mdi-finance menu-icon"></i>
+                    <i class="mdi mdi-account-multiple-outline menu-icon"></i>
                       <span class="menu-title">Socios</span>
                       <i class="menu-arrow"></i>
                     </a>
@@ -74,7 +75,7 @@
                 <!--reportes-->
                 <li @click="menu=16" class="nav-item">
                     <a href="#" class="nav-link">
-                      <i class="mdi mdi-emoticon menu-icon"></i>
+                    <i class="mdi mdi-chart-line menu-icon"></i>
                       <span class="menu-title">Reportes</span>
                       <i class="menu-arrow"></i>
                     </a>

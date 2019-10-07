@@ -32,7 +32,7 @@ class CuotaController extends Controller
 
                     'creditos.numeroprestamo',
                     
-                    'socio.dni as idsocio',
+                    'socio.id as idsocio',
                     'socio.dni as dni',
                     'socio.nombre as nombre',
                     'socio.apellidos as apellidos',      
