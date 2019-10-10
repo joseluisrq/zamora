@@ -8,7 +8,7 @@
                         <!--detalle de pago-->
                     <div class="row" v-for="c in dataC" :key="c.id">
                             <div class="col-md-12">
-                                <h4 class="font-weight-bold">PAGO DE CUOTA N° {{c.numerocuota}}</h4>       
+                                <h4 class="font-weight-bold">PAGO DE CUOTA N° {{c.numerodecuota}}</h4>       
                             </div>
                             <!--Datos del cliente-->
                             <div class="col-md-6">
@@ -24,7 +24,7 @@
                                     </div>
                                     <div class="col-md-9">  
                                         <p class="font-weight-bold">Cliente</p>
-                                        <p class="font-weight-light" v-text="c.nombre+' '+c.apellidopaterno+' '+c.apellidomaterno"></p>
+                                        <p class="font-weight-light" v-text="c.nombre+' '+c.apellidos"></p>
                                     </div>
                                 
                                 </div>
@@ -43,12 +43,19 @@
                                         <p class="font-weight-light" v-text="c.numeroprestamo"></p>
                                     </div>
                                     <div class="col-md-3">
-                                        <p class="font-weight-bold ">ID KIVA</p>
-                                        <p class="font-weight-light" v-text="c.idkiva"></p>
+                                        <p class="font-weight-bold ">TEA(Tasa de Interes Anual)</p>
+                                        <p class="font-weight-light" v-text="c.tasa+' %'"></p>
                                     </div>
                                     <div class="col-md-3">
-                                        <p class="font-weight-bold ">Tipo cambio</p>
-                                        <p class="font-weight-light" v-text="'S/ '+parseFloat(c.tipocambio).toFixed(2)"></p>
+                                        <p class="font-weight-bold ">Numero de Cuotas</p>
+                                        <p class="font-weight-light" v-text="c.numerocuotas+' Cuotas'"></p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <p class="font-weight-bold ">Periodo</p>
+                                        <p class="font-weight-light" v-if="c.periodo==1">Mensual</p>
+                                        <p class="font-weight-light" v-else-if="c.periodo==3">Trimestral</p>
+                                        <p class="font-weight-light" v-else-if="c.periodo==6">Semestral</p>
+                                        <p class="font-weight-light" v-else-if="c.periodo==12">Anual</p>
                                     </div>
                                     <div class="col-md-3">
                                             <p class="font-weight-bold">Fecha pago</p>
@@ -83,12 +90,12 @@
                                             </tr>
                                             <tr>
                                             <td>Otros Pagos S/</td>
-                                            <td> <input type="number" class="form-control" min="0"  v-model="c.otroscostos"  placeholder="No puede dejar este campo vacio"></td>
+                                            <td> <input type="number" class="form-control" min="0"  v-model="c.mora"  placeholder="No puede dejar este campo vacio"></td>
                                             </tr>
                                         
                                             <tr class="">
                                             <td>Total a Pagar</td>
-                                            <td v-text="'S/. '+(parseFloat(c.otroscostos)+parseFloat(totalpagar)).toFixed(2)" class="bg bg-warning text-white"></td>
+                                            <td v-text="'S/. '+(parseFloat(c.mora)+parseFloat(totalpagar)).toFixed(2)" class="bg bg-warning text-white"></td>
 
                                             </tr>
                                         
@@ -97,8 +104,10 @@
                                 </table>
                             </div>
                             <div class="col-md-6">  
-                                <p class="font-weight-bold">Descripción</p>
-                                        <textarea rows="5" cols="50" oninput="this.value = this.value.toUpperCase();" v-model="descpagocuota"></textarea>   
+                                <h5 class="font-weight-bold">Descripción</h5>
+                                        <textarea  class="form-control"
+                                        rows="3"
+                                        oninput="this.value = this.value.toUpperCase();" v-model="descpagocuota"></textarea>   
                             </div>  
                             <div class="col-md-12">  
                                 <hr>
@@ -106,45 +115,13 @@
                                     <div class="col-md-9">
                                         <button type="button" v-if="botoncuota" @click="pagarCuota(c.id,c.otroscostos,c.idpersona)" class="btn btn-success col-md-4" >Pagar Cuota</button>
                                     </div>
-                                    <div class="col-md-3">
-                                        <button type="button" class="btn btn-outline-primary" @click="showpagoporcion=true;botoncuota=false;">Pagar porción</button>      
-                                    </div>
+                                   
                                 </div>
                             </div>
                         <!--fin detalle de pago-->
                         
                     <!-- INICIO PAGO PORCION  -->
-                        <template v-if="showpagoporcion">
-                    
-                            <div class="col-md-12">
-                                <hr>
-                                <h5 class="font-weight-bold">Pagar Porción de Cuota</h5>
-                                <hr>
-                            </div>
-                            <div class="col-md-2">
-                                <p class="font-weight-bold">Ingresar Monto S/</p>
-                                <input required="" class="col-md-12" type="Number" :max="c.monto" min="0" v-model="montoporcion" placeholder="Ingrese el monto a pagar">                 
-                            </div>
-                            <div class="col-md-2">
-                            <p class="font-weight-bold">Otros Pagos S/</p>
-                            <input type="Number" min="0" placeholder="Ingrese cantidad" v-model="otroscostosporcion">
-                        </div>
-                            <div class="col-md-8">
-                                    <p class="font-weight-bold">Descripción</p>
-                                    <input type="text" oninput="this.value = this.value.toUpperCase();" v-model="descpagoporcion" class="col-md-12">
-                            </div>  
-                                                    
-                            <div class="col-md-12">
-                                <hr>
-                                    <button type="button" class="btn btn-danger" @click="showpagoporcion=false;botoncuota=true;">Cerrar</button>
-                                    <button type="button" class="btn btn-success" @click="pagarPorcionCuota(c.id,c.tipocambio,c.tasa)">Confirmar pago</button>
-                            </div>
-                            
-                                
-                        
-                        
-                        </template>
-                    <!-- FIN PAGO PORCION  -->
+                  
     
                 </div>
                 </div>
@@ -237,9 +214,9 @@ export default {
                 axios.get('/cuota/detallepagar?id='+this.idcliente)
                     .then(res => {
                     this.dataC = res.data.cuotas;
-                    me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
+                  //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
                    // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
-                    me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
+                   // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
                      })
                     .catch(err => {
                         console.log(err);
@@ -285,71 +262,7 @@ export default {
                 window.open('/credito/detalleporcioncuotapdf/'+this.identificadorcuota+'','_blank');
             },
 
-            //pagar porcion cuota
-            pagarPorcionCuota(idcuota,tipocambio,tasa){
-
-                if(this.montoporcion == 0){
-                    Swal.fire({
-                    title: 'Debe ingresar un monto mayor a cero',
-                    animation: true,
-                    customClass: {
-                        popup: 'animated tada'
-                    }
-                    })
-                    return;
-                }
-                //adolares
-                 let montopagardolares=this.montoporcion/tipocambio
-                 //monto de interes
-                 let pagoInteresPorcion=montopagardolares*(tasa/100)
-                 //monto de cuta
-                 let pagoCuotaProcion=montopagardolares-pagoInteresPorcion;
-               
-               
-                axios.post('/cuota/porcion',{
-                    'id':idcuota,
-                    'monto': pagoCuotaProcion,
-                    'otroscostos': this.otroscostosporcion,
-                    'descripcion': this.descpagoporcion
-                })
-                    .then(res => {
-                    Swal.fire({
-                        position: 'top-end',
-                        type: 'success',
-                        title: 'El pago se realizó correctamente',
-                        showConfirmButton: false,
-                        timer: 1500
-                        })
-                   // this.generarboucher(cuotaid);
-                    this.montoporcion=0.0,
-                    this.otroscostosporcion=0.0,
-                    this.descpagoporcion='',
-                     this.botoncuota=true;
-
-
-                   
-                    this.showpagoporcion=false;
-
-                    this.mostrarpagar=false;
-                    this.identificadorcuota=idcuota
-                    this.btnboucher=2;
-
-
-                   
-                   
-                    })
-                    .catch(err => {
-                        Swal.fire({
-                        position: 'top-end',
-                        type: 'error',
-                        title: 'Error, No se completó el pago',
-                        showConfirmButton: false,
-                        timer: 1500
-                        })
-                    });
-
-                  
-            },
+          
         },
         mounted() {
             this.obtenerCuotaDeCliente();

@@ -31,6 +31,9 @@ Route::get('/socios/selectCliente', 'CreditoController@selectCliente');
 //cuotas
 Route::get('/cuota', 'CuotaController@index');//listar creditos
 Route::get('/cuota/cuotassinpagar', 'CuotaController@cuotassinpagar');
+Route::get('/cuota/detallepagar', 'CuotaController@detalleCuota');
+Route::put('/cuota/pagar', 'CuotaController@update');
+
 //listar cuotas a pagaR
 
 

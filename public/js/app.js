@@ -3678,29 +3678,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['idcliente'],
   data: function data() {
@@ -3733,10 +3710,9 @@ __webpack_require__.r(__webpack_exports__);
 
       var me = this;
       axios.get('/cuota/detallepagar?id=' + this.idcliente).then(function (res) {
-        _this.dataC = res.data.cuotas;
-        me.interes = me.dataC[0].monto * (me.dataC[0].tasa / 100); // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
-
-        me.totalpagar = ((parseFloat(me.dataC[0].monto) + parseFloat(me.interes)) * me.dataC[0].tipocambio).toFixed(2);
+        _this.dataC = res.data.cuotas; //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
+        // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
+        // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
       })["catch"](function (err) {
         console.log(err);
       });
@@ -3776,56 +3752,6 @@ __webpack_require__.r(__webpack_exports__);
     },
     generarboucherPorcion: function generarboucherPorcion() {
       window.open('/credito/detalleporcioncuotapdf/' + this.identificadorcuota + '', '_blank');
-    },
-    //pagar porcion cuota
-    pagarPorcionCuota: function pagarPorcionCuota(idcuota, tipocambio, tasa) {
-      var _this3 = this;
-
-      if (this.montoporcion == 0) {
-        Swal.fire({
-          title: 'Debe ingresar un monto mayor a cero',
-          animation: true,
-          customClass: {
-            popup: 'animated tada'
-          }
-        });
-        return;
-      } //adolares
-
-
-      var montopagardolares = this.montoporcion / tipocambio; //monto de interes
-
-      var pagoInteresPorcion = montopagardolares * (tasa / 100); //monto de cuta
-
-      var pagoCuotaProcion = montopagardolares - pagoInteresPorcion;
-      axios.post('/cuota/porcion', {
-        'id': idcuota,
-        'monto': pagoCuotaProcion,
-        'otroscostos': this.otroscostosporcion,
-        'descripcion': this.descpagoporcion
-      }).then(function (res) {
-        Swal.fire({
-          position: 'top-end',
-          type: 'success',
-          title: 'El pago se realizó correctamente',
-          showConfirmButton: false,
-          timer: 1500
-        }); // this.generarboucher(cuotaid);
-
-        _this3.montoporcion = 0.0, _this3.otroscostosporcion = 0.0, _this3.descpagoporcion = '', _this3.botoncuota = true;
-        _this3.showpagoporcion = false;
-        _this3.mostrarpagar = false;
-        _this3.identificadorcuota = idcuota;
-        _this3.btnboucher = 2;
-      })["catch"](function (err) {
-        Swal.fire({
-          position: 'top-end',
-          type: 'error',
-          title: 'Error, No se completó el pago',
-          showConfirmButton: false,
-          timer: 1500
-        });
-      });
     }
   },
   mounted: function mounted() {
@@ -43483,431 +43409,278 @@ var render = function() {
                 "div",
                 { staticClass: "card-body" },
                 _vm._l(_vm.dataC, function(c) {
-                  return _c(
-                    "div",
-                    { key: c.id, staticClass: "row" },
-                    [
-                      _c("div", { staticClass: "col-md-12" }, [
-                        _c("h4", { staticClass: "font-weight-bold" }, [
-                          _vm._v("PAGO DE CUOTA N° " + _vm._s(c.numerocuota))
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-6" }, [
-                        _c("div", { staticClass: "row" }, [
-                          _vm._m(0, true),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-3" }, [
-                            _c("p", { staticClass: "font-weight-bold" }, [
-                              _vm._v("DNI")
-                            ]),
-                            _vm._v(" "),
-                            _c("p", {
-                              staticClass: "font-weight-light",
-                              domProps: { textContent: _vm._s(c.dni) }
-                            })
+                  return _c("div", { key: c.id, staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-12" }, [
+                      _c("h4", { staticClass: "font-weight-bold" }, [
+                        _vm._v("PAGO DE CUOTA N° " + _vm._s(c.numerodecuota))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "row" }, [
+                        _vm._m(0, true),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("p", { staticClass: "font-weight-bold" }, [
+                            _vm._v("DNI")
                           ]),
                           _vm._v(" "),
-                          _c("div", { staticClass: "col-md-9" }, [
-                            _c("p", { staticClass: "font-weight-bold" }, [
-                              _vm._v("Cliente")
-                            ]),
-                            _vm._v(" "),
-                            _c("p", {
-                              staticClass: "font-weight-light",
-                              domProps: {
-                                textContent: _vm._s(
-                                  c.nombre +
-                                    " " +
-                                    c.apellidopaterno +
-                                    " " +
-                                    c.apellidomaterno
-                                )
-                              }
-                            })
-                          ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-6" }, [
-                        _c("div", { staticClass: "row" }, [
-                          _vm._m(1, true),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-3" }, [
-                            _c("p", { staticClass: "font-weight-bold " }, [
-                              _vm._v("N° Prestamo")
-                            ]),
-                            _vm._v(" "),
-                            _c("p", {
-                              staticClass: "font-weight-light",
-                              domProps: {
-                                textContent: _vm._s(c.numeroprestamo)
-                              }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-3" }, [
-                            _c("p", { staticClass: "font-weight-bold " }, [
-                              _vm._v("ID KIVA")
-                            ]),
-                            _vm._v(" "),
-                            _c("p", {
-                              staticClass: "font-weight-light",
-                              domProps: { textContent: _vm._s(c.idkiva) }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-3" }, [
-                            _c("p", { staticClass: "font-weight-bold " }, [
-                              _vm._v("Tipo cambio")
-                            ]),
-                            _vm._v(" "),
-                            _c("p", {
-                              staticClass: "font-weight-light",
-                              domProps: {
-                                textContent: _vm._s(
-                                  "S/ " + parseFloat(c.tipocambio).toFixed(2)
-                                )
-                              }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-3" }, [
-                            _c("p", { staticClass: "font-weight-bold" }, [
-                              _vm._v("Fecha pago")
-                            ]),
-                            _vm._v(" "),
-                            _c("p", {
-                              staticClass: "font-weight-light",
-                              domProps: { textContent: _vm._s(c.fechapago) }
-                            })
-                          ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _vm._m(2, true),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-6" }, [
-                        _c("table", { staticClass: "table table-bordered" }, [
-                          _c("thead"),
-                          _vm._v(" "),
-                          _c("tbody", [
-                            _c("tr", [
-                              _c("td", [_vm._v("Saldo Anterior Neto")]),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(
-                                    "$ " +
-                                      (
-                                        parseFloat(c.saldopendiente) +
-                                        parseFloat(c.monto)
-                                      ).toFixed(2)
-                                  )
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("tr", [
-                              _c("td", [_vm._v("Pago Neto")]),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(
-                                    "S/ " + (c.monto * c.tipocambio).toFixed(2)
-                                  )
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("tr", [
-                              _c("td", [_vm._v("Interes")]),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(
-                                    "S/ " +
-                                      (_vm.interes * c.tipocambio).toFixed(2)
-                                  )
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("tr", [
-                              _c("td", [_vm._v("Otros Pagos S/")]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: c.otroscostos,
-                                      expression: "c.otroscostos"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: {
-                                    type: "number",
-                                    min: "0",
-                                    placeholder:
-                                      "No puede dejar este campo vacio"
-                                  },
-                                  domProps: { value: c.otroscostos },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.$set(
-                                        c,
-                                        "otroscostos",
-                                        $event.target.value
-                                      )
-                                    }
-                                  }
-                                })
-                              ])
-                            ]),
-                            _vm._v(" "),
-                            _c("tr", {}, [
-                              _c("td", [_vm._v("Total a Pagar")]),
-                              _vm._v(" "),
-                              _c("td", {
-                                staticClass: "bg bg-warning text-white",
-                                domProps: {
-                                  textContent: _vm._s(
-                                    "S/. " +
-                                      (
-                                        parseFloat(c.otroscostos) +
-                                        parseFloat(_vm.totalpagar)
-                                      ).toFixed(2)
-                                  )
-                                }
-                              })
-                            ])
-                          ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-6" }, [
-                        _c("p", { staticClass: "font-weight-bold" }, [
-                          _vm._v("Descripción")
+                          _c("p", {
+                            staticClass: "font-weight-light",
+                            domProps: { textContent: _vm._s(c.dni) }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("textarea", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.descpagocuota,
-                              expression: "descpagocuota"
-                            }
-                          ],
-                          attrs: {
-                            rows: "5",
-                            cols: "50",
-                            oninput: "this.value = this.value.toUpperCase();"
-                          },
-                          domProps: { value: _vm.descpagocuota },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.descpagocuota = $event.target.value
-                            }
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-12" }, [
-                        _c("hr"),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "row" }, [
-                          _c("div", { staticClass: "col-md-9" }, [
-                            _vm.botoncuota
-                              ? _c(
-                                  "button",
-                                  {
-                                    staticClass: "btn btn-success col-md-4",
-                                    attrs: { type: "button" },
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.pagarCuota(
-                                          c.id,
-                                          c.otroscostos,
-                                          c.idpersona
-                                        )
-                                      }
-                                    }
-                                  },
-                                  [_vm._v("Pagar Cuota")]
-                                )
-                              : _vm._e()
+                        _c("div", { staticClass: "col-md-9" }, [
+                          _c("p", { staticClass: "font-weight-bold" }, [
+                            _vm._v("Cliente")
                           ]),
                           _vm._v(" "),
-                          _c("div", { staticClass: "col-md-3" }, [
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-outline-primary",
-                                attrs: { type: "button" },
+                          _c("p", {
+                            staticClass: "font-weight-light",
+                            domProps: {
+                              textContent: _vm._s(c.nombre + " " + c.apellidos)
+                            }
+                          })
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "row" }, [
+                        _vm._m(1, true),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("p", { staticClass: "font-weight-bold " }, [
+                            _vm._v("N° Prestamo")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            staticClass: "font-weight-light",
+                            domProps: { textContent: _vm._s(c.numeroprestamo) }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("p", { staticClass: "font-weight-bold " }, [
+                            _vm._v("TEA(Tasa de Interes Anual)")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            staticClass: "font-weight-light",
+                            domProps: { textContent: _vm._s(c.tasa + " %") }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("p", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Numero de Cuotas")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            staticClass: "font-weight-light",
+                            domProps: {
+                              textContent: _vm._s(c.numerocuotas + " Cuotas")
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("p", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Periodo")
+                          ]),
+                          _vm._v(" "),
+                          c.periodo == 1
+                            ? _c("p", { staticClass: "font-weight-light" }, [
+                                _vm._v("Mensual")
+                              ])
+                            : c.periodo == 3
+                            ? _c("p", { staticClass: "font-weight-light" }, [
+                                _vm._v("Trimestral")
+                              ])
+                            : c.periodo == 6
+                            ? _c("p", { staticClass: "font-weight-light" }, [
+                                _vm._v("Semestral")
+                              ])
+                            : c.periodo == 12
+                            ? _c("p", { staticClass: "font-weight-light" }, [
+                                _vm._v("Anual")
+                              ])
+                            : _vm._e()
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("p", { staticClass: "font-weight-bold" }, [
+                            _vm._v("Fecha pago")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            staticClass: "font-weight-light",
+                            domProps: { textContent: _vm._s(c.fechapago) }
+                          })
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _vm._m(2, true),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("table", { staticClass: "table table-bordered" }, [
+                        _c("thead"),
+                        _vm._v(" "),
+                        _c("tbody", [
+                          _c("tr", [
+                            _c("td", [_vm._v("Saldo Anterior Neto")]),
+                            _vm._v(" "),
+                            _c("td", {
+                              domProps: {
+                                textContent: _vm._s(
+                                  "$ " +
+                                    (
+                                      parseFloat(c.saldopendiente) +
+                                      parseFloat(c.monto)
+                                    ).toFixed(2)
+                                )
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("tr", [
+                            _c("td", [_vm._v("Pago Neto")]),
+                            _vm._v(" "),
+                            _c("td", {
+                              domProps: {
+                                textContent: _vm._s(
+                                  "S/ " + (c.monto * c.tipocambio).toFixed(2)
+                                )
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("tr", [
+                            _c("td", [_vm._v("Interes")]),
+                            _vm._v(" "),
+                            _c("td", {
+                              domProps: {
+                                textContent: _vm._s(
+                                  "S/ " +
+                                    (_vm.interes * c.tipocambio).toFixed(2)
+                                )
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("tr", [
+                            _c("td", [_vm._v("Otros Pagos S/")]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: c.mora,
+                                    expression: "c.mora"
+                                  }
+                                ],
+                                staticClass: "form-control",
+                                attrs: {
+                                  type: "number",
+                                  min: "0",
+                                  placeholder: "No puede dejar este campo vacio"
+                                },
+                                domProps: { value: c.mora },
                                 on: {
-                                  click: function($event) {
-                                    _vm.showpagoporcion = true
-                                    _vm.botoncuota = false
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(c, "mora", $event.target.value)
                                   }
                                 }
-                              },
-                              [_vm._v("Pagar porción")]
-                            )
+                              })
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _c("tr", {}, [
+                            _c("td", [_vm._v("Total a Pagar")]),
+                            _vm._v(" "),
+                            _c("td", {
+                              staticClass: "bg bg-warning text-white",
+                              domProps: {
+                                textContent: _vm._s(
+                                  "S/. " +
+                                    (
+                                      parseFloat(c.mora) +
+                                      parseFloat(_vm.totalpagar)
+                                    ).toFixed(2)
+                                )
+                              }
+                            })
                           ])
                         ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("h5", { staticClass: "font-weight-bold" }, [
+                        _vm._v("Descripción")
                       ]),
                       _vm._v(" "),
-                      _vm.showpagoporcion
-                        ? [
-                            _vm._m(3, true),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "col-md-2" }, [
-                              _c("p", { staticClass: "font-weight-bold" }, [
-                                _vm._v("Ingresar Monto S/")
-                              ]),
-                              _vm._v(" "),
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.montoporcion,
-                                    expression: "montoporcion"
-                                  }
-                                ],
-                                staticClass: "col-md-12",
-                                attrs: {
-                                  required: "",
-                                  type: "Number",
-                                  max: c.monto,
-                                  min: "0",
-                                  placeholder: "Ingrese el monto a pagar"
-                                },
-                                domProps: { value: _vm.montoporcion },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.montoporcion = $event.target.value
-                                  }
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "col-md-2" }, [
-                              _c("p", { staticClass: "font-weight-bold" }, [
-                                _vm._v("Otros Pagos S/")
-                              ]),
-                              _vm._v(" "),
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.otroscostosporcion,
-                                    expression: "otroscostosporcion"
-                                  }
-                                ],
-                                attrs: {
-                                  type: "Number",
-                                  min: "0",
-                                  placeholder: "Ingrese cantidad"
-                                },
-                                domProps: { value: _vm.otroscostosporcion },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.otroscostosporcion = $event.target.value
-                                  }
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "col-md-8" }, [
-                              _c("p", { staticClass: "font-weight-bold" }, [
-                                _vm._v("Descripción")
-                              ]),
-                              _vm._v(" "),
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.descpagoporcion,
-                                    expression: "descpagoporcion"
-                                  }
-                                ],
-                                staticClass: "col-md-12",
-                                attrs: {
-                                  type: "text",
-                                  oninput:
-                                    "this.value = this.value.toUpperCase();"
-                                },
-                                domProps: { value: _vm.descpagoporcion },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.descpagoporcion = $event.target.value
-                                  }
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "col-md-12" }, [
-                              _c("hr"),
-                              _vm._v(" "),
-                              _c(
+                      _c("textarea", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.descpagocuota,
+                            expression: "descpagocuota"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          rows: "3",
+                          oninput: "this.value = this.value.toUpperCase();"
+                        },
+                        domProps: { value: _vm.descpagocuota },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.descpagocuota = $event.target.value
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-12" }, [
+                      _c("hr"),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-md-9" }, [
+                          _vm.botoncuota
+                            ? _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-danger",
+                                  staticClass: "btn btn-success col-md-4",
                                   attrs: { type: "button" },
                                   on: {
                                     click: function($event) {
-                                      _vm.showpagoporcion = false
-                                      _vm.botoncuota = true
-                                    }
-                                  }
-                                },
-                                [_vm._v("Cerrar")]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-success",
-                                  attrs: { type: "button" },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.pagarPorcionCuota(
+                                      return _vm.pagarCuota(
                                         c.id,
-                                        c.tipocambio,
-                                        c.tasa
+                                        c.otroscostos,
+                                        c.idpersona
                                       )
                                     }
                                   }
                                 },
-                                [_vm._v("Confirmar pago")]
+                                [_vm._v("Pagar Cuota")]
                               )
-                            ])
-                          ]
-                        : _vm._e()
-                    ],
-                    2
-                  )
+                            : _vm._e()
+                        ])
+                      ])
+                    ])
+                  ])
                 }),
                 0
               )
@@ -44018,20 +43791,6 @@ var staticRenderFns = [
       _c("h5", {}, [
         _c("i", { staticClass: "fa fa-money  " }),
         _vm._v(" Detalle del Pago")
-      ]),
-      _vm._v(" "),
-      _c("hr")
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-md-12" }, [
-      _c("hr"),
-      _vm._v(" "),
-      _c("h5", { staticClass: "font-weight-bold" }, [
-        _vm._v("Pagar Porción de Cuota")
       ]),
       _vm._v(" "),
       _c("hr")
@@ -58733,7 +58492,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
