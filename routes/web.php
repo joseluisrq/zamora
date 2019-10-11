@@ -47,6 +47,9 @@ Route::post('/aporte/registrar', 'AporteController@store');
 Route::post('/cuentaahorros/crear', 'CuentaAhorroController@store');
 
 
+//simulaciones
+Route::get('/simulacion/listaSilumaciones', 'SimuladorController@listaSilumaciones');//listar creditos
+Route::post('/simulacion/guardarSimulacion', 'SimuladorController@guardarSimulacion');
 
 
 //pdf

@@ -3761,6 +3761,360 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/creditos/SimularCreditos.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/creditos/SimularCreditos.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      //datos de nuevo credito
+      ruta: 'http://127.0.0.1:8000',
+      idcliente: 0,
+      montodesembolsado: 1000,
+      numerocuotas: 12,
+      tasa: 13,
+      periodo: 1,
+      fechadesembolso: '2019-09-01',
+      fechaprimeracuota: '2019-09-01',
+      //arrary Credito
+      newCredito: [],
+      //array Cuotas
+      newCuotas: [],
+      //aarayClientes
+      arrayCliente: [],
+      dni: '70212063',
+      nombresapellidos: 'JOSE LUIS RAMIREZ QUIROZ',
+      //control de vistas
+      viewAgregar: 'listar',
+      viewCuotas: false,
+      verlista: false,
+      //Control de errores
+      errorCredito: 0,
+      errorMostrarMsjCredito: [],
+      arrayAuxliar: [],
+      idcredito: 0
+    };
+  },
+  methods: {
+    editar_fecha: function editar_fecha(fecha, intervalo, dma, separador) {
+      var separador = separador || "-";
+      var arrayFecha = fecha.split(separador);
+      var dia = arrayFecha[2];
+      var mes = arrayFecha[1];
+      var anio = arrayFecha[0];
+      var fechaInicial = new Date(anio, mes - 1, dia);
+      var fechaFinal = fechaInicial;
+
+      if (dma == "m" || dma == "M") {
+        fechaFinal.setMonth(fechaInicial.getMonth() + parseInt(intervalo));
+      } else if (dma == "y" || dma == "Y") {
+        fechaFinal.setFullYear(fechaInicial.getFullYear() + parseInt(intervalo));
+      } else if (dma == "d" || dma == "D") {
+        fechaFinal.setDate(fechaInicial.getDate() + parseInt(intervalo));
+      } else {
+        return fecha;
+      }
+
+      dia = fechaFinal.getDate();
+      mes = fechaFinal.getMonth() + 1;
+      anio = fechaFinal.getFullYear();
+      dia = dia.toString().length == 1 ? "0" + dia.toString() : dia;
+      mes = mes.toString().length == 1 ? "0" + mes.toString() : mes;
+      return anio + "-" + mes + "-" + dia;
+    },
+    agregarCuotas: function agregarCuotas() {
+      this.newCuotas.length = 0;
+      var me = this;
+
+      if (this.montodesembolsado == 0 || this.numerocuotas == 0 || this.periodo == '0' || this.tasa == '0') {
+        Swal.fire({
+          position: 'top-end',
+          type: 'error',
+          title: 'Inserte información en los campos obligatorios',
+          showConfirmButton: false,
+          timer: 2000
+        });
+      } else {
+        //  me.btnregistar=1;
+        var montotal = this.montodesembolsado;
+        var contadoraux = 1; //cuota neta
+
+        var cuotaneta = (this.montodesembolsado / this.numerocuotas).toFixed(2); //saldo pendienteneto =monto desembolsado- montopor cuota
+
+        var saldop = (parseFloat(this.montodesembolsado) - parseFloat(cuotaneta)).toFixed(2); //FECHA
+
+        var e = new Date(me.fechadesembolso);
+        var pe = me.periodo; // var dia=e.getDate();//
+
+        var dia = me.fechadesembolso.substr(-2);
+        var unmesmas = this.editar_fecha(me.fechadesembolso, me.periodo, "m");
+
+        for (var i = 0; i < me.numerocuotas; i++) {
+          if (i + 1 == me.numerocuotas) saldop = 0;
+          me.newCuotas.push({
+            //(monto total+tasa)/cantidadde cuotas
+            monto: cuotaneta,
+            fechapago: unmesmas,
+            saldopendiente: saldop,
+            otroscostos: 0.0,
+            descripcion: '',
+            contador: contadoraux
+          });
+          saldop = (parseFloat(saldop) - parseFloat(cuotaneta)).toFixed(2);
+          contadoraux++;
+          pe = parseInt(pe) + parseInt(me.periodo);
+          unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+        }
+
+        this.viewCuotas = true;
+      } //fin del else
+
+    },
+    limpiar: function limpiar() {
+      this.montodesembolsado = 0;
+      this.numerocuotas = 0;
+      this.tasa = 0;
+      this.periodo = 0;
+      this.fechadesembolso = '';
+      this.idcliente = 0, this.viewCuotas = false;
+    },
+    registrarCredito: function registrarCredito() {
+      var _this = this;
+
+      if (this.validarCredito()) {
+        return;
+      }
+
+      var me = this;
+      Swal.fire({
+        title: 'Registrar Simulación',
+        text: "",
+        type: 'success',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Si'
+      }).then(function (result) {
+        if (result.value) {
+          axios.post(_this.ruta + '/simulacion/guardarSimulacion', {
+            'montodesembolsado': _this.montodesembolsado,
+            'fechadesembolso': _this.fechadesembolso,
+            'fechaprimeracuota': _this.fechaprimeracuota,
+            'numerocuotas': _this.numerocuotas,
+            'tasa': _this.tasa,
+            'periodo': _this.periodo,
+            'dni': _this.dni,
+            'nombresapellidos': _this.nombresapellidos
+          }).then(function (response) {
+            Swal.fire('Credito Registrado', 'Correctamente', 'success');
+            var respuesta = response.data;
+            me.idcredito = respuesta.idcredito;
+            me.viewAgregar = 'detalle';
+          })["catch"](function (error) {
+            console.log(error);
+          });
+        }
+      });
+    },
+    validarCredito: function validarCredito() {
+      this.errorCredito = 0;
+      this.errorMostrarMsjCredito = [];
+      if (!this.dni) this.errorMostrarMsjCredito.push("Ingrese DNI de cliente solicitante");
+      if (!this.nombresapellidos) this.errorMostrarMsjCredito.push("Ingrese Nmobres y Apellidos del cliente solicitante");
+      if (this.montodesembolsado == 0) this.errorMostrarMsjCredito.push("El monto a desembolsar no puede ser 0");
+      if (!this.fechadesembolso) this.errorMostrarMsjCredito.push("Seleccione una fecha de desembolso");
+      if (!this.fechaprimeracuota) this.errorMostrarMsjCredito.push("Seleccione una fecha de la primera cuota");
+      if (this.numerocuotas == 0) this.errorMostrarMsjCredito.push("Ingrese el número de cuotas");
+      if (this.tipocambio == 0) this.errorMostrarMsjCredito.push("Ingrese el tipo de cambio");
+      if (this.tasa == 0) this.errorMostrarMsjCredito.push("La tasa de interes no puede ser 0"); //si al menos tenemosun error enotnces errorCredito=1
+
+      if (this.errorMostrarMsjCredito.length) this.errorCredito = 1;
+      return this.errorCredito;
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/personas/PersonaDetalle.vue?vue&type=script&lang=js&":
 /*!**********************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/personas/PersonaDetalle.vue?vue&type=script&lang=js& ***!
@@ -43803,6 +44157,694 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/creditos/SimularCreditos.vue?vue&type=template&id=2102dcd5&":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/creditos/SimularCreditos.vue?vue&type=template&id=2102dcd5& ***!
+  \***************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "main",
+    [
+      _vm.viewAgregar == "agregar"
+        ? [
+            _c("div", { staticClass: "row" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-warning",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      _vm.viewAgregar = "listar"
+                      _vm.limpiar()
+                    }
+                  }
+                },
+                [
+                  _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                  _vm._v(" Lista de Simulaciones\n        ")
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm._m(0),
+                    _vm._v(" "),
+                    _c(
+                      "form",
+                      { staticClass: "forms-sample mt-4" },
+                      [
+                        _c("div", { staticClass: "row" }, [
+                          _c("div", { staticClass: "col-md-4 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputUsername1" } },
+                              [_vm._v("DNI del Cliente")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.dni,
+                                  expression: "dni"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Codigo de Credito"
+                              },
+                              domProps: { value: _vm.dni },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.dni = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-8 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputUsername1" } },
+                              [_vm._v("Nombres y Apellidos del Cliente")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.nombresapellidos,
+                                  expression: "nombresapellidos"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Nombres y apellidos  completos "
+                              },
+                              domProps: { value: _vm.nombresapellidos },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.nombresapellidos = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Monto")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.montodesembolsado,
+                                  expression: "montodesembolsado"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "number",
+                                placeholder: "Monto en Soles"
+                              },
+                              domProps: { value: _vm.montodesembolsado },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.montodesembolsado = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("N° Cuotas")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.numerocuotas,
+                                  expression: "numerocuotas"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "number",
+                                placeholder: "Número de Cuotas"
+                              },
+                              domProps: { value: _vm.numerocuotas },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.numerocuotas = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Tasa de Interés")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.tasa,
+                                  expression: "tasa"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Número de Telefono"
+                              },
+                              domProps: { value: _vm.tasa },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.tasa = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Periodo")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.periodo,
+                                    expression: "periodo"
+                                  }
+                                ],
+                                staticClass: "form-control ",
+                                on: {
+                                  change: function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.periodo = $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  }
+                                }
+                              },
+                              [
+                                _c("option", { attrs: { value: "1" } }, [
+                                  _vm._v("Mensual")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "2" } }, [
+                                  _vm._v("Bimestral")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "3" } }, [
+                                  _vm._v("Trimestral")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "6" } }, [
+                                  _vm._v("Semestral")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "12" } }, [
+                                  _vm._v("Anual")
+                                ])
+                              ]
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Fecha de Desembolso")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.fechadesembolso,
+                                  expression: "fechadesembolso"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "date",
+                                placeholder: "Número de Telefono"
+                              },
+                              domProps: { value: _vm.fechadesembolso },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.fechadesembolso = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Fecha de Primera Cuota")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.fechaprimeracuota,
+                                  expression: "fechaprimeracuota"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "date",
+                                placeholder: "Número de Telefono"
+                              },
+                              domProps: { value: _vm.fechaprimeracuota },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.fechaprimeracuota = $event.target.value
+                                }
+                              }
+                            })
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-warning mr-2 ",
+                            attrs: { type: "button " },
+                            on: {
+                              click: function($event) {
+                                $event.preventDefault()
+                                return _vm.agregarCuotas()
+                              }
+                            }
+                          },
+                          [
+                            _c("i", {
+                              staticClass:
+                                "mdi mdi-arrange-send-to-back mdi-24px"
+                            }),
+                            _vm._v(" Generar Cuotas \n                        ")
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _vm.viewCuotas
+                          ? _c("div", { staticClass: "table-responsive" }, [
+                              _c(
+                                "table",
+                                { staticClass: "table  table-bordered" },
+                                [
+                                  _vm._m(1),
+                                  _vm._v(" "),
+                                  _vm.newCuotas.length
+                                    ? _c(
+                                        "tbody",
+                                        _vm._l(_vm.newCuotas, function(c) {
+                                          return _c("tr", { key: c.id }, [
+                                            _c("td", { staticClass: "py-1" }, [
+                                              _vm._v(_vm._s(c.contador))
+                                            ]),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(c.fechapago)
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(c.monto)
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(c.monto)
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(c.monto)
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  c.saldopendiente
+                                                )
+                                              }
+                                            })
+                                          ])
+                                        }),
+                                        0
+                                      )
+                                    : _c("tbody", [_vm._m(2)])
+                                ]
+                              )
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c("hr"),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          {
+                            directives: [
+                              {
+                                name: "show",
+                                rawName: "v-show",
+                                value: _vm.errorCredito,
+                                expression: "errorCredito"
+                              }
+                            ],
+                            staticClass: " form-group col-md-12 mt-2 bg-danger"
+                          },
+                          [
+                            _c(
+                              "div",
+                              { staticClass: "text-center" },
+                              _vm._l(_vm.errorMostrarMsjCredito, function(
+                                error
+                              ) {
+                                return _c("div", { key: error }, [
+                                  _c(
+                                    "mark",
+                                    {
+                                      staticClass:
+                                        "bg-danger text-white col-md-12"
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass:
+                                          "fa fa-exclamation-triangle"
+                                      }),
+                                      _vm._v(" " + _vm._s(error))
+                                    ]
+                                  )
+                                ])
+                              }),
+                              0
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _vm.viewCuotas
+                          ? [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary mr-2 ",
+                                  attrs: { type: "button " },
+                                  on: {
+                                    click: function($event) {
+                                      $event.preventDefault()
+                                      return _vm.registrarCredito()
+                                    }
+                                  }
+                                },
+                                [_vm._v("Registrar  Simulación")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-light ",
+                                  on: {
+                                    click: function($event) {
+                                      _vm.viewCuotas = false
+                                      _vm.limpiar()
+                                    }
+                                  }
+                                },
+                                [_vm._v("Cancelar")]
+                              )
+                            ]
+                          : _vm._e()
+                      ],
+                      2
+                    )
+                  ])
+                ])
+              ])
+            ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.viewAgregar == "detalle"
+        ? [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-warning",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    _vm.viewAgregar = "agregar"
+                    _vm.limpiar()
+                  }
+                }
+              },
+              [
+                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _vm._v(" Nueva simulacion\n    ")
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-warning",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    _vm.viewAgregar = "listar"
+                    _vm.limpiar()
+                  }
+                }
+              },
+              [
+                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _vm._v(" Lista de Simulaciones\n    ")
+              ]
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "row" }, [
+              _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-body" }, [
+                    _c("h1", [
+                      _vm._v(
+                        "\n                        Simulación de Préstamo\n                    "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("hr"),
+                    _vm._v(" "),
+                    _c("h3", { staticClass: "text-dark font-weight-bold" }, [
+                      _vm._v("Información del Cliente")
+                    ]),
+                    _vm._v(" "),
+                    _c("p", [_vm._v("Dni : " + _vm._s(_vm.dni))]),
+                    _vm._v(" "),
+                    _c("p", [
+                      _vm._v("Nombres: " + _vm._s(_vm.nombresapellidos))
+                    ]),
+                    _vm._v(" "),
+                    _c("hr"),
+                    _vm._v(" "),
+                    _c("h3", { staticClass: "text-dark font-weight-bold" }, [
+                      _vm._v("Información del Crédito")
+                    ]),
+                    _vm._v(" "),
+                    _c("p", [
+                      _vm._v(
+                        "Monto de Crédito: " + _vm._s(_vm.montodesembolsado)
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("p", [_vm._v("Tasa(TEA): " + _vm._s(_vm.tasa) + " %")]),
+                    _vm._v(" "),
+                    _c("p", [
+                      _vm._v(
+                        "Número de Cuotas: " + _vm._s(_vm.numerocuotas) + " %"
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _vm.periodo == 1
+                      ? _c("p", [_vm._v("Periodo: Mensual ")])
+                      : _vm.periodo == 2
+                      ? _c("p", [_vm._v("Periodo: Bimestral ")])
+                      : _vm.periodo == 3
+                      ? _c("p", [_vm._v("Periodo: Trimestral ")])
+                      : _vm.periodo == 6
+                      ? _c("p", [_vm._v("Periodo: Semestral ")])
+                      : _vm.periodo == 12
+                      ? _c("p", [_vm._v("Periodo: Anual ")])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("hr"),
+                    _vm._v(" "),
+                    _c("button", { staticClass: "btn  btn-success" }, [
+                      _vm._v("Descargar Tabla de amortización")
+                    ])
+                  ])
+                ])
+              ])
+            ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.viewAgregar == "listar"
+        ? [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-warning",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    _vm.viewAgregar = "agregar"
+                    _vm.limpiar()
+                  }
+                }
+              },
+              [
+                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _vm._v(" Nueva simulacion\n    ")
+              ]
+            )
+          ]
+        : _vm._e()
+    ],
+    2
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row bg bg-dark" }, [
+      _c("div", { staticClass: "col-md-12 mt-2 text-white" }, [
+        _c("h4", [
+          _c("i", { staticClass: "mdi mdi-package-variant-closed mdi-36px" }),
+          _vm._v(" Simulador de Crédito")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", { staticClass: "table-info text-white" }, [
+      _c("tr", [
+        _c("th", [_vm._v("Cuota ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Fecha de Pago ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Monto de Cuota ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Capital ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Interés ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Saldo ")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", { attrs: { colspan: "6" } }, [
+        _vm._v(
+          "\n                                    Inserte la información requerida\n                                    "
+        )
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/personas/PersonaDetalle.vue?vue&type=template&id=68654318&":
 /*!**************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/personas/PersonaDetalle.vue?vue&type=template&id=68654318& ***!
@@ -57565,6 +58607,7 @@ Vue.component('detallepersona', __webpack_require__(/*! ./components/personas/Pe
 Vue.component('listaroles', __webpack_require__(/*! ./components/personas/RolesLista.vue */ "./resources/js/components/personas/RolesLista.vue")["default"]);
 Vue.component('crearcuentaahorro', __webpack_require__(/*! ./components/ahorros/CrearCuentaAhorro.vue */ "./resources/js/components/ahorros/CrearCuentaAhorro.vue")["default"]);
 Vue.component('aportes', __webpack_require__(/*! ./components/aportes/Aportes.vue */ "./resources/js/components/aportes/Aportes.vue")["default"]);
+Vue.component('simularcreditos', __webpack_require__(/*! ./components/creditos/SimularCreditos.vue */ "./resources/js/components/creditos/SimularCreditos.vue")["default"]);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -57574,7 +58617,7 @@ Vue.component('aportes', __webpack_require__(/*! ./components/aportes/Aportes.vu
 var app = new Vue({
   el: '#app',
   data: {
-    menu: 90,
+    menu: 31,
     ruta: 'http://127.0.0.1:8000'
   }
 });
@@ -58186,6 +59229,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PagarCuota_vue_vue_type_template_id_273be8ba___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PagarCuota_vue_vue_type_template_id_273be8ba___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/creditos/SimularCreditos.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/creditos/SimularCreditos.vue ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _SimularCreditos_vue_vue_type_template_id_2102dcd5___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SimularCreditos.vue?vue&type=template&id=2102dcd5& */ "./resources/js/components/creditos/SimularCreditos.vue?vue&type=template&id=2102dcd5&");
+/* harmony import */ var _SimularCreditos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SimularCreditos.vue?vue&type=script&lang=js& */ "./resources/js/components/creditos/SimularCreditos.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _SimularCreditos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _SimularCreditos_vue_vue_type_template_id_2102dcd5___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _SimularCreditos_vue_vue_type_template_id_2102dcd5___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/creditos/SimularCreditos.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/creditos/SimularCreditos.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/creditos/SimularCreditos.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_SimularCreditos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./SimularCreditos.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/creditos/SimularCreditos.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_SimularCreditos_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/creditos/SimularCreditos.vue?vue&type=template&id=2102dcd5&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/creditos/SimularCreditos.vue?vue&type=template&id=2102dcd5& ***!
+  \*********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SimularCreditos_vue_vue_type_template_id_2102dcd5___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./SimularCreditos.vue?vue&type=template&id=2102dcd5& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/creditos/SimularCreditos.vue?vue&type=template&id=2102dcd5&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SimularCreditos_vue_vue_type_template_id_2102dcd5___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SimularCreditos_vue_vue_type_template_id_2102dcd5___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

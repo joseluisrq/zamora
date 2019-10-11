@@ -13,6 +13,9 @@
             <template v-if="menu==30">
                     <nuevocredito></nuevocredito>
              </template>
+             <template v-if="menu==31">
+                    <simularcreditos></simularcreditos>
+             </template>
              <template v-if="menu==40">
                     <listarcredito :ruta="ruta"></listarcredito>
              </template>

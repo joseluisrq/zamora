@@ -39,6 +39,8 @@ Vue.component('listaroles', require('./components/personas/RolesLista.vue').defa
 Vue.component('crearcuentaahorro', require('./components/ahorros/CrearCuentaAhorro.vue').default);
 Vue.component('aportes', require('./components/aportes/Aportes.vue').default);
 
+
+Vue.component('simularcreditos', require('./components/creditos/SimularCreditos.vue').default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -48,7 +50,7 @@ Vue.component('aportes', require('./components/aportes/Aportes.vue').default);
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 90,
+        menu: 31,
         ruta: 'http://127.0.0.1:8000',
 
     },
