@@ -7,7 +7,9 @@
                     <div class="card-body ">
                         <div class="row bg bg-dark ">
                             <div class="col-md-12 mt-2 text-white ">
-                                <h4>Detalle de Crédtio</h4>
+                                <h4>Detalle de Crédtio
+
+                                    </h4>
 
                             </div>
                         </div>
@@ -17,16 +19,18 @@
                                     <!--INFORMACION DEL SOCIO-->
                                    
                                     <div class="row" v-for="c in arrayCreditos" :key="c.id">
-                                        <div class="col-md-9">
+                                        <div class="col-md-7">
                                             <h4 class="text-dark font-weight-bold">
-                                                <i class="mdi mdi-package-variant-closed mdi-36px"></i>Informacón del Crédito </h4>
+                                                <i class="mdi mdi-package-variant-closed mdi-36px"></i>Información del Crédito </h4>
                                             <hr>
                                         </div>
-                                        <div class="col-md-3 ">
+                                        <div class="col-md-5 ">
                                             <button type="button" @click="pdfCronograma()" class="btn btn-danger btn-icon-text">
                                                 <i class="mdi mdi-file-pdf btn-icon-prepend"></i>                                                    
                                                 Descargar Cronograma
                                             </button>
+                                             <button v-if="arrayCreditos[0].estadodesembolso==0" class="btn btn-success"> Desembolsar</button>
+                                
 
                                         </div>
 
@@ -37,30 +41,42 @@
                                             <p v-text="c.numeroprestamo"></p>
                                         </div>
                                         <div class="col-md-3 ">
-                                            <h5 class="font-weight-bold ">Monto:</h5>
-                                             <p v-text="c.montodesembolsado"></p>
+                                            <h5 class="font-weight-bold ">Monto Financiado:</h5>
+                                             <p v-text="'S/ '+c.montodesembolsado"></p>
                                         </div>
                                         <div class="col-md-3 ">
                                             <h5 class="font-weight-bold ">Número de Cuotas</h5>
-                                             <p v-text="c.numerocuotas"></p>
+                                             <p v-text="c.numerocuotas+'Cuotas'"></p>
                                         </div>
                                         <div class="col-md-3 ">
-                                            <h5 class="font-weight-bold ">Tasa de Interes:</h5>
-                                            <p v-text="c.tasa"></p>
+                                            <h5 class="font-weight-bold ">TEA(Tasa de interes anual)</h5>
+                                            <p >{{c.tasa}} % </p>
+                                        </div>
+                                        
+                                        <div class="col-md-3 ">
+                                            <h5 class="font-weight-bold ">Interes Total</h5>
+                                            <p > S/ {{c.interes}}</p>
+                                        </div>
+                                        <div class="col-md-3 ">
+                                            <h5 class="font-weight-bold ">Monto total a Pagar</h5>
+                                            <p > S/ {{parseFloat(c.montodesembolsado)+parseFloat(c.interes)}}</p>
                                         </div>
                                         <div class="col-md-3 ">
                                             <h5 class="font-weight-bold ">Periodo</h5>
-                                              <p v-text="c.periodo"></p>
+                                              <p v-if="c.periodo==1">Anual</p>
+                                                <p v-if="c.periodo==2">Semestral</p>
+                                                  <p v-if="c.periodo==4">Trimestral</p>
+                                                   <p v-if="c.periodo==12">Mensual</p>
                                         </div>
                                         <div class="col-md-3">
-                                            <h5 class="font-weight-bold ">Creado por:</h5>
+                                            <h5 class="font-weight-bold ">Analista del Crédito</h5>
                                              <p v-text="c.usernombre+' '+c.userapellidos"></p>
                                         </div>
 
                                         <!--INFORMACIONde credito-->
                                           <div class="col-md-12 ">
                                             <h4 class="text-dark font-weight-bold">
-                                                <i class="mdi mdi-account-location mdi-36px"></i>Informacón del Socio </h4>
+                                                <i class="mdi mdi-account-location mdi-36px"></i>Información del Socio </h4>
                                             <hr>
                                         </div>
 
@@ -88,6 +104,37 @@
                                             <h5 class="font-weight-bold ">Email:</h5>
                                             <p v-text="c.socioemail"></p>
                                         </div>
+                                         <!--INFORMACIONde credito-->
+                                          <div class="col-md-12 ">
+                                            <h4 class="text-dark font-weight-bold">
+                                                <i class="mdi mdi-account-location mdi-36px"></i>Información del Garante </h4>
+                                            <hr>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <h5 class="font-weight-bold ">DNI:</h5>
+                                            <p v-text="c.garantedni"></p>
+                                        </div>
+                                        <div class="col-md-3 ">
+                                            <h5 class="font-weight-bold ">Nombres y apellidos:</h5>
+                                            <p v-text="c.garantenombre+' '+c.garanteapellidos"></p>
+                                        </div>
+                                        <div class="col-md-3 ">
+                                            <h5 class="font-weight-bold ">Fecha nacimiento:</h5>
+                                             <p v-text="c.garantefechanacimiento"></p>
+                                        </div>
+                                        <div class="col-md-3 ">
+                                            <h5 class="font-weight-bold ">Dirección:</h5>
+                                              <p v-text="c.garantedireccion"></p>
+                                        </div>
+                                        <div class="col-md-3 ">
+                                            <h5 class="font-weight-bold ">Teléfono:</h5>
+                                            <p v-text="c.garantetelefono"></p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <h5 class="font-weight-bold ">Email:</h5>
+                                            <p v-text="c.garanteemail"></p>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -103,9 +150,9 @@
                                                 <th>Cuota </th>
                                                 <th>Boucher </th>
                                                 <th>Fecha </th>
-                                                <th>Monto de Cuota </th>
-                                                <th> Capital </th>
-                                                <th> Interés </th>
+                                                <th>Cuota </th>
+                                                <th> Interes </th>
+                                                <th> Amortización </th>
                                                 <th> Saldo </th>
                                                 <th> Cajero</th>
                                                 <th> Estado </th>
@@ -138,8 +185,8 @@
                                                 </template>
                                                 
                                                 <td v-text="cu.monto"></td>
-                                                <td v-text="cu.monto"></td>
-                                                <td v-text="cu.mora"></td>
+                                                <td v-text="cu.interes"></td>
+                                                <td v-text="cu.amortizacion"></td>
                                                 <td v-text="cu.saldopendiente"></td>
 
                                                 <td v-if="cu.estado==1">{{cu.nombre}} {{cu.apellidos}}</td>

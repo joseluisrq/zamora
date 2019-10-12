@@ -15,7 +15,7 @@
                     <form class="forms-sample mt-4">
                         <div class="row">
                             <div class="col-md-6 form-group">
-                                <label for="exampleInputUsername1">Ingrese DNI 
+                                <label for="exampleInputUsername1">Ingrese DNI del Socio 
                                 </label>
                                 <v-select
                                     :on-search="selectCliente"
@@ -33,12 +33,81 @@
                             </div>
                             <div class="col-md-3"></div>
                             <div class="col-md-3 form-group">
-                                <label for="exampleInputUsername1">Si el socio no esta registrado </label>
-                                <br><button class="btn btn-success "> <i class="mdi mdi-clipboard-account"></i>  Agregar Socio</button>
+                                
+                                <br>
+                                <template v-if="registropersona==true">
+                                    <button class="btn btn-success" type="button" @click="registropersona=false;garanteestado=0" > <i class="mdi mdi-clipboard-account"></i>  Sin Garante</button>
+                                </template>
+                                <template v-else>
+                                    <button class="btn btn-success" type="button" @click="registropersona=true;garanteestado=1" > <i class="mdi mdi-clipboard-account"></i>  Agregar Garante</button>
+                                </template>
+                                  </div>
+                            <template v-if="registropersona==true" >
+                                
+                                     <div class="col-md-12 form-group ">
+                                         <hr>
+                                            <h3 class="font-weight-bold"> Formulario de Garante </h3> 
+                                      </div>
+                                     <div class="col-md-2 form-group">
+                                        <label for="exampleInputUsername1" class=" text-dark">DNI de Socio</label>
+                                        <input type="text" class="form-control" v-model="dnig" placeholder="Ingrese DNI" >
+                                    </div>
+
+                                    <div class="col-md-3 form-group ">
+                                        <label for="exampleInputUsername1" class=" text-dark">Nombres Completos</label>
+                                        <input type="text" class="form-control" v-model="nombreg" placeholder="Ingrese nombres completos" >
+                                    </div>
+
+                                      <div class="col-md-3 form-group">
+                                        <label for="exampleInputUsername1" class=" text-dark">Apellidos Completos</label>
+                                        <input type="text" class="form-control" v-model="apellidosg" placeholder="Ingrese apellidos completos" >
+                                    </div>
+                                     <div class="col-md-2 form-group">
+                                        <label for="exampleInputUsername1" class=" text-dark">Fecha Nacimiento</label>
+                                        <input type="date" class="form-control" v-model="fechanacimientog" placeholder="" >
+                                    </div>
+                                     <div class="col-md-2 form-group">
+                                        <label for="exampleInputUsername1"  class=" text-dark">Departamento</label>
+                                        <input type="text" class="form-control" v-model="departamentog" placeholder="Departamento" >
+                                    </div>
+                                    <div class="col-md-3 form-group ">
+                                        <label for="exampleInputUsername1"  class=" text-dark">Ciudad</label>
+                                        <input type="text" class="form-control" v-model="ciudadg" placeholder="Ciudad" >
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label for="exampleInputUsername1"  class=" text-dark">Direccion</label>
+                                        <input type="text" class="form-control" v-model="direcciong" placeholder="Dirección" >
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label for="exampleInputUsername1"  class=" text-dark">Teléfono</label>
+                                        <input type="text" class="form-control" v-model="telefonog" placeholder="Número de Teléfono" >
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label for="exampleInputUsername1"  class=" text-dark">Correo Electrónico</label>
+                                        <input type="text" class="form-control" v-model="emailg" placeholder="Correo Electrónico" >
+                                    </div>
+                                                                  
+                                    
+                                    
+                                
+                            </template>
+                            
+                            <template v-if="registrogarante==true">
+                                <div class="row">
+                                     <div class="col-md-2 form-group">
+                                        <label for="exampleInputUsername1">Codigo de Crédito</label>
+                                        <input type="text" class="form-control" v-model="numeroprestamo" placeholder="Codigo de Credito" disabled>
+                                    </div>
+                                </div>
+                            </template>
+                            <div class="col-md-12">
+                                <hr>
+                                <h3 class="font-weight-bold"> Formulario de Crédito </h3> 
                             </div>
+                            
                             <div class="col-md-2 form-group">
                                 <label for="exampleInputUsername1">Codigo de Crédito</label>
-                                <input type="text" class="form-control" v-model="numeroprestamo" placeholder="Codigo de Credito">
+                                <input type="text" class="form-control" v-model="numeroprestamo" placeholder="Codigo de Credito" disabled>
                             </div>
                             <div class=" col-md-2 form-group">
                                 <label for="exampleInputEmail1">Monto</label>
@@ -53,13 +122,13 @@
                                 <input type="text"   class="form-control" v-model="tasa" placeholder="Número de Telefono">
                             </div>
                             <div class=" col-md-2 form-group">
-                                <label for="exampleInputEmail1">Periodo</label>
+                                <label for="exampleInputEmail1">Periodo dce Cuotas</label>
                                 <select class="form-control "  v-model="periodo"> 
-                                       <option value="1">Mensual</option>
-                                        <option value="2">Bimestral</option>
-                                        <option value="3">Trimestral</option>
-                                        <option value="6">Semestral</option>
-                                        <option value="12">Anual</option>
+                                        <option value=12 selected>Mensual</option>
+                                        <option value=1>Anual</option>
+                                        <option value=2>Semestral</option>
+                                        <option value=4>Trimestral</option>
+                                       
                                 </select>
                             </div>
                             <div class=" col-md-2 form-group">
@@ -78,27 +147,38 @@
                                     <tr>
                                         <th>Cuota </th>
                                         <th>Fecha de Pago </th>
-                                        <th>Monto de Cuota </th>
-                                        <th> Capital </th>
-                                        <th> Interés </th>
+                                        <th>Cuota </th>
+                                        <th> Interes </th>
+                                        <th> Amortización </th>
                                         <th> Saldo </th>
 
 
                                     </tr>
                                 </thead>
-                                <tbody v-if="newCuotas.length">
-                                    <tr v-for="c in newCuotas" :key="c.id">
-                                        <td class="py-1">{{c.contador}}</td>
-                                        <td v-text="c.fechapago"></td>
-                                        <td v-text="c.monto"></td>
-                                        <td v-text="c.monto"></td>
-                                         <td v-text="c.monto"></td>
-                                         <td v-text="c.saldopendiente"></td>
-                                        
-
+                                <template v-if="newCuotas.length">
+                                    <tbody >
+                                        <tr v-for="c in newCuotas" :key="c.id">
+                                            <td class="py-1">{{c.contador}}</td>
+                                            <td v-text="c.fechapago"></td>
+                                            <td v-text="'S/ '+c.monto"></td>
+                                            <td v-text="'S/ '+c.interes"></td>
+                                                <td v-text="'S/ '+c.amortizacion"></td>
+                                                <td v-text="'S/ '+c.saldopendiente"></td>
+                                        </tr>
+                                    </tbody>
+                                <tbody>
+                                    <tr class="bg bg-warning">
+                                        <td></td>
+                                        <td class="font-weight-bold">Total</td>
+                                        <td class="font-weight-bold"> S/{{totalcuotas}}</td>
+                                        <td class="font-weight-bold">S/ {{totalinteres}}</td>
+                                         <td class="font-weight-bold">S/ {{totalamortizacion}}</td>
+                                         <td></td>
                                     </tr>
-
                                 </tbody>
+                                </template>
+                                
+
                                 <tbody v-else>
                                 <tr>
                                     <td colspan="6">
@@ -154,6 +234,7 @@
                 numerocuotas:12,
                 tasa:13,
                 periodo:1,
+                interesprestamo:0,
                 fechadesembolso:'2019-09-01',
 
                 //arrary Credito
@@ -162,6 +243,8 @@
                 newCuotas:[],
                 //aarayClientes
                 arrayCliente:[],
+                registropersona:false,
+                registrogarante:false,
 
 
               
@@ -181,8 +264,26 @@
 
 
                 arrayAuxliar:[],
-                idcredito:0
-                }
+                idcredito:0,
+
+
+                totalcuotas:0,
+                totalinteres:0,
+                totalamortizacion:0  ,
+
+                //datos garante
+                dnig:'',
+                nombreg:'',
+                apellidosg:'',
+                fechanacimientog:'',
+                direcciong:'',
+                departamentog:'',
+                ciudadg:'',
+                telefonog:'',
+                emailg:'',
+
+                garanteestado:0
+                 }
         },
           components:{
             vSelect
@@ -232,51 +333,167 @@
                         })
                 }else{
                    //  me.btnregistar=1;
-                    var montotal=this.montodesembolsado; 
-                    var contadoraux=1;
-                    //cuota neta
-                    var cuotaneta=(this.montodesembolsado/this.numerocuotas).toFixed(2);
-                    //saldo pendienteneto =monto desembolsado- montopor cuota
-                    var saldop=(parseFloat(this.montodesembolsado)-parseFloat(cuotaneta)).toFixed(2);
-                
-                     //FECHA
+                    var periodofecha
+                    if(me.periodo==1)periodofecha=12
+                    else  if(me.periodo==2)periodofecha=6
+                    else  if(me.periodo==4)periodofecha=3
+                    else  if(me.periodo==12)periodofecha=1
+
+
                     var e = new Date(me.fechadesembolso);
-                    var pe=me.periodo
-                   // var dia=e.getDate();//
+                    var pe=periodofecha
                     var dia=me.fechadesembolso.substr(-2)
-                    var unmesmas = this.editar_fecha(me.fechadesembolso, me.periodo, "m");
+                    var unmesmas = this.editar_fecha(me.fechadesembolso, periodofecha, "m");
 
-                    for (let i = 0; i < me.numerocuotas; i++) { 
-                    
-                    if((i+1)==me.numerocuotas)saldop=0;
-                   
+                  
+                                       
+                    //INICIO DE FORMULAR
+                    var TIN = 0;
+                    var TA = 0;
+                    var TAN = 0;
+                    var AA = 0;
+                    var CUOTA = "";
+                    var I = 0;
+                    var AN = 0;
+                    var IN = 0;
+                    var A1 = 0;
+                    var CP2 = 0;
+                    var POT = 0;
+                    var CP1 = 0;
 
-                    me.newCuotas.push({
-                        //(monto total+tasa)/cantidadde cuotas
-                    
-                        monto:cuotaneta,
-                        fechapago:unmesmas,
-                        saldopendiente:saldop,
-                        otroscostos:0.0,
-                        descripcion:'',
-                        contador:contadoraux,
+                    var C = this.montodesembolsado;
+                    var J =  this.tasa/ 100;
+                    var N =this.numerocuotas;
+                    var D = 0;
 
-                    
-                    })
+                    N = Math.round(N);
+                    var M =this.periodo;
 
-                    saldop=(parseFloat(saldop)-parseFloat(cuotaneta)).toFixed(2);
-                    contadoraux++;
-                    pe= parseInt(pe)+parseInt(me.periodo);
-                    unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+
+                    var DD = 2;
+                    if (M == 1) {
+                        CUOTA = "ANUALES"
                     }
+                    if (M == 2) {
+                        CUOTA = "SEMESTRALES"
+                    }
+                    if (M == 4) {
+                        CUOTA = "TRIMESTRALES"
+                    }
+                    if (M == 12) {
+                        CUOTA = "MENSUALES"
+                    }  I = Math.pow(1 + J, 1 / M) - 1;
+                        AN = 0;
+                        IN = 0;
+                        A1 = 0;
+                        CP2 = C;
+                        POT = parseInt(D) - N;
+                        TIN = 0;
+                        TA = 0;
+                        TAN = 0;
+                    //FIN DE FORMULA
+                    for (var K = 0; K <= N; K++) {
+
+                        TIN = TIN + IN;
+                        TA = TA + A1;
+                        TAN = TAN + AN;
+                        if(K!=0){
+                             me.newCuotas.push({
+                            //(monto total+tasa)/cantidadde cuotas
+                            contador:K,
+                            monto:this.deci(AN, DD),
+                            interes:this.deci(IN, DD),
+                            amortizacion:this.deci(A1, DD),
+                            saldopendiente:this.deci(CP2, DD),
+                            fechapago:unmesmas,
+                                                  
+                        })
+                        }
+
+                       
+                        if(K!=0){
+                        pe= parseInt(pe)+parseInt(periodofecha);
+                        unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");}
+                    
+                       if (K < D) {
+                       
+                            AN = C * I;
+                            IN = C * I;
+                            A1 = 0;
+                            CP2 = C;
+                       
+                            }
+                        if (K == D) {
+                            
+                                AN = (C * I) / (1 - Math.pow(1 + I, POT));
+                                IN = C * I;
+                                A1 = AN - IN;
+                                CP2 = C - A1;
+                                CP1 = CP2;
+                        
+                        }
+
+                        if (K > D) {
+                            IN = CP1 * I;
+                            A1 = AN - IN;
+                            CP2 = CP1 - A1;
+                            CP1 = CP2;
+                        }
+
+                     }
+
+                     this.totalcuotas=this.deci(TAN, DD);
+                     this.totalinteres=this.deci(TIN, DD);
+                     this.totalamortizacion=this.deci(TA, DD)
+
+
+
     
                     this.viewCuotas=true;
 
                  }//fin del else
                
             },
+            deci(GG, KK){
+                 return (Math.round(GG * Math.pow(10, KK)) / Math.pow(10, KK));
+            },
+            codigoprestamo(){
+                let me=this;
+                var url= this.ruta+'/credito/ultimocredito';               
+                axios.get(url).then(function (response) {
+                let respuesta= response.data;
+                let idcreditou= respuesta.idultimocredito[0].id;
+                me.numeroprestamo='CZ'+me.zfill(idcreditou,6);
+                 
+                
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            },
+            zfill(number, width) {
+                var numberOutput = Math.abs(number); /* Valor absoluto del número */
+                var length = number.toString().length; /* Largo del número */ 
+                var zero = "0"; /* String de cero */  
+
+                if (width <= length) {
+                    if (number < 0) {
+                            return ("-" + numberOutput.toString()); 
+                    } else {
+                            return numberOutput.toString(); 
+                    }
+                } else {
+                    if (number < 0) {
+                        return ("-" + (zero.repeat(width - length)) + numberOutput.toString()); 
+                    } else {
+                        return ((zero.repeat(width - length)) + numberOutput.toString()); 
+                    }
+                }
+            },
+
             limpiar(){
-                this.numeroprestamo='';
+                this.codigoprestamo();
                 this.montodesembolsado=0; 
                 this.numerocuotas=0; 
                 this.tasa=0;               
@@ -333,10 +550,24 @@
                         'montodesembolsado': this.montodesembolsado,
                         'fechadesembolso' : this.fechadesembolso,                               
                         'numerocuotas' : this.numerocuotas,
+                        'interes':this.totalinteres,
                        
                         'tasa' : this.tasa,
                         'periodo' : this.periodo,
                         'idcliente' : this.idcliente,
+
+
+                        'dnig':this.dnig,
+                        'nombreg':this.nombreg,
+                        'apellidosg':this.apellidosg,
+                        'fechanacimientog':this.fechanacimientog,
+                        'direcciong':this.direcciong,
+                        'departamentog':this.departamentog,
+                        'ciudadg':this.ciudadg,
+                        'telefonog':this.telefonog,
+                        'emailg':this.emailg,
+
+
                         'data':this.newCuotas    
                         }).then(function (response) {
 
@@ -373,6 +604,9 @@
 
             }
             
+         },
+         mounted(){
+             this.codigoprestamo();
          }
       
 

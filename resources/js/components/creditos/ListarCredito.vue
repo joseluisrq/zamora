@@ -36,11 +36,11 @@
                                     <th> Fecha de Desembolso</th>
                                     <th> Monto Capital</th>
                                     <th> Tasa de Interes</th>
-                                    <th> Interes </th>
+                                  
                                     <th> N° Cuotas </th>
                                     <th> DNI Socio </th>
-                                    <th> Nombres Socio </th>
-                                    <th> Estados</th>
+                                    <th> Nombres del  Socio </th>
+                                    <th> Estado</th>
 
                                 </tr>
                             </thead>
@@ -70,9 +70,7 @@
                                     <td v-text="c.fechadesembolso"></td>
                                     <td v-text="'S/ '+c.montodesembolsado"></td>
                                      <td v-text="c.tasa+' %'"></td>
-                                    <td>S/ {{
-                                        parseFloat(c.montodesembolsado)*((c.tasa)/100)
-                                        }}</td>
+                                    
                                     <td v-text="c.numerocuotas"></td>
 
                                     <td v-text="c.sociodni"></td>

@@ -14,6 +14,8 @@
 Route::get('/credito', 'CreditoController@index');//listar creditos
 Route::get('/credito/detallecredito','CreditoController@detallecredito');//detalle credito
 Route::post('/credito/registrar', 'CreditoController@store');//registrar un nuevo credito
+Route::get('/credito/ultimocredito', 'CreditoController@ultimocredito');//listar creditos
+
 // PERSONAS
 Route::get('/listapersonas', 'PersonaController@index');
 Route::get('/detallepersona', 'PersonaController@detalle');

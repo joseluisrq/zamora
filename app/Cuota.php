@@ -8,7 +8,7 @@ class Cuota extends Model
 {
     protected $table='cuotas';
     protected $fillable=[
-        'id','numerodecuota','fechapago',
+        'id','numerodecuota','fechapago','interes','amortizacion',
         'fechacancelo','monto','saldopendiente',
         'mora','descripcion','estado'
     ];

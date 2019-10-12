@@ -37,6 +37,8 @@ class CreditoController extends Controller
                 'creditos.tasa',
                 'creditos.estado',
                 'creditos.periodo',
+                'creditos.interes',
+                'creditos.estadodesembolso',
 
                
                 'socio.dni as sociodni',
@@ -60,6 +62,8 @@ class CreditoController extends Controller
                     'creditos.tasa',
                     'creditos.estado',
                     'creditos.periodo',
+                    'creditos.interes',
+                    'creditos.estadodesembolso',
     
                    
                     'socio.dni as sociodni',
@@ -84,6 +88,8 @@ class CreditoController extends Controller
                     'creditos.tasa',
                     'creditos.estado',
                     'creditos.periodo',
+                    'creditos.interes',
+                    'creditos.estadodesembolso',
     
                    
                     'socio.dni as sociodni',
@@ -109,6 +115,18 @@ class CreditoController extends Controller
         ];
     }
 
+    public function ultimocredito(Request $request){
+        
+        $ultimo=Credito::select(
+        'creditos.id')
+        ->orderBy('creditos.id', 'desc')
+        ->take(1)->get();
+
+        return[
+            'idultimocredito'=> $ultimo
+        ];
+    }
+
     //Detalle de un credito recibe id
     public function detallecredito(Request $request){
         $id=$request->id;
@@ -125,6 +143,8 @@ class CreditoController extends Controller
                 'creditos.tasa',
                 'creditos.estado',
                 'creditos.periodo',
+                'creditos.interes',
+                'creditos.estadodesembolso',
 
                
                 'socio.dni as sociodni',
@@ -134,6 +154,14 @@ class CreditoController extends Controller
                 'socio.direccion as sociodireccion',
                 'socio.telefono as sociotelefono',
                 'socio.email as socioemail',
+
+                'garante.dni as garantedni',
+                'garante.nombre as garantenombre',
+                'garante.apellidos as garanteapellidos',
+                'garante.fechanacimiento as garantefechanacimiento',
+                'garante.direccion as garantedireccion',
+                'garante.telefono as garantetelefono',
+                'garante.email as garanteemail',
 
                
                 'user.nombre as usernombre',
@@ -149,6 +177,8 @@ class CreditoController extends Controller
                     'cuotas.fechapago',                  
                     'cuotas.fechacancelo',
                     'cuotas.monto',
+                    'cuotas.interes',
+                    'cuotas.amortizacion',
                     'cuotas.saldopendiente',
                     'cuotas.mora',
                     'cuotas.descripcion',
@@ -187,10 +217,24 @@ class CreditoController extends Controller
         if (!$request->ajax()) return redirect('/');
  
         try{
-            DB::beginTransaction();       
+            DB::beginTransaction(); 
+            
+            $garante=new Persona();
+            $garante->dni = $request->dnig;
+            $garante->nombre = $request->nombreg;
+            $garante->apellidos = $request->apellidosg;
+            $garante->fechanacimiento = $request->fechanacimientog;
+            $garante->direccion = $request->direcciong;
+            $garante->departamento = $request->departamentog;
+            $garante->ciudad = $request->ciudadg;
+            $garante->telefono = $request->telefonog;
+            $garante->email = $request->emailg;
+            $garante->save();
+
+
             $credito = new Credito();            
             $credito->idsocio = $request->idcliente;
-            $credito->idgarante = $request->idcliente;
+            $credito->idgarante = $garante->id;
             $credito->idusuario = $request->idcliente;// \Auth::user()->id;
             $credito->numeroprestamo = $request->numeroprestamo;
            
@@ -200,7 +244,9 @@ class CreditoController extends Controller
             $credito->numerocuotas = $request->numerocuotas; //cantidad de cuiotas
             $credito->tipocambio = 3.35; //de dolares a soles
             $credito->tasa = $request->tasa;
-            $credito->estado = '1'; //Credito activo /2 credito inactivo //3 credito pagado completado
+            $credito->interes = $request->interes;
+            $credito->estado = '1'; 
+            $credito->estadodesembolso = '0';//Credito activo /2 credito inactivo //3 credito pagado completado
             $credito->periodo = $request->periodo; //1mensual/2bimensual/3trimestral/6semmestral/12anual
           
             $credito->save();
@@ -216,6 +262,8 @@ class CreditoController extends Controller
                 $cuota->fechapago = $cuot['fechapago'];               
                 $cuota->saldopendiente =  $cuot['saldopendiente'];
                 $cuota->monto = $cuot['monto'];
+                $cuota->interes=$cuot['interes'];
+                $cuota->amortizacion=$cuot['amortizacion'];
                 $cuota->mora = 0;
                 $cuota->descripcion ='Debe'; 
                 $cuota->estado = '0';                              
@@ -248,6 +296,7 @@ class CreditoController extends Controller
             'creditos.tipocambio',
             'creditos.tasa',
             'creditos.estado',
+            'creditos.interes',
             'creditos.periodo',
 
             'socio.nombre',
@@ -267,6 +316,8 @@ class CreditoController extends Controller
                 'cuotas.fechacancelo',
                 'cuotas.saldopendiente',
                 'cuotas.monto',
+                'cuotas.interes',
+                'cuotas.amortizacion',
                 'cuotas.mora',
                 'cuotas.descripcion',
                 'cuotas.estado')

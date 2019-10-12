@@ -2663,6 +2663,53 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['id'],
   data: function data() {
@@ -2714,8 +2761,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-//
-//
 //
 //
 //
@@ -3058,6 +3103,86 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3070,6 +3195,7 @@ __webpack_require__.r(__webpack_exports__);
       numerocuotas: 12,
       tasa: 13,
       periodo: 1,
+      interesprestamo: 0,
       fechadesembolso: '2019-09-01',
       //arrary Credito
       newCredito: [],
@@ -3077,6 +3203,8 @@ __webpack_require__.r(__webpack_exports__);
       newCuotas: [],
       //aarayClientes
       arrayCliente: [],
+      registropersona: false,
+      registrogarante: false,
       dni: '',
       nombre: '',
       apellidos: '',
@@ -3087,7 +3215,21 @@ __webpack_require__.r(__webpack_exports__);
       errorCredito: 0,
       errorMostrarMsjCredito: [],
       arrayAuxliar: [],
-      idcredito: 0
+      idcredito: 0,
+      totalcuotas: 0,
+      totalinteres: 0,
+      totalamortizacion: 0,
+      //datos garante
+      dnig: '',
+      nombreg: '',
+      apellidosg: '',
+      fechanacimientog: '',
+      direcciong: '',
+      departamentog: '',
+      ciudadg: '',
+      telefonog: '',
+      emailg: '',
+      garanteestado: 0
     };
   },
   components: {
@@ -3134,42 +3276,151 @@ __webpack_require__.r(__webpack_exports__);
         });
       } else {
         //  me.btnregistar=1;
-        var montotal = this.montodesembolsado;
-        var contadoraux = 1; //cuota neta
-
-        var cuotaneta = (this.montodesembolsado / this.numerocuotas).toFixed(2); //saldo pendienteneto =monto desembolsado- montopor cuota
-
-        var saldop = (parseFloat(this.montodesembolsado) - parseFloat(cuotaneta)).toFixed(2); //FECHA
-
+        var periodofecha;
+        if (me.periodo == 1) periodofecha = 12;else if (me.periodo == 2) periodofecha = 6;else if (me.periodo == 4) periodofecha = 3;else if (me.periodo == 12) periodofecha = 1;
         var e = new Date(me.fechadesembolso);
-        var pe = me.periodo; // var dia=e.getDate();//
-
+        var pe = periodofecha;
         var dia = me.fechadesembolso.substr(-2);
-        var unmesmas = this.editar_fecha(me.fechadesembolso, me.periodo, "m");
+        var unmesmas = this.editar_fecha(me.fechadesembolso, periodofecha, "m"); //INICIO DE FORMULAR
 
-        for (var i = 0; i < me.numerocuotas; i++) {
-          if (i + 1 == me.numerocuotas) saldop = 0;
-          me.newCuotas.push({
-            //(monto total+tasa)/cantidadde cuotas
-            monto: cuotaneta,
-            fechapago: unmesmas,
-            saldopendiente: saldop,
-            otroscostos: 0.0,
-            descripcion: '',
-            contador: contadoraux
-          });
-          saldop = (parseFloat(saldop) - parseFloat(cuotaneta)).toFixed(2);
-          contadoraux++;
-          pe = parseInt(pe) + parseInt(me.periodo);
-          unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+        var TIN = 0;
+        var TA = 0;
+        var TAN = 0;
+        var AA = 0;
+        var CUOTA = "";
+        var I = 0;
+        var AN = 0;
+        var IN = 0;
+        var A1 = 0;
+        var CP2 = 0;
+        var POT = 0;
+        var CP1 = 0;
+        var C = this.montodesembolsado;
+        var J = this.tasa / 100;
+        var N = this.numerocuotas;
+        var D = 0;
+        N = Math.round(N);
+        var M = this.periodo;
+        var DD = 2;
+
+        if (M == 1) {
+          CUOTA = "ANUALES";
         }
 
+        if (M == 2) {
+          CUOTA = "SEMESTRALES";
+        }
+
+        if (M == 4) {
+          CUOTA = "TRIMESTRALES";
+        }
+
+        if (M == 12) {
+          CUOTA = "MENSUALES";
+        }
+
+        I = Math.pow(1 + J, 1 / M) - 1;
+        AN = 0;
+        IN = 0;
+        A1 = 0;
+        CP2 = C;
+        POT = parseInt(D) - N;
+        TIN = 0;
+        TA = 0;
+        TAN = 0; //FIN DE FORMULA
+
+        for (var K = 0; K <= N; K++) {
+          TIN = TIN + IN;
+          TA = TA + A1;
+          TAN = TAN + AN;
+
+          if (K != 0) {
+            me.newCuotas.push({
+              //(monto total+tasa)/cantidadde cuotas
+              contador: K,
+              monto: this.deci(AN, DD),
+              interes: this.deci(IN, DD),
+              amortizacion: this.deci(A1, DD),
+              saldopendiente: this.deci(CP2, DD),
+              fechapago: unmesmas
+            });
+          }
+
+          if (K != 0) {
+            pe = parseInt(pe) + parseInt(periodofecha);
+            unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+          }
+
+          if (K < D) {
+            AN = C * I;
+            IN = C * I;
+            A1 = 0;
+            CP2 = C;
+          }
+
+          if (K == D) {
+            AN = C * I / (1 - Math.pow(1 + I, POT));
+            IN = C * I;
+            A1 = AN - IN;
+            CP2 = C - A1;
+            CP1 = CP2;
+          }
+
+          if (K > D) {
+            IN = CP1 * I;
+            A1 = AN - IN;
+            CP2 = CP1 - A1;
+            CP1 = CP2;
+          }
+        }
+
+        this.totalcuotas = this.deci(TAN, DD);
+        this.totalinteres = this.deci(TIN, DD);
+        this.totalamortizacion = this.deci(TA, DD);
         this.viewCuotas = true;
       } //fin del else
 
     },
+    deci: function deci(GG, KK) {
+      return Math.round(GG * Math.pow(10, KK)) / Math.pow(10, KK);
+    },
+    codigoprestamo: function codigoprestamo() {
+      var me = this;
+      var url = this.ruta + '/credito/ultimocredito';
+      axios.get(url).then(function (response) {
+        var respuesta = response.data;
+        var idcreditou = respuesta.idultimocredito[0].id;
+        me.numeroprestamo = 'CZ' + me.zfill(idcreditou, 6);
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    zfill: function zfill(number, width) {
+      var numberOutput = Math.abs(number);
+      /* Valor absoluto del número */
+
+      var length = number.toString().length;
+      /* Largo del número */
+
+      var zero = "0";
+      /* String de cero */
+
+      if (width <= length) {
+        if (number < 0) {
+          return "-" + numberOutput.toString();
+        } else {
+          return numberOutput.toString();
+        }
+      } else {
+        if (number < 0) {
+          return "-" + zero.repeat(width - length) + numberOutput.toString();
+        } else {
+          return zero.repeat(width - length) + numberOutput.toString();
+        }
+      }
+    },
     limpiar: function limpiar() {
-      this.numeroprestamo = '';
+      this.codigoprestamo();
       this.montodesembolsado = 0;
       this.numerocuotas = 0;
       this.tasa = 0;
@@ -3226,9 +3477,19 @@ __webpack_require__.r(__webpack_exports__);
             'montodesembolsado': _this.montodesembolsado,
             'fechadesembolso': _this.fechadesembolso,
             'numerocuotas': _this.numerocuotas,
+            'interes': _this.totalinteres,
             'tasa': _this.tasa,
             'periodo': _this.periodo,
             'idcliente': _this.idcliente,
+            'dnig': _this.dnig,
+            'nombreg': _this.nombreg,
+            'apellidosg': _this.apellidosg,
+            'fechanacimientog': _this.fechanacimientog,
+            'direcciong': _this.direcciong,
+            'departamentog': _this.departamentog,
+            'ciudadg': _this.ciudadg,
+            'telefonog': _this.telefonog,
+            'emailg': _this.emailg,
             'data': _this.newCuotas
           }).then(function (response) {
             Swal.fire('CREDITO REGISTRADO', 'El credito ha sido registrado correctamente', 'success');
@@ -3255,6 +3516,9 @@ __webpack_require__.r(__webpack_exports__);
       if (this.errorMostrarMsjCredito.length) this.errorCredito = 1;
       return this.errorCredito;
     }
+  },
+  mounted: function mounted() {
+    this.codigoprestamo();
   }
 });
 
@@ -3942,6 +4206,97 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -3970,6 +4325,7 @@ __webpack_require__.r(__webpack_exports__);
       errorCredito: 0,
       errorMostrarMsjCredito: [],
       arrayAuxliar: [],
+      arrayCreditos: [],
       idcredito: 0
     };
   },
@@ -4014,39 +4370,113 @@ __webpack_require__.r(__webpack_exports__);
         });
       } else {
         //  me.btnregistar=1;
-        var montotal = this.montodesembolsado;
-        var contadoraux = 1; //cuota neta
-
-        var cuotaneta = (this.montodesembolsado / this.numerocuotas).toFixed(2); //saldo pendienteneto =monto desembolsado- montopor cuota
-
-        var saldop = (parseFloat(this.montodesembolsado) - parseFloat(cuotaneta)).toFixed(2); //FECHA
-
+        var periodofecha;
+        if (me.periodo == 1) periodofecha = 12;else if (me.periodo == 2) periodofecha = 6;else if (me.periodo == 4) periodofecha = 3;else if (me.periodo == 12) periodofecha = 1;
         var e = new Date(me.fechadesembolso);
-        var pe = me.periodo; // var dia=e.getDate();//
-
+        var pe = periodofecha;
         var dia = me.fechadesembolso.substr(-2);
-        var unmesmas = this.editar_fecha(me.fechadesembolso, me.periodo, "m");
+        var unmesmas = this.editar_fecha(me.fechadesembolso, periodofecha, "m"); //INICIO DE FORMULAR
 
-        for (var i = 0; i < me.numerocuotas; i++) {
-          if (i + 1 == me.numerocuotas) saldop = 0;
-          me.newCuotas.push({
-            //(monto total+tasa)/cantidadde cuotas
-            monto: cuotaneta,
-            fechapago: unmesmas,
-            saldopendiente: saldop,
-            otroscostos: 0.0,
-            descripcion: '',
-            contador: contadoraux
-          });
-          saldop = (parseFloat(saldop) - parseFloat(cuotaneta)).toFixed(2);
-          contadoraux++;
-          pe = parseInt(pe) + parseInt(me.periodo);
-          unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+        var TIN = 0;
+        var TA = 0;
+        var TAN = 0;
+        var AA = 0;
+        var CUOTA = "";
+        var I = 0;
+        var AN = 0;
+        var IN = 0;
+        var A1 = 0;
+        var CP2 = 0;
+        var POT = 0;
+        var CP1 = 0;
+        var C = this.montodesembolsado;
+        var J = this.tasa / 100;
+        var N = this.numerocuotas;
+        var D = 0;
+        N = Math.round(N);
+        var M = this.periodo;
+        var DD = 2;
+
+        if (M == 1) {
+          CUOTA = "ANUALES";
         }
 
+        if (M == 2) {
+          CUOTA = "SEMESTRALES";
+        }
+
+        if (M == 4) {
+          CUOTA = "TRIMESTRALES";
+        }
+
+        if (M == 12) {
+          CUOTA = "MENSUALES";
+        }
+
+        I = Math.pow(1 + J, 1 / M) - 1;
+        AN = 0;
+        IN = 0;
+        A1 = 0;
+        CP2 = C;
+        POT = parseInt(D) - N;
+        TIN = 0;
+        TA = 0;
+        TAN = 0; //FIN DE FORMULA
+
+        for (var K = 0; K <= N; K++) {
+          TIN = TIN + IN;
+          TA = TA + A1;
+          TAN = TAN + AN;
+
+          if (K != 0) {
+            me.newCuotas.push({
+              //(monto total+tasa)/cantidadde cuotas
+              contador: K,
+              monto: this.deci(AN, DD),
+              interes: this.deci(IN, DD),
+              amortizacion: this.deci(A1, DD),
+              saldopendiente: this.deci(CP2, DD),
+              fechapago: unmesmas
+            });
+          }
+
+          if (K != 0) {
+            pe = parseInt(pe) + parseInt(periodofecha);
+            unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+          }
+
+          if (K < D) {
+            AN = C * I;
+            IN = C * I;
+            A1 = 0;
+            CP2 = C;
+          }
+
+          if (K == D) {
+            AN = C * I / (1 - Math.pow(1 + I, POT));
+            IN = C * I;
+            A1 = AN - IN;
+            CP2 = C - A1;
+            CP1 = CP2;
+          }
+
+          if (K > D) {
+            IN = CP1 * I;
+            A1 = AN - IN;
+            CP2 = CP1 - A1;
+            CP1 = CP2;
+          }
+        }
+
+        this.totalcuotas = this.deci(TAN, DD);
+        this.totalinteres = this.deci(TIN, DD);
+        this.totalamortizacion = this.deci(TA, DD);
         this.viewCuotas = true;
       } //fin del else
 
+    },
+    deci: function deci(GG, KK) {
+      return Math.round(GG * Math.pow(10, KK)) / Math.pow(10, KK);
     },
     limpiar: function limpiar() {
       this.montodesembolsado = 0;
@@ -4109,7 +4539,22 @@ __webpack_require__.r(__webpack_exports__);
 
       if (this.errorMostrarMsjCredito.length) this.errorCredito = 1;
       return this.errorCredito;
+    },
+    listarCreditos: function listarCreditos(page, buscar, criterio) {
+      var me = this;
+      me.listado = 2;
+      var url = 'simulacion/listaSilumaciones';
+      axios.get(url).then(function (response) {
+        var respuesta = response.data;
+        me.arrayCreditos = respuesta.simulaciones;
+        me.pagination = respuesta.pagination;
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
+  },
+  mounted: function mounted() {
+    this.listarCreditos(1, this.buscar, this.criterio);
   }
 });
 
@@ -41979,7 +42424,7 @@ var render = function() {
                     return _c("div", { key: c.id, staticClass: "row" }, [
                       _vm._m(1, true),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
+                      _c("div", { staticClass: "col-md-5 " }, [
                         _c(
                           "button",
                           {
@@ -41999,7 +42444,13 @@ var render = function() {
                               "                                                    \n                                            Descargar Cronograma\n                                        "
                             )
                           ]
-                        )
+                        ),
+                        _vm._v(" "),
+                        _vm.arrayCreditos[0].estadodesembolso == 0
+                          ? _c("button", { staticClass: "btn btn-success" }, [
+                              _vm._v(" Desembolsar")
+                            ])
+                          : _vm._e()
                       ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-3" }, [
@@ -42014,11 +42465,13 @@ var render = function() {
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-3 " }, [
                         _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Monto:")
+                          _vm._v("Monto Financiado:")
                         ]),
                         _vm._v(" "),
                         _c("p", {
-                          domProps: { textContent: _vm._s(c.montodesembolsado) }
+                          domProps: {
+                            textContent: _vm._s("S/ " + c.montodesembolsado)
+                          }
                         })
                       ]),
                       _vm._v(" "),
@@ -42028,16 +42481,42 @@ var render = function() {
                         ]),
                         _vm._v(" "),
                         _c("p", {
-                          domProps: { textContent: _vm._s(c.numerocuotas) }
+                          domProps: {
+                            textContent: _vm._s(c.numerocuotas + "Cuotas")
+                          }
                         })
                       ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-3 " }, [
                         _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Tasa de Interes:")
+                          _vm._v("TEA(Tasa de interes anual)")
                         ]),
                         _vm._v(" "),
-                        _c("p", { domProps: { textContent: _vm._s(c.tasa) } })
+                        _c("p", [_vm._v(_vm._s(c.tasa) + " % ")])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3 " }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Interes Total")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", [_vm._v(" S/ " + _vm._s(c.interes))])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3 " }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Monto total a Pagar")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", [
+                          _vm._v(
+                            " S/ " +
+                              _vm._s(
+                                parseFloat(c.montodesembolsado) +
+                                  parseFloat(c.interes)
+                              )
+                          )
+                        ])
                       ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-3 " }, [
@@ -42045,14 +42524,24 @@ var render = function() {
                           _vm._v("Periodo")
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.periodo) }
-                        })
+                        c.periodo == 1 ? _c("p", [_vm._v("Anual")]) : _vm._e(),
+                        _vm._v(" "),
+                        c.periodo == 2
+                          ? _c("p", [_vm._v("Semestral")])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        c.periodo == 4
+                          ? _c("p", [_vm._v("Trimestral")])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        c.periodo == 12
+                          ? _c("p", [_vm._v("Mensual")])
+                          : _vm._e()
                       ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-3" }, [
                         _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Creado por:")
+                          _vm._v("Analista del Crédito")
                         ]),
                         _vm._v(" "),
                         _c("p", {
@@ -42130,6 +42619,74 @@ var render = function() {
                         _c("p", {
                           domProps: { textContent: _vm._s(c.socioemail) }
                         })
+                      ]),
+                      _vm._v(" "),
+                      _vm._m(3, true),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3" }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("DNI:")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", {
+                          domProps: { textContent: _vm._s(c.garantedni) }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3 " }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Nombres y apellidos:")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", {
+                          domProps: {
+                            textContent: _vm._s(
+                              c.garantenombre + " " + c.garanteapellidos
+                            )
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3 " }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Fecha nacimiento:")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", {
+                          domProps: {
+                            textContent: _vm._s(c.garantefechanacimiento)
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3 " }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Dirección:")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", {
+                          domProps: { textContent: _vm._s(c.garantedireccion) }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3 " }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Teléfono:")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", {
+                          domProps: { textContent: _vm._s(c.garantetelefono) }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3" }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Email:")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", {
+                          domProps: { textContent: _vm._s(c.garanteemail) }
+                        })
                       ])
                     ])
                   }),
@@ -42138,13 +42695,13 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "col-lg-12 mt-4 " }, [
-                _vm._m(3),
+                _vm._m(4),
                 _vm._v(" "),
                 _c("hr"),
                 _vm._v(" "),
                 _c("div", { staticClass: "table-responsive" }, [
                   _c("table", { staticClass: "table  table-bordered" }, [
-                    _vm._m(4),
+                    _vm._m(5),
                     _vm._v(" "),
                     _c(
                       "tbody",
@@ -42163,7 +42720,7 @@ var render = function() {
                             _c(
                               "td",
                               [
-                                cu.estado == 0 ? [_vm._m(5, true)] : _vm._e(),
+                                cu.estado == 0 ? [_vm._m(6, true)] : _vm._e(),
                                 _vm._v(" "),
                                 cu.estado == 1
                                   ? [
@@ -42228,11 +42785,11 @@ var render = function() {
                             }),
                             _vm._v(" "),
                             _c("td", {
-                              domProps: { textContent: _vm._s(cu.monto) }
+                              domProps: { textContent: _vm._s(cu.interes) }
                             }),
                             _vm._v(" "),
                             _c("td", {
-                              domProps: { textContent: _vm._s(cu.mora) }
+                              domProps: { textContent: _vm._s(cu.amortizacion) }
                             }),
                             _vm._v(" "),
                             _c("td", {
@@ -42270,8 +42827,8 @@ var render = function() {
                                   ])
                                 ]
                               : cu.estado == 1
-                              ? [_vm._m(6, true)]
-                              : [_vm._m(7, true)]
+                              ? [_vm._m(7, true)]
+                              : [_vm._m(8, true)]
                           ],
                           2
                         )
@@ -42295,7 +42852,9 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "row bg bg-dark " }, [
       _c("div", { staticClass: "col-md-12 mt-2 text-white " }, [
-        _c("h4", [_vm._v("Detalle de Crédtio")])
+        _c("h4", [
+          _vm._v("Detalle de Crédtio\n\n                                ")
+        ])
       ])
     ])
   },
@@ -42303,10 +42862,10 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-md-9" }, [
+    return _c("div", { staticClass: "col-md-7" }, [
       _c("h4", { staticClass: "text-dark font-weight-bold" }, [
         _c("i", { staticClass: "mdi mdi-package-variant-closed mdi-36px" }),
-        _vm._v("Informacón del Crédito ")
+        _vm._v("Información del Crédito ")
       ]),
       _vm._v(" "),
       _c("hr")
@@ -42319,7 +42878,20 @@ var staticRenderFns = [
     return _c("div", { staticClass: "col-md-12 " }, [
       _c("h4", { staticClass: "text-dark font-weight-bold" }, [
         _c("i", { staticClass: "mdi mdi-account-location mdi-36px" }),
-        _vm._v("Informacón del Socio ")
+        _vm._v("Información del Socio ")
+      ]),
+      _vm._v(" "),
+      _c("hr")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12 " }, [
+      _c("h4", { staticClass: "text-dark font-weight-bold" }, [
+        _c("i", { staticClass: "mdi mdi-account-location mdi-36px" }),
+        _vm._v("Información del Garante ")
       ]),
       _vm._v(" "),
       _c("hr")
@@ -42346,11 +42918,11 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Fecha ")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Monto de Cuota ")]),
+        _c("th", [_vm._v("Cuota ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Capital ")]),
+        _c("th", [_vm._v(" Interes ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Interés ")]),
+        _c("th", [_vm._v(" Amortización ")]),
         _vm._v(" "),
         _c("th", [_vm._v(" Saldo ")]),
         _vm._v(" "),
@@ -42594,16 +43166,6 @@ var render = function() {
                               domProps: { textContent: _vm._s(c.tasa + " %") }
                             }),
                             _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                "S/ " +
-                                  _vm._s(
-                                    parseFloat(c.montodesembolsado) *
-                                      (c.tasa / 100)
-                                  )
-                              )
-                            ]),
-                            _vm._v(" "),
                             _c("td", {
                               domProps: { textContent: _vm._s(c.numerocuotas) }
                             }),
@@ -42720,15 +43282,13 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v(" Tasa de Interes")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Interes ")]),
-        _vm._v(" "),
         _c("th", [_vm._v(" N° Cuotas ")]),
         _vm._v(" "),
         _c("th", [_vm._v(" DNI Socio ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Nombres Socio ")]),
+        _c("th", [_vm._v(" Nombres del  Socio ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Estados")])
+        _c("th", [_vm._v(" Estado")])
       ])
     ])
   }
@@ -42768,276 +43328,750 @@ var render = function() {
                     "form",
                     { staticClass: "forms-sample mt-4" },
                     [
-                      _c("div", { staticClass: "row" }, [
-                        _c(
-                          "div",
-                          { staticClass: "col-md-6 form-group" },
-                          [
+                      _c(
+                        "div",
+                        { staticClass: "row" },
+                        [
+                          _c(
+                            "div",
+                            { staticClass: "col-md-6 form-group" },
+                            [
+                              _c(
+                                "label",
+                                { attrs: { for: "exampleInputUsername1" } },
+                                [
+                                  _vm._v(
+                                    "Ingrese DNI del Socio \n                            "
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c("v-select", {
+                                attrs: {
+                                  "on-search": _vm.selectCliente,
+                                  label: "dni",
+                                  options: _vm.arrayCliente,
+                                  placeholder: "Ingrese DNI del cliente...",
+                                  onChange: _vm.getDatosCliente
+                                }
+                              }),
+                              _vm._v(" "),
+                              _vm.idcliente != 0
+                                ? _c("div", [
+                                    _c("label", {
+                                      staticClass: "badge badge-dark",
+                                      domProps: {
+                                        textContent: _vm._s(
+                                          _vm.nombre + " " + _vm.apellidos
+                                        )
+                                      }
+                                    })
+                                  ])
+                                : _vm._e()
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-3" }),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "col-md-3 form-group" },
+                            [
+                              _c("br"),
+                              _vm._v(" "),
+                              _vm.registropersona == true
+                                ? [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-success",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.registropersona = false
+                                            _vm.garanteestado = 0
+                                          }
+                                        }
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass:
+                                            "mdi mdi-clipboard-account"
+                                        }),
+                                        _vm._v("  Sin Garante")
+                                      ]
+                                    )
+                                  ]
+                                : [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-success",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.registropersona = true
+                                            _vm.garanteestado = 1
+                                          }
+                                        }
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass:
+                                            "mdi mdi-clipboard-account"
+                                        }),
+                                        _vm._v("  Agregar Garante")
+                                      ]
+                                    )
+                                  ]
+                            ],
+                            2
+                          ),
+                          _vm._v(" "),
+                          _vm.registropersona == true
+                            ? [
+                                _vm._m(1),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-2 form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("DNI de Socio")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.dnig,
+                                          expression: "dnig"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder: "Ingrese DNI"
+                                      },
+                                      domProps: { value: _vm.dnig },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.dnig = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-3 form-group " },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Nombres Completos")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.nombreg,
+                                          expression: "nombreg"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder: "Ingrese nombres completos"
+                                      },
+                                      domProps: { value: _vm.nombreg },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.nombreg = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-3 form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Apellidos Completos")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.apellidosg,
+                                          expression: "apellidosg"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder:
+                                          "Ingrese apellidos completos"
+                                      },
+                                      domProps: { value: _vm.apellidosg },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.apellidosg = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-2 form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Fecha Nacimiento")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.fechanacimientog,
+                                          expression: "fechanacimientog"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: { type: "date", placeholder: "" },
+                                      domProps: { value: _vm.fechanacimientog },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.fechanacimientog =
+                                            $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-2 form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Departamento")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.departamentog,
+                                          expression: "departamentog"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder: "Departamento"
+                                      },
+                                      domProps: { value: _vm.departamentog },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.departamentog =
+                                            $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-3 form-group " },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Ciudad")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.ciudadg,
+                                          expression: "ciudadg"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder: "Ciudad"
+                                      },
+                                      domProps: { value: _vm.ciudadg },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.ciudadg = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-3 form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Direccion")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.direcciong,
+                                          expression: "direcciong"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder: "Dirección"
+                                      },
+                                      domProps: { value: _vm.direcciong },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.direcciong = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-3 form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Teléfono")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.telefonog,
+                                          expression: "telefonog"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder: "Número de Teléfono"
+                                      },
+                                      domProps: { value: _vm.telefonog },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.telefonog = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-3 form-group" },
+                                  [
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: " text-dark",
+                                        attrs: { for: "exampleInputUsername1" }
+                                      },
+                                      [_vm._v("Correo Electrónico")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.emailg,
+                                          expression: "emailg"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        placeholder: "Correo Electrónico"
+                                      },
+                                      domProps: { value: _vm.emailg },
+                                      on: {
+                                        input: function($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.emailg = $event.target.value
+                                        }
+                                      }
+                                    })
+                                  ]
+                                )
+                              ]
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.registrogarante == true
+                            ? [
+                                _c("div", { staticClass: "row" }, [
+                                  _c(
+                                    "div",
+                                    { staticClass: "col-md-2 form-group" },
+                                    [
+                                      _c(
+                                        "label",
+                                        {
+                                          attrs: {
+                                            for: "exampleInputUsername1"
+                                          }
+                                        },
+                                        [_vm._v("Codigo de Crédito")]
+                                      ),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.numeroprestamo,
+                                            expression: "numeroprestamo"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
+                                        attrs: {
+                                          type: "text",
+                                          placeholder: "Codigo de Credito",
+                                          disabled: ""
+                                        },
+                                        domProps: { value: _vm.numeroprestamo },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.numeroprestamo =
+                                              $event.target.value
+                                          }
+                                        }
+                                      })
+                                    ]
+                                  )
+                                ])
+                              ]
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm._m(2),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-2 form-group" }, [
                             _c(
                               "label",
                               { attrs: { for: "exampleInputUsername1" } },
-                              [
-                                _vm._v(
-                                  "Ingrese DNI \n                            "
-                                )
-                              ]
+                              [_vm._v("Codigo de Crédito")]
                             ),
                             _vm._v(" "),
-                            _c("v-select", {
-                              attrs: {
-                                "on-search": _vm.selectCliente,
-                                label: "dni",
-                                options: _vm.arrayCliente,
-                                placeholder: "Ingrese DNI del cliente...",
-                                onChange: _vm.getDatosCliente
-                              }
-                            }),
-                            _vm._v(" "),
-                            _vm.idcliente != 0
-                              ? _c("div", [
-                                  _c("label", {
-                                    staticClass: "badge badge-dark",
-                                    domProps: {
-                                      textContent: _vm._s(
-                                        _vm.nombre + " " + _vm.apellidos
-                                      )
-                                    }
-                                  })
-                                ])
-                              : _vm._e()
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3" }),
-                        _vm._v(" "),
-                        _vm._m(1),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-2 form-group" }, [
-                          _c(
-                            "label",
-                            { attrs: { for: "exampleInputUsername1" } },
-                            [_vm._v("Codigo de Crédito")]
-                          ),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.numeroprestamo,
-                                expression: "numeroprestamo"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            attrs: {
-                              type: "text",
-                              placeholder: "Codigo de Credito"
-                            },
-                            domProps: { value: _vm.numeroprestamo },
-                            on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.numeroprestamo = $event.target.value
-                              }
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: " col-md-2 form-group" }, [
-                          _c(
-                            "label",
-                            { attrs: { for: "exampleInputEmail1" } },
-                            [_vm._v("Monto")]
-                          ),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.montodesembolsado,
-                                expression: "montodesembolsado"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            attrs: {
-                              type: "number",
-                              placeholder: "Monto en Soles"
-                            },
-                            domProps: { value: _vm.montodesembolsado },
-                            on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.montodesembolsado = $event.target.value
-                              }
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: " col-md-2 form-group" }, [
-                          _c(
-                            "label",
-                            { attrs: { for: "exampleInputEmail1" } },
-                            [_vm._v("N° Cuotas")]
-                          ),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.numerocuotas,
-                                expression: "numerocuotas"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            attrs: {
-                              type: "number",
-                              placeholder: "Número de Cuotas"
-                            },
-                            domProps: { value: _vm.numerocuotas },
-                            on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.numerocuotas = $event.target.value
-                              }
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: " col-md-2 form-group" }, [
-                          _c(
-                            "label",
-                            { attrs: { for: "exampleInputEmail1" } },
-                            [_vm._v("Tasa de Interés")]
-                          ),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.tasa,
-                                expression: "tasa"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            attrs: {
-                              type: "text",
-                              placeholder: "Número de Telefono"
-                            },
-                            domProps: { value: _vm.tasa },
-                            on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.tasa = $event.target.value
-                              }
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: " col-md-2 form-group" }, [
-                          _c(
-                            "label",
-                            { attrs: { for: "exampleInputEmail1" } },
-                            [_vm._v("Periodo")]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "select",
-                            {
+                            _c("input", {
                               directives: [
                                 {
                                   name: "model",
                                   rawName: "v-model",
-                                  value: _vm.periodo,
-                                  expression: "periodo"
+                                  value: _vm.numeroprestamo,
+                                  expression: "numeroprestamo"
                                 }
                               ],
-                              staticClass: "form-control ",
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Codigo de Credito",
+                                disabled: ""
+                              },
+                              domProps: { value: _vm.numeroprestamo },
                               on: {
-                                change: function($event) {
-                                  var $$selectedVal = Array.prototype.filter
-                                    .call($event.target.options, function(o) {
-                                      return o.selected
-                                    })
-                                    .map(function(o) {
-                                      var val =
-                                        "_value" in o ? o._value : o.value
-                                      return val
-                                    })
-                                  _vm.periodo = $event.target.multiple
-                                    ? $$selectedVal
-                                    : $$selectedVal[0]
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.numeroprestamo = $event.target.value
                                 }
                               }
-                            },
-                            [
-                              _c("option", { attrs: { value: "1" } }, [
-                                _vm._v("Mensual")
-                              ]),
-                              _vm._v(" "),
-                              _c("option", { attrs: { value: "2" } }, [
-                                _vm._v("Bimestral")
-                              ]),
-                              _vm._v(" "),
-                              _c("option", { attrs: { value: "3" } }, [
-                                _vm._v("Trimestral")
-                              ]),
-                              _vm._v(" "),
-                              _c("option", { attrs: { value: "6" } }, [
-                                _vm._v("Semestral")
-                              ]),
-                              _vm._v(" "),
-                              _c("option", { attrs: { value: "12" } }, [
-                                _vm._v("Anual")
-                              ])
-                            ]
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: " col-md-2 form-group" }, [
-                          _c(
-                            "label",
-                            { attrs: { for: "exampleInputEmail1" } },
-                            [_vm._v("Fecha de Desembolso")]
-                          ),
+                            })
+                          ]),
                           _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.fechadesembolso,
-                                expression: "fechadesembolso"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            attrs: {
-                              type: "date",
-                              placeholder: "Número de Telefono"
-                            },
-                            domProps: { value: _vm.fechadesembolso },
-                            on: {
-                              input: function($event) {
-                                if ($event.target.composing) {
-                                  return
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Monto")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.montodesembolsado,
+                                  expression: "montodesembolsado"
                                 }
-                                _vm.fechadesembolso = $event.target.value
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "number",
+                                placeholder: "Monto en Soles"
+                              },
+                              domProps: { value: _vm.montodesembolsado },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.montodesembolsado = $event.target.value
+                                }
                               }
-                            }
-                          })
-                        ])
-                      ]),
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("N° Cuotas")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.numerocuotas,
+                                  expression: "numerocuotas"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "number",
+                                placeholder: "Número de Cuotas"
+                              },
+                              domProps: { value: _vm.numerocuotas },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.numerocuotas = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Tasa de Interés")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.tasa,
+                                  expression: "tasa"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Número de Telefono"
+                              },
+                              domProps: { value: _vm.tasa },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.tasa = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Periodo dce Cuotas")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.periodo,
+                                    expression: "periodo"
+                                  }
+                                ],
+                                staticClass: "form-control ",
+                                on: {
+                                  change: function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.periodo = $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  }
+                                }
+                              },
+                              [
+                                _c(
+                                  "option",
+                                  { attrs: { value: "12", selected: "" } },
+                                  [_vm._v("Mensual")]
+                                ),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "1" } }, [
+                                  _vm._v("Anual")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "2" } }, [
+                                  _vm._v("Semestral")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "4" } }, [
+                                  _vm._v("Trimestral")
+                                ])
+                              ]
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Fecha de Desembolso")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.fechadesembolso,
+                                  expression: "fechadesembolso"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "date",
+                                placeholder: "Número de Telefono"
+                              },
+                              domProps: { value: _vm.fechadesembolso },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.fechadesembolso = $event.target.value
+                                }
+                              }
+                            })
+                          ])
+                        ],
+                        2
+                      ),
                       _vm._v(" "),
                       _c(
                         "button",
@@ -43065,54 +44099,124 @@ var render = function() {
                               "table",
                               { staticClass: "table  table-bordered" },
                               [
-                                _vm._m(2),
+                                _vm._m(3),
                                 _vm._v(" "),
                                 _vm.newCuotas.length
-                                  ? _c(
-                                      "tbody",
-                                      _vm._l(_vm.newCuotas, function(c) {
-                                        return _c("tr", { key: c.id }, [
-                                          _c("td", { staticClass: "py-1" }, [
-                                            _vm._v(_vm._s(c.contador))
-                                          ]),
-                                          _vm._v(" "),
-                                          _c("td", {
-                                            domProps: {
-                                              textContent: _vm._s(c.fechapago)
-                                            }
-                                          }),
-                                          _vm._v(" "),
-                                          _c("td", {
-                                            domProps: {
-                                              textContent: _vm._s(c.monto)
-                                            }
-                                          }),
-                                          _vm._v(" "),
-                                          _c("td", {
-                                            domProps: {
-                                              textContent: _vm._s(c.monto)
-                                            }
-                                          }),
-                                          _vm._v(" "),
-                                          _c("td", {
-                                            domProps: {
-                                              textContent: _vm._s(c.monto)
-                                            }
-                                          }),
-                                          _vm._v(" "),
-                                          _c("td", {
-                                            domProps: {
-                                              textContent: _vm._s(
-                                                c.saldopendiente
-                                              )
-                                            }
-                                          })
-                                        ])
-                                      }),
-                                      0
-                                    )
-                                  : _c("tbody", [_vm._m(3)])
-                              ]
+                                  ? [
+                                      _c(
+                                        "tbody",
+                                        _vm._l(_vm.newCuotas, function(c) {
+                                          return _c("tr", { key: c.id }, [
+                                            _c("td", { staticClass: "py-1" }, [
+                                              _vm._v(_vm._s(c.contador))
+                                            ]),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(c.fechapago)
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  "S/ " + c.monto
+                                                )
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  "S/ " + c.interes
+                                                )
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  "S/ " + c.amortizacion
+                                                )
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("td", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  "S/ " + c.saldopendiente
+                                                )
+                                              }
+                                            })
+                                          ])
+                                        }),
+                                        0
+                                      ),
+                                      _vm._v(" "),
+                                      _c("tbody", [
+                                        _c(
+                                          "tr",
+                                          { staticClass: "bg bg-warning" },
+                                          [
+                                            _c("td"),
+                                            _vm._v(" "),
+                                            _c(
+                                              "td",
+                                              {
+                                                staticClass: "font-weight-bold"
+                                              },
+                                              [_vm._v("Total")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "td",
+                                              {
+                                                staticClass: "font-weight-bold"
+                                              },
+                                              [
+                                                _vm._v(
+                                                  " S/" +
+                                                    _vm._s(_vm.totalcuotas)
+                                                )
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "td",
+                                              {
+                                                staticClass: "font-weight-bold"
+                                              },
+                                              [
+                                                _vm._v(
+                                                  "S/ " +
+                                                    _vm._s(_vm.totalinteres)
+                                                )
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "td",
+                                              {
+                                                staticClass: "font-weight-bold"
+                                              },
+                                              [
+                                                _vm._v(
+                                                  "S/ " +
+                                                    _vm._s(
+                                                      _vm.totalamortizacion
+                                                    )
+                                                )
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("td")
+                                          ]
+                                        )
+                                      ])
+                                    ]
+                                  : _c("tbody", [_vm._m(4)])
+                              ],
+                              2
                             )
                           ])
                         : _vm._e(),
@@ -43244,15 +44348,23 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-md-3 form-group" }, [
-      _c("label", { attrs: { for: "exampleInputUsername1" } }, [
-        _vm._v("Si el socio no esta registrado ")
-      ]),
+    return _c("div", { staticClass: "col-md-12 form-group " }, [
+      _c("hr"),
       _vm._v(" "),
-      _c("br"),
-      _c("button", { staticClass: "btn btn-success " }, [
-        _c("i", { staticClass: "mdi mdi-clipboard-account" }),
-        _vm._v("  Agregar Socio")
+      _c("h3", { staticClass: "font-weight-bold" }, [
+        _vm._v(" Formulario de Garante ")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12" }, [
+      _c("hr"),
+      _vm._v(" "),
+      _c("h3", { staticClass: "font-weight-bold" }, [
+        _vm._v(" Formulario de Crédito ")
       ])
     ])
   },
@@ -43266,11 +44378,11 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Fecha de Pago ")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Monto de Cuota ")]),
+        _c("th", [_vm._v("Cuota ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Capital ")]),
+        _c("th", [_vm._v(" Interes ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Interés ")]),
+        _c("th", [_vm._v(" Amortización ")]),
         _vm._v(" "),
         _c("th", [_vm._v(" Saldo ")])
       ])
@@ -44187,6 +45299,7 @@ var render = function() {
                     click: function($event) {
                       _vm.viewAgregar = "listar"
                       _vm.limpiar()
+                      this.listarCreditos(1, this.buscar, this.criterio)
                     }
                   }
                 },
@@ -44408,24 +45521,22 @@ var render = function() {
                                 }
                               },
                               [
+                                _c(
+                                  "option",
+                                  { attrs: { value: "12", selected: "" } },
+                                  [_vm._v("Mensual")]
+                                ),
+                                _vm._v(" "),
                                 _c("option", { attrs: { value: "1" } }, [
-                                  _vm._v("Mensual")
+                                  _vm._v("Anual")
                                 ]),
                                 _vm._v(" "),
                                 _c("option", { attrs: { value: "2" } }, [
-                                  _vm._v("Bimestral")
-                                ]),
-                                _vm._v(" "),
-                                _c("option", { attrs: { value: "3" } }, [
-                                  _vm._v("Trimestral")
-                                ]),
-                                _vm._v(" "),
-                                _c("option", { attrs: { value: "6" } }, [
                                   _vm._v("Semestral")
                                 ]),
                                 _vm._v(" "),
-                                _c("option", { attrs: { value: "12" } }, [
-                                  _vm._v("Anual")
+                                _c("option", { attrs: { value: "4" } }, [
+                                  _vm._v("Trimestral")
                                 ])
                               ]
                             )
@@ -44528,51 +45639,129 @@ var render = function() {
                                   _vm._m(1),
                                   _vm._v(" "),
                                   _vm.newCuotas.length
-                                    ? _c(
-                                        "tbody",
-                                        _vm._l(_vm.newCuotas, function(c) {
-                                          return _c("tr", { key: c.id }, [
-                                            _c("td", { staticClass: "py-1" }, [
-                                              _vm._v(_vm._s(c.contador))
-                                            ]),
-                                            _vm._v(" "),
-                                            _c("td", {
-                                              domProps: {
-                                                textContent: _vm._s(c.fechapago)
-                                              }
-                                            }),
-                                            _vm._v(" "),
-                                            _c("td", {
-                                              domProps: {
-                                                textContent: _vm._s(c.monto)
-                                              }
-                                            }),
-                                            _vm._v(" "),
-                                            _c("td", {
-                                              domProps: {
-                                                textContent: _vm._s(c.monto)
-                                              }
-                                            }),
-                                            _vm._v(" "),
-                                            _c("td", {
-                                              domProps: {
-                                                textContent: _vm._s(c.monto)
-                                              }
-                                            }),
-                                            _vm._v(" "),
-                                            _c("td", {
-                                              domProps: {
-                                                textContent: _vm._s(
-                                                  c.saldopendiente
-                                                )
-                                              }
-                                            })
-                                          ])
-                                        }),
-                                        0
-                                      )
+                                    ? [
+                                        _c(
+                                          "tbody",
+                                          _vm._l(_vm.newCuotas, function(c) {
+                                            return _c("tr", { key: c.id }, [
+                                              _c(
+                                                "td",
+                                                { staticClass: "py-1" },
+                                                [_vm._v(_vm._s(c.contador))]
+                                              ),
+                                              _vm._v(" "),
+                                              _c("td", {
+                                                domProps: {
+                                                  textContent: _vm._s(
+                                                    c.fechapago
+                                                  )
+                                                }
+                                              }),
+                                              _vm._v(" "),
+                                              _c("td", {
+                                                domProps: {
+                                                  textContent: _vm._s(
+                                                    "S/ " + c.monto
+                                                  )
+                                                }
+                                              }),
+                                              _vm._v(" "),
+                                              _c("td", {
+                                                domProps: {
+                                                  textContent: _vm._s(
+                                                    "S/ " + c.interes
+                                                  )
+                                                }
+                                              }),
+                                              _vm._v(" "),
+                                              _c("td", {
+                                                domProps: {
+                                                  textContent: _vm._s(
+                                                    "S/ " + c.amortizacion
+                                                  )
+                                                }
+                                              }),
+                                              _vm._v(" "),
+                                              _c("td", {
+                                                domProps: {
+                                                  textContent: _vm._s(
+                                                    "S/ " + c.saldopendiente
+                                                  )
+                                                }
+                                              })
+                                            ])
+                                          }),
+                                          0
+                                        ),
+                                        _vm._v(" "),
+                                        _c("tbody", [
+                                          _c(
+                                            "tr",
+                                            { staticClass: "bg bg-warning" },
+                                            [
+                                              _c("td"),
+                                              _vm._v(" "),
+                                              _c(
+                                                "td",
+                                                {
+                                                  staticClass:
+                                                    "font-weight-bold"
+                                                },
+                                                [_vm._v("Total")]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "td",
+                                                {
+                                                  staticClass:
+                                                    "font-weight-bold"
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    " S/" +
+                                                      _vm._s(_vm.totalcuotas)
+                                                  )
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "td",
+                                                {
+                                                  staticClass:
+                                                    "font-weight-bold"
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    "S/ " +
+                                                      _vm._s(_vm.totalinteres)
+                                                  )
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "td",
+                                                {
+                                                  staticClass:
+                                                    "font-weight-bold"
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    "S/ " +
+                                                      _vm._s(
+                                                        _vm.totalamortizacion
+                                                      )
+                                                  )
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _c("td")
+                                            ]
+                                          )
+                                        ])
+                                      ]
                                     : _c("tbody", [_vm._m(2)])
-                                ]
+                                ],
+                                2
                               )
                             ])
                           : _vm._e(),
@@ -44785,7 +45974,231 @@ var render = function() {
                 _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
                 _vm._v(" Nueva simulacion\n    ")
               ]
-            )
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "row" }, [
+              _c(
+                "div",
+                { staticClass: "col-lg-12 grid-margin stretch-card " },
+                [
+                  _c("div", { staticClass: "card " }, [
+                    _c("div", { staticClass: "card-body " }, [
+                      _c("h4", { staticClass: "card-title " }, [
+                        _vm._v("Lista de Simulaciones de Créditos")
+                      ]),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "card-description " }, [
+                        _vm._v(
+                          "\n                                        Información de simulaciones de Créditos \n                                    "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-md-6 col-sm-6" }, [
+                          _c("div", { staticClass: "input-group" }, [
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.criterio,
+                                    expression: "criterio"
+                                  }
+                                ],
+                                staticClass: "form-control col-md-12",
+                                on: {
+                                  change: function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.criterio = $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  }
+                                }
+                              },
+                              [
+                                _c(
+                                  "option",
+                                  { attrs: { value: "numeroprestamo" } },
+                                  [_vm._v("Número de prestamo")]
+                                ),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "dni" } }, [
+                                  _vm._v("DNI Socio")
+                                ]),
+                                _vm._v(" "),
+                                _c(
+                                  "option",
+                                  { attrs: { value: "fechadesembolso" } },
+                                  [_vm._v("Fecha de Desembolso ")]
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.buscar,
+                                  expression: "buscar"
+                                }
+                              ],
+                              staticClass: "form-control form-control-lg",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Texto a buscar"
+                              },
+                              domProps: { value: _vm.buscar },
+                              on: {
+                                keyup: function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "enter",
+                                      13,
+                                      $event.key,
+                                      "Enter"
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.listarCreditos(
+                                    1,
+                                    _vm.buscar,
+                                    _vm.criterio
+                                  )
+                                },
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.buscar = $event.target.value
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-outline-primary btn-sm",
+                                attrs: { type: "submit" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.listarCreditos(
+                                      1,
+                                      _vm.buscar,
+                                      _vm.criterio
+                                    )
+                                  }
+                                }
+                              },
+                              [
+                                _c("i", { staticClass: "fa fa-search" }),
+                                _vm._v(" "),
+                                _c("i", { staticClass: "mdi mdi-magnify" }),
+                                _vm._v(" Buscar")
+                              ]
+                            )
+                          ])
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "table-responsive pt-3 " }, [
+                        _c("table", { staticClass: "table table-bordered " }, [
+                          _vm._m(3),
+                          _vm._v(" "),
+                          _c(
+                            "tbody",
+                            _vm._l(_vm.arrayCreditos, function(c) {
+                              return _c("tr", { key: c.id }, [
+                                _c("td", [
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass:
+                                        "btn btn-success btn-rounded btn-icon ",
+                                      attrs: { type: "button" },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.viewDetalle = true
+                                          _vm.idcredito = c.id
+                                          _vm.viewLista = false
+                                        }
+                                      }
+                                    },
+                                    [_c("i", { staticClass: "mdi mdi-eye " })]
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(c.id))]),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(c.fechadesembolso)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(
+                                      "S/ " + c.montodesembolsado
+                                    )
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(c.tasa + " %")
+                                  }
+                                }),
+                                _vm._v(" "),
+                                c.periodo == 12
+                                  ? _c("td", [_vm._v("Mensual")])
+                                  : c.periodo == 1
+                                  ? _c("td", [_vm._v("Anual")])
+                                  : c.periodo == 6
+                                  ? _c("td", [_vm._v("Anual")])
+                                  : c.periodo == 4
+                                  ? _c("td", [_vm._v("Trimestral")])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(c.numerocuotas)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: { textContent: _vm._s(c.dni) }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(c.nombresapellidos)
+                                  }
+                                })
+                              ])
+                            }),
+                            0
+                          )
+                        ])
+                      ])
+                    ])
+                  ])
+                ]
+              )
+            ])
           ]
         : _vm._e()
     ],
@@ -44816,11 +46229,11 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Fecha de Pago ")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Monto de Cuota ")]),
+        _c("th", [_vm._v("Cuota ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Capital ")]),
+        _c("th", [_vm._v(" Interes ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Interés ")]),
+        _c("th", [_vm._v(" Amortización ")]),
         _vm._v(" "),
         _c("th", [_vm._v(" Saldo ")])
       ])
@@ -44833,8 +46246,34 @@ var staticRenderFns = [
     return _c("tr", [
       _c("td", { attrs: { colspan: "6" } }, [
         _vm._v(
-          "\n                                    Inserte la información requerida\n                                    "
+          "\n                                   Inserte la información requerida\n                                "
         )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", { staticClass: "bg bg-dark text-white " }, [
+        _c("th", [_vm._v(" Opciones")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Id Crédito ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Fecha de Desembolso")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Monto Capital")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Tasa de Interes")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Periodo ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" N° Cuotas ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" DNI Cliente ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Nombres del  Cliente ")])
       ])
     ])
   }
@@ -59604,7 +61043,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

@@ -3,7 +3,8 @@
     <main>
     <template v-if="viewAgregar=='agregar'">
         <div class="row" >
-            <button type="button" class="btn btn-warning" @click="viewAgregar='listar';limpiar()">
+            <button type="button" class="btn btn-warning"
+             @click="viewAgregar='listar';limpiar();this.listarCreditos(1,this.buscar,this.criterio);">
             <i class="mdi mdi-arrow-left-bold"></i> Lista de Simulaciones
             </button> 
             <div class="col-md-12 grid-margin stretch-card">
@@ -42,11 +43,10 @@
                                 <div class=" col-md-2 form-group">
                                     <label for="exampleInputEmail1">Periodo</label>
                                     <select class="form-control "  v-model="periodo"> 
-                                        <option value="1">Mensual</option>
-                                            <option value="2">Bimestral</option>
-                                            <option value="3">Trimestral</option>
-                                            <option value="6">Semestral</option>
-                                            <option value="12">Anual</option>
+                                        <option value=12 selected>Mensual</option>
+                                        <option value=1>Anual</option>
+                                        <option value=2>Semestral</option>
+                                        <option value=4>Trimestral</option>
                                     </select>
                                 </div>
                                 <div class=" col-md-2 form-group">
@@ -64,40 +64,51 @@
                         
 
                             <div class="table-responsive" v-if="viewCuotas">
-                                <table class="table  table-bordered">
-                                    <thead class="table-info text-white">
-                                        <tr>
-                                            <th>Cuota </th>
-                                            <th>Fecha de Pago </th>
-                                            <th>Monto de Cuota </th>
-                                            <th> Capital </th>
-                                            <th> Interés </th>
-                                            <th> Saldo </th>
+                                 <table class="table  table-bordered">
+                                <thead class="table-info text-white">
+                                    <tr>
+                                        <th>Cuota </th>
+                                        <th>Fecha de Pago </th>
+                                        <th>Cuota </th>
+                                        <th> Interes </th>
+                                        <th> Amortización </th>
+                                        <th> Saldo </th>
 
 
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="newCuotas.length">
+                                    </tr>
+                                </thead>
+                                <template v-if="newCuotas.length">
+                                    <tbody >
                                         <tr v-for="c in newCuotas" :key="c.id">
                                             <td class="py-1">{{c.contador}}</td>
                                             <td v-text="c.fechapago"></td>
-                                            <td v-text="c.monto"></td>
-                                            <td v-text="c.monto"></td>
-                                            <td v-text="c.monto"></td>
-                                            <td v-text="c.saldopendiente"></td>
-                                            
-
+                                            <td v-text="'S/ '+c.monto"></td>
+                                            <td v-text="'S/ '+c.interes"></td>
+                                                <td v-text="'S/ '+c.amortizacion"></td>
+                                                <td v-text="'S/ '+c.saldopendiente"></td>
                                         </tr>
-
                                     </tbody>
-                                    <tbody v-else>
-                                    <tr>
-                                        <td colspan="6">
-                                        Inserte la información requerida
-                                        </td>
+                                <tbody>
+                                    <tr class="bg bg-warning">
+                                        <td></td>
+                                        <td class="font-weight-bold">Total</td>
+                                        <td class="font-weight-bold"> S/{{totalcuotas}}</td>
+                                        <td class="font-weight-bold">S/ {{totalinteres}}</td>
+                                         <td class="font-weight-bold">S/ {{totalamortizacion}}</td>
+                                         <td></td>
                                     </tr>
                                 </tbody>
-                                </table>
+                                </template>
+                                
+
+                                <tbody v-else>
+                                <tr>
+                                    <td colspan="6">
+                                       Inserte la información requerida
+                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>
                             </div>
                             <hr>
                             <div  v-show="errorCredito" class=" form-group col-md-12 mt-2 bg-danger">
@@ -162,6 +173,86 @@
          <button type="button" class="btn btn-warning" @click="viewAgregar='agregar';limpiar()">
            <i class="mdi mdi-arrow-left-bold"></i> Nueva simulacion
         </button>  
+        <div class="row">
+             
+                            <div class="col-lg-12 grid-margin stretch-card ">
+                                <div class="card ">
+                                    <div class="card-body ">
+                                        <h4 class="card-title ">Lista de Simulaciones de Créditos</h4>
+                                        <p class="card-description ">
+                                            Información de simulaciones de Créditos 
+                                        </p>
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="input-group">
+                                                    <select class="form-control col-md-12" v-model="criterio">
+                                                        <option value="numeroprestamo">Número de prestamo</option>
+                                                        <option value="dni">DNI Socio</option>
+                                                        <option value="fechadesembolso">Fecha de Desembolso </option>
+                                                    </select>
+                                                    <input type="text" v-model="buscar" @keyup.enter="listarCreditos(1,buscar,criterio)" 
+                                                    class="form-control form-control-lg" placeholder="Texto a buscar">
+                                                    <button type="submit" @click="listarCreditos(1,buscar,criterio)" 
+                                                    class="btn btn-outline-primary btn-sm"><i class="fa fa-search"></i>  <i class="mdi mdi-magnify"></i> Buscar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive pt-3 ">
+                                            <table class="table table-bordered ">
+                                                <thead>
+                                                    <tr class="bg bg-dark text-white ">
+                                                        
+                                                        <th> Opciones</th>
+                                                        <th> Id Crédito </th>
+                                                        <th> Fecha de Desembolso</th>
+                                                        <th> Monto Capital</th>
+                                                        <th> Tasa de Interes</th>
+                                                         <th>Periodo </th>
+                                                        
+                                                        <th> N° Cuotas </th>
+                                                        <th> DNI Cliente </th>
+                                                        <th> Nombres del  Cliente </th>
+                                                       
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="c in arrayCreditos" :key="c.id">
+                                                        
+                                                        <td>
+                                                            <!--detalle de credito-->
+                                                            <button type="button" @click="viewDetalle=true;idcredito=c.id;viewLista=false" class="btn btn-success btn-rounded btn-icon ">
+                                                                    <i class="mdi mdi-eye "></i>
+                                                            </button>
+                                                        </td>
+                                                        <td>{{c.id}}</td>
+                                                      
+                                                        <td v-text="c.fechadesembolso"></td>
+                                                        <td v-text="'S/ '+c.montodesembolsado"></td>
+                                                            <td v-text="c.tasa+' %'"></td>
+
+                                                          <td v-if="c.periodo==12">Mensual</td>
+                                                           <td v-else-if="c.periodo==1">Anual</td>
+                                                            <td v-else-if="c.periodo==6">Anual</td>
+                                                             <td v-else-if="c.periodo==4">Trimestral</td>
+                                                        
+                                                        <td v-text="c.numerocuotas"></td>
+
+                                                        <td v-text="c.dni"></td>
+                                                        <td v-text="c.nombresapellidos"></td>
+                                                        
+                                                       
+
+                                                    </tr>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+           
     </template>
   
     
@@ -213,6 +304,7 @@
 
 
                 arrayAuxliar:[],
+                arrayCreditos:[],
                 idcredito:0
                 }
         },
@@ -246,7 +338,7 @@
                 
                 return anio + "-" + mes + "-" + dia;
             },
-            agregarCuotas()
+                agregarCuotas()
             {
                 
                 this.newCuotas.length=0;
@@ -261,49 +353,133 @@
                         })
                 }else{
                    //  me.btnregistar=1;
-                    var montotal=this.montodesembolsado; 
-                    var contadoraux=1;
-                    //cuota neta
-                    var cuotaneta=(this.montodesembolsado/this.numerocuotas).toFixed(2);
-                    //saldo pendienteneto =monto desembolsado- montopor cuota
-                    var saldop=(parseFloat(this.montodesembolsado)-parseFloat(cuotaneta)).toFixed(2);
-                
-                     //FECHA
+                    var periodofecha
+                    if(me.periodo==1)periodofecha=12
+                    else  if(me.periodo==2)periodofecha=6
+                    else  if(me.periodo==4)periodofecha=3
+                    else  if(me.periodo==12)periodofecha=1
+
+
                     var e = new Date(me.fechadesembolso);
-                    var pe=me.periodo
-                   // var dia=e.getDate();//
+                    var pe=periodofecha
                     var dia=me.fechadesembolso.substr(-2)
-                    var unmesmas = this.editar_fecha(me.fechadesembolso, me.periodo, "m");
+                    var unmesmas = this.editar_fecha(me.fechadesembolso, periodofecha, "m");
 
-                    for (let i = 0; i < me.numerocuotas; i++) { 
-                    
-                    if((i+1)==me.numerocuotas)saldop=0;
-                   
+                  
+                                       
+                    //INICIO DE FORMULAR
+                    var TIN = 0;
+                    var TA = 0;
+                    var TAN = 0;
+                    var AA = 0;
+                    var CUOTA = "";
+                    var I = 0;
+                    var AN = 0;
+                    var IN = 0;
+                    var A1 = 0;
+                    var CP2 = 0;
+                    var POT = 0;
+                    var CP1 = 0;
 
-                    me.newCuotas.push({
-                        //(monto total+tasa)/cantidadde cuotas
-                    
-                        monto:cuotaneta,
-                        fechapago:unmesmas,
-                        saldopendiente:saldop,
-                        otroscostos:0.0,
-                        descripcion:'',
-                        contador:contadoraux,
+                    var C = this.montodesembolsado;
+                    var J =  this.tasa/ 100;
+                    var N =this.numerocuotas;
+                    var D = 0;
 
-                    
-                    })
+                    N = Math.round(N);
+                    var M =this.periodo;
 
-                    saldop=(parseFloat(saldop)-parseFloat(cuotaneta)).toFixed(2);
-                    contadoraux++;
-                    pe= parseInt(pe)+parseInt(me.periodo);
-                    unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+
+                    var DD = 2;
+                    if (M == 1) {
+                        CUOTA = "ANUALES"
                     }
+                    if (M == 2) {
+                        CUOTA = "SEMESTRALES"
+                    }
+                    if (M == 4) {
+                        CUOTA = "TRIMESTRALES"
+                    }
+                    if (M == 12) {
+                        CUOTA = "MENSUALES"
+                    }  I = Math.pow(1 + J, 1 / M) - 1;
+                        AN = 0;
+                        IN = 0;
+                        A1 = 0;
+                        CP2 = C;
+                        POT = parseInt(D) - N;
+                        TIN = 0;
+                        TA = 0;
+                        TAN = 0;
+                    //FIN DE FORMULA
+                    for (var K = 0; K <= N; K++) {
+
+                        TIN = TIN + IN;
+                        TA = TA + A1;
+                        TAN = TAN + AN;
+                        if(K!=0){
+                             me.newCuotas.push({
+                            //(monto total+tasa)/cantidadde cuotas
+                            contador:K,
+                            monto:this.deci(AN, DD),
+                            interes:this.deci(IN, DD),
+                            amortizacion:this.deci(A1, DD),
+                            saldopendiente:this.deci(CP2, DD),
+                            fechapago:unmesmas,
+                                                  
+                        })
+                        }
+
+                       
+                        if(K!=0){
+                        pe= parseInt(pe)+parseInt(periodofecha);
+                        unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");}
+                    
+                       if (K < D) {
+                       
+                            AN = C * I;
+                            IN = C * I;
+                            A1 = 0;
+                            CP2 = C;
+                       
+                            }
+                        if (K == D) {
+                            
+                                AN = (C * I) / (1 - Math.pow(1 + I, POT));
+                                IN = C * I;
+                                A1 = AN - IN;
+                                CP2 = C - A1;
+                                CP1 = CP2;
+                        
+                        }
+
+                        if (K > D) {
+                            IN = CP1 * I;
+                            A1 = AN - IN;
+                            CP2 = CP1 - A1;
+                            CP1 = CP2;
+                        }
+
+                     }
+
+                     this.totalcuotas=this.deci(TAN, DD);
+                     this.totalinteres=this.deci(TIN, DD);
+                     this.totalamortizacion=this.deci(TA, DD)
+
+
+
     
                     this.viewCuotas=true;
 
                  }//fin del else
                
             },
+            deci(GG, KK){
+                 return (Math.round(GG * Math.pow(10, KK)) / Math.pow(10, KK));
+            },
+         
+          
+           
             limpiar(){
                
                 this.montodesembolsado=0; 
@@ -380,9 +556,27 @@
 
                 return this.errorCredito;
 
-            }
+            },
+             listarCreditos (page,buscar,criterio)
+            {
+                let me=this;
+                me.listado=2;
+                var url= 'simulacion/listaSilumaciones';
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayCreditos = respuesta.simulaciones;
+                    me.pagination= respuesta.pagination;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
             
-         }
+         },
+          mounted() {
+            this.listarCreditos(1,this.buscar,this.criterio);
+          
+    }
       
 
     }

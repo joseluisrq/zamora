@@ -19,8 +19,10 @@ class Credito extends Model
         'numerocuotas',
         'tipocambio',
         'tasa',
+        'intes',
         'estado',
-        'periodo'
+        'periodo',
+        'estadodesembolso'
     ];
 //usuario, socio que ha registrado el credito
     public function personas(){

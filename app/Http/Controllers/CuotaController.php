@@ -27,6 +27,8 @@ class CuotaController extends Controller
                     'cuotas.fechapago',                  
                     'cuotas.fechacancelo',
                     'cuotas.monto',
+                    'cuotas.interes',
+                    'cuotas.amortizacion',
                     'cuotas.saldopendiente',
                     'cuotas.mora',
                     'cuotas.descripcion',
@@ -70,6 +72,8 @@ class CuotaController extends Controller
                 'cuotas.fechacancelo',
                 'cuotas.fechapago',
                 'cuotas.monto',
+                'cuotas.interes',
+                'cuotas.amortizacion',
                 'cuotas.mora',
                 'cuotas.saldopendiente',
 

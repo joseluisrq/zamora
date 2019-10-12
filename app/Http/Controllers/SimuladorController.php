@@ -25,6 +25,7 @@ class SimuladorController extends Controller
             'simulaciones.nombresapellidos',
 
             )
+        ->orderBy('simulaciones.id','desc')
         ->where('simulaciones.estado', '=', '1')
         ->get();
        
