@@ -41,6 +41,17 @@ Vue.component('aportes', require('./components/aportes/Aportes.vue').default);
 
 
 Vue.component('simularcreditos', require('./components/creditos/SimularCreditos.vue').default);
+
+
+//Ahorros
+Vue.component('listarcuentas', require('./components/ahorros/ListaCuentas.vue').default);
+Vue.component('detallecuenta', require('./components/ahorros/DetalleCuentaAhorro.vue').default);
+Vue.component('crearcuentaahorro', require('./components/ahorros/CrearCuentaAhorro.vue').default);
+Vue.component('registrarmovimiento', require('./components/ahorros/RegistrarMovimiento.vue').default);
+
+// CONFIGURACIONES DE TASAS
+Vue.component('configuraciones', require('./components/configuracion/Configuracion.vue').default);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

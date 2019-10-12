@@ -19,15 +19,22 @@
              <template v-if="menu==40">
                     <listarcredito :ruta="ruta"></listarcredito>
              </template>
-             <template v-if="menu==90">
+             <template v-if="menu==100">
                     <pagar :ruta="ruta"></pagar>
              </template>
             
              {{-- INICIO MENU AHORROS --}}
+             <template v-if="menu==70">
+                <registrarmovimiento :ruta="ruta"/>
+             </template>
              <template v-if="menu==71">
                 <crearcuentaahorro :ruta="ruta"></crearcuentaahorro>
-             </template>             
+             </template>
+             <template v-if="menu==72">
+                <listarcuentas :ruta="ruta"></listarcuentas>
+             </template>
              {{-- FIN AHORROS --}}
+            
             
              {{-- INICIO MENU SOCIOS --}}
             <template v-if="menu==2">
@@ -60,6 +67,12 @@
                 <listaroles :ruta="ruta"/>
             </template>
              {{-- FIN ACCESO --}}
+
+             {{-- INICIO CONFIGURACIÓN --}}
+            <template v-if="menu==90">
+                <configuraciones :ruta='ruta'/>
+            </template>
+            {{-- FIN CONFIGURACIÓN --}}
 
         </div>
     </div>

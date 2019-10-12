@@ -96,6 +96,19 @@
                         </ul>
                     </div>
                 </li>
+                        <!--Configracion-->
+                        <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="mdi mdi-codepen menu-icon"></i>
+                      <span class="menu-title">Configuraciones</span>
+                      <i class="menu-arrow"></i>
+                    </a>
+                    <div class="submenu">
+                        <ul class="submenu-item">
+                            <li @click="menu=90" class="nav-item"><a class="nav-link" href="#">Configurar tasas</a></li>
+                        </ul>
+                    </div>
+                </li>
               </ul>
           </div>
         </nav>

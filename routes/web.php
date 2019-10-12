@@ -46,13 +46,23 @@ Route::get('/aporte/pdfDetalleAporte', 'AporteController@pdfDetalleAporte')->nam
 Route::post('/aporte/registrar', 'AporteController@store');
 
 // CUENTA AHORROS
+Route::get('/ahorro/listar', 'CuentaAhorroController@index');
+Route::get('/ahorro/detalle/', 'CuentaAhorroController@detalleCuentaAhorro');
+Route::get('/ahorro/selectsocio', 'CuentaAhorroController@selectSocio');
 Route::post('/cuentaahorros/crear', 'CuentaAhorroController@store');
+Route::get('/ahorro/movimiento/imprimirboucher', 'CuentaAhorroController@imprimirBoucherMovimiento');
+//MOVIMIENTOS
+Route::get('/movimiento/selectCuenta', 'MovimientoController@selectCuenta');
+Route::post('/movimiento/registrar', 'MovimientoController@store');
 
 
 //simulaciones
 Route::get('/simulacion/listaSilumaciones', 'SimuladorController@listaSilumaciones');//listar creditos
 Route::post('/simulacion/guardarSimulacion', 'SimuladorController@guardarSimulacion');
 
+// OPCIONES DE CONFIGURACION
+Route::get('/config/valores', 'EmpresaController@index');
+Route::put('/config/actualizar', 'EmpresaController@update');
 
 //pdf
 Route::get('/credito/pdfDetallecredito/{id}', 'CreditoController@pdfDetallecredito')->name('detallecredito_pdf');

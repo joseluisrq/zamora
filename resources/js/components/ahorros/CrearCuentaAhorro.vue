@@ -1,7 +1,7 @@
 <template>
     <div class="content-wrapper">
         <div class="row ">
-            <div class="col-md-12 grid-margin stretch-card">
+            <div class="col-md-6 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
                         <h3 class=" text-dark font-weight-bold">
@@ -28,14 +28,6 @@
                                     <label class="badge badge-dark" v-text="nombre+' '+apellidos"/>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                    <label for="numcuentasocio " class="font-weight-bold">Número de Cuenta</label>
-                                    <input type="text" class="form-control" id="numcuentasocio" placeholder="Número de cuenta de ahorros" v-model="numerocuenta" oninvalid="this.setCustomValidity('ingrese un número de cuenta')" oninput="this.setCustomValidity('')" required>
-                            </div>
-                            <div class="form-group">
-                                    <label for="tasainteres" class="font-weight-bold">Tasa de Interés</label>
-                                    <input type="number" class="form-control" id="tasainteres" placeholder="Tasa de interes por aporte" v-model="tasa" min="1" max="99" oninvalid="this.setCustomValidity('ingrese la tasa de interés')" oninput="this.setCustomValidity('')" required>
-                            </div>
                             <hr>
                             <div class="form-group">
                                 <label for="montoinicial" class="font-weight-bold">Monto de Aporte Incial(S/)</label>
@@ -43,13 +35,49 @@
                             </div>
                             <div class="form-group">
                                 <label for="descripcion" class="font-weight-bold">Descripción</label>
-                                <input type="text" class="form-control" id="descripcion" placeholder="Detalle de Aporte" v-model="descripcion">
+                                <input type="text" class="form-control" id="descripcion" placeholder="Detalle de Aporte" v-model="descripcion" required>
                             </div>
                             
                         
                             <input type="submit" class="btn btn-primary mr-2" value="Crear Cuenta" @click="crearcuentaahorros"></input>
                             <a class="btn btn-light" @click="limpiarformulario">Cancelar</a>
                         </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class=" text-dark font-weight-bold">
+                                <i class="mdi mdi-cash-usd mdi-36px"></i>
+                                Datos de la nueva Cuenta de Ahorros
+                        </h3>
+                                <hr>
+                        <p class="card-description text-primary">
+                            La cuenta que se creará tendrá la siguiente información
+                        </p>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="font-weight-bold ">Número de cuenta</h5>
+                                <p v-text="numerocuenta"></p>
+                            </div>
+                            <div class="col-md-12">
+                                <h5 class="font-weight-bold ">Socio</h5>
+                                 <p v-text="nombre+' '+apellidos"></p>
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="font-weight-bold ">Saldo efectivo</h5>
+                                 <p v-text="'S/.'+monto"></p>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="font-weight-bold ">Tasa</h5>
+                                 <p v-text="tasa"></p>
+                            </div>
+                            <div class="col-md-12">
+                                <h5 class="font-weight-bold ">Creado por:</h5>
+                                 <p v-text="usuario.usuario"></p>
+                            </div>
+                        </div>                        
                     </div>
                 </div>
             </div>
@@ -72,12 +100,18 @@
 
                 numerocuenta: '',
 
-                monto: '',
+                monto: '',//Al momnto de crear la cuenta, este es el saldo inicial
                 descripcion: '',
                 tasa: '',
 
                 socioseleccionado: false,
-                arraysocios: []
+                arraysocios: [],
+
+                numerocuenta: '',
+                usuario: {
+                    id: '',
+                    usuario: ''
+                }
             }
         },
         components:{
@@ -112,13 +146,20 @@
                 me.apellidos = '';
                 me.socioseleccionado = false;
                 me.arraysocios = [];
+
+                me.tasa = '';
+                me.usuario = {
+                    id: '',
+                    usuario: ''
+                };
+                me.numerocuenta = '';
             },
             limpiarselect(){
                 let me = this;
-                me.limpiardatossocio();//Limpiar datos del socio
                 me.$nextTick(() => {
                     me.selected = null;//Limpiar el valor de label de v-select
-                })
+                });
+                me.limpiardatossocio();//Limpiar datos del socio
             },
             crearcuentaahorros(){
                 let me = this;
@@ -134,9 +175,9 @@
                 if(form.checkValidity()){
                     let cuentaahorros = {
                         'idsocio': me.idsocio,
+                        'idusuario': me.usuario.id,
                         'numerocuenta': me.numerocuenta,
-                        'dni': me.dni,
-                        'monto': me.monto,
+                        'monto_inicial': me.monto,
                         'descripcion': me.descripcion,
                         'tasa': me.tasa
                     };
@@ -156,12 +197,16 @@
             selectSocio(search, loading){//CREAR SOLO PARA LOS SOCIOS QUE NO TIENEN CUENTA DE AHORROS
                 let me=this;
                  loading(true)
-                var url= this.ruta+'/aporte/selectsocio?filtro='+search;
+                var url= me.ruta+'/ahorro/selectsocio?filtro='+search;
                 axios.get(url).then(function (response) {
                     let respuesta = response.data;
                     q:search;
                     me.socioseleccionado = false;
                     me.arraysocios = respuesta.socios;
+
+                    me.tasa = respuesta.tasa;
+                    me.usuario = respuesta.usuario;
+
                     loading(false)
                 })
                 .catch(function (error) {
@@ -176,10 +221,24 @@
                     me.dni = value.dni;
                     me.nombre = value.nombre;
                     me.apellidos = value.apellidos;
+
+                    me.generarNumeroCuenta(me.idsocio+'');
+
                     me.socioseleccionado = true;
                 }else{//en el caso de que no exista, se limpia el label de v-select
                     me.limpiarselect();
                 }
+            },
+            generarNumeroCuenta(id){
+                let me = this;
+                let numcuenta = 'C-';
+
+                for(let i = 0; i < 5 - id.length; i++)
+                    numcuenta += '0';
+
+                numcuenta += id;
+
+                me.numerocuenta = numcuenta;
             }
         },
         mounted() {
