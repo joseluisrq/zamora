@@ -15,7 +15,7 @@ Route::get('/credito', 'CreditoController@index');//listar creditos
 Route::get('/credito/detallecredito','CreditoController@detallecredito');//detalle credito
 Route::post('/credito/registrar', 'CreditoController@store');//registrar un nuevo credito
 Route::get('/credito/ultimocredito', 'CreditoController@ultimocredito');//listar creditos
-
+Route::put('/credito/desembolsar', 'CreditoController@desembolsar');
 // PERSONAS
 Route::get('/listapersonas', 'PersonaController@index');
 Route::get('/detallepersona', 'PersonaController@detalle');
@@ -34,8 +34,9 @@ Route::get('/socios/selectCliente', 'CreditoController@selectCliente');
 Route::get('/cuota', 'CuotaController@index');//listar creditos
 Route::get('/cuota/cuotassinpagar', 'CuotaController@cuotassinpagar');
 Route::get('/cuota/detallepagar', 'CuotaController@detalleCuota');
-Route::put('/cuota/pagar', 'CuotaController@update');
-
+Route::put('/cuota/pagarCuota', 'CuotaController@pagarCuota');
+Route::get('/cuota/selectsocio', 'CuotaController@selectSocio');
+Route::get('/cuota/detallecuotapdf/{id}', 'CuotaController@pdfDetalleCuota')->name('detallecuota_pdf');
 //listar cuotas a pagaR
 
 

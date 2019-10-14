@@ -49,18 +49,20 @@
                                             <h3 class="font-weight-bold"> Formulario de Garante </h3> 
                                       </div>
                                      <div class="col-md-2 form-group">
-                                        <label for="exampleInputUsername1" class=" text-dark">DNI de Socio</label>
+                                        <label for="exampleInputUsername1" class=" text-dark">DNI de Garante</label>
                                         <input type="text" class="form-control" v-model="dnig" placeholder="Ingrese DNI" >
                                     </div>
 
                                     <div class="col-md-3 form-group ">
                                         <label for="exampleInputUsername1" class=" text-dark">Nombres Completos</label>
-                                        <input type="text" class="form-control" v-model="nombreg" placeholder="Ingrese nombres completos" >
+                                        <input type="text" class="form-control" v-model="nombreg"
+                                         onkeyup="this.value = this.value.toUpperCase();" placeholder="Ingrese nombres completos" >
                                     </div>
 
                                       <div class="col-md-3 form-group">
                                         <label for="exampleInputUsername1" class=" text-dark">Apellidos Completos</label>
-                                        <input type="text" class="form-control" v-model="apellidosg" placeholder="Ingrese apellidos completos" >
+                                        <input type="text" class="form-control" v-model="apellidosg" 
+                                         onkeyup="this.value = this.value.toUpperCase();" placeholder="Ingrese apellidos completos" >
                                     </div>
                                      <div class="col-md-2 form-group">
                                         <label for="exampleInputUsername1" class=" text-dark">Fecha Nacimiento</label>
@@ -68,15 +70,20 @@
                                     </div>
                                      <div class="col-md-2 form-group">
                                         <label for="exampleInputUsername1"  class=" text-dark">Departamento</label>
-                                        <input type="text" class="form-control" v-model="departamentog" placeholder="Departamento" >
+                                        <input type="text" class="form-control" v-model="departamentog"
+                                         onkeyup="this.value = this.value.toUpperCase();"  placeholder="Departamento" >
                                     </div>
                                     <div class="col-md-3 form-group ">
                                         <label for="exampleInputUsername1"  class=" text-dark">Ciudad</label>
-                                        <input type="text" class="form-control" v-model="ciudadg" placeholder="Ciudad" >
+                                        <input type="text" class="form-control" 
+                                         onkeyup="this.value = this.value.toUpperCase();"
+                                         v-model="ciudadg" placeholder="Ciudad" >
                                     </div>
                                     <div class="col-md-3 form-group">
                                         <label for="exampleInputUsername1"  class=" text-dark">Direccion</label>
-                                        <input type="text" class="form-control" v-model="direcciong" placeholder="Dirección" >
+                                        <input type="text" class="form-control"
+                                         onkeyup="this.value = this.value.toUpperCase();"
+                                          v-model="direcciong" placeholder="Dirección" >
                                     </div>
                                     <div class="col-md-3 form-group">
                                         <label for="exampleInputUsername1"  class=" text-dark">Teléfono</label>
@@ -118,21 +125,21 @@
                                 <input type="number" class="form-control" v-model="numerocuotas" placeholder="Número de Cuotas">
                             </div>
                             <div class=" col-md-2 form-group">
-                                <label for="exampleInputEmail1">Tasa de Interés</label>
-                                <input type="text"   class="form-control" v-model="tasa" placeholder="Número de Telefono">
+                                <label for="exampleInputEmail1">Tasa Efectiva Anual(TEA) %</label>
+                                <input type="text"   class="form-control"  v-model="tasa_creditos" placeholder="Número de Telefono" disabled> 
                             </div>
                             <div class=" col-md-2 form-group">
                                 <label for="exampleInputEmail1">Periodo dce Cuotas</label>
                                 <select class="form-control "  v-model="periodo"> 
-                                        <option value=12 selected>Mensual</option>
-                                        <option value=1>Anual</option>
-                                        <option value=2>Semestral</option>
-                                        <option value=4>Trimestral</option>
+                                        <option value="12" selected>Mensual</option>
+                                        <option value="1">Anual</option>
+                                        <option value="2">Semestral</option>
+                                        <option value="4">Trimestral</option>
                                        
                                 </select>
                             </div>
                             <div class=" col-md-2 form-group">
-                                <label for="exampleInputEmail1">Fecha de Desembolso</label>
+                                <label for="exampleInputEmail1">Fecha Primera Cuota</label>
                                 <input type="date" class="form-control" v-model="fechadesembolso" placeholder="Número de Telefono">
                             </div>
                         </div>
@@ -282,8 +289,10 @@
                 telefonog:'',
                 emailg:'',
 
-                garanteestado:0
-                 }
+                garanteestado:0,
+
+                tasa_creditos:0.0 ,
+                hoy:'',                }
         },
           components:{
             vSelect
@@ -341,9 +350,9 @@
 
 
                     var e = new Date(me.fechadesembolso);
-                    var pe=periodofecha
+                    var pe=0;
                     var dia=me.fechadesembolso.substr(-2)
-                    var unmesmas = this.editar_fecha(me.fechadesembolso, periodofecha, "m");
+                    var unmesmas =me.fechadesembolso// this.editar_fecha(me.fechadesembolso, periodofecha, "m");
 
                   
                                        
@@ -408,12 +417,9 @@
                             fechapago:unmesmas,
                                                   
                         })
-                        }
-
-                       
-                        if(K!=0){
                         pe= parseInt(pe)+parseInt(periodofecha);
-                        unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");}
+                        unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
+                        }
                     
                        if (K < D) {
                        
@@ -459,10 +465,16 @@
             },
             codigoprestamo(){
                 let me=this;
+                 let idcreditou=0;
                 var url= this.ruta+'/credito/ultimocredito';               
                 axios.get(url).then(function (response) {
                 let respuesta= response.data;
-                let idcreditou= respuesta.idultimocredito[0].id;
+                if(response.length==0){
+                    idcreditou=1;
+                }else{
+                    idcreditou= respuesta.idultimocredito[0].id;
+                }
+               
                 me.numeroprestamo='CZ'+me.zfill(idcreditou,6);
                  
                 
@@ -490,6 +502,24 @@
                         return ((zero.repeat(width - length)) + numberOutput.toString()); 
                     }
                 }
+            },
+            cargarValores()
+            {
+                let me = this;
+
+                axios.get('/config/valores')
+                    .then(res => {
+                        //  me.array_empresa=res.data.config;
+                        me.tasa_creditos =  res.data.config.tasa_creditos;
+                        me.tasa=me.tasa_creditos;
+                        me.hoy = res.data.hoy;
+                        me.fechadesembolso=me.hoy;
+                    
+                    })
+                    .catch(err => {
+                    // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
+                        console.log(err);
+                    });
             },
 
             limpiar(){
@@ -548,7 +578,8 @@
                        axios.post(this.ruta+'/credito/registrar',{
                         'numeroprestamo': this.numeroprestamo,                              
                         'montodesembolsado': this.montodesembolsado,
-                        'fechadesembolso' : this.fechadesembolso,                               
+                        'fechadesembolso' : this.hoy, 
+                                                       
                         'numerocuotas' : this.numerocuotas,
                         'interes':this.totalinteres,
                        
@@ -556,10 +587,12 @@
                         'periodo' : this.periodo,
                         'idcliente' : this.idcliente,
 
+                        'garanteestado':this.garanteestado,
+
 
                         'dnig':this.dnig,
-                        'nombreg':this.nombreg,
-                        'apellidosg':this.apellidosg,
+                        'nombreg':this.nombreg,  
+                        'apellidosg':this.apellidosg,                       
                         'fechanacimientog':this.fechanacimientog,
                         'direcciong':this.direcciong,
                         'departamentog':this.departamentog,
@@ -607,6 +640,7 @@
          },
          mounted(){
              this.codigoprestamo();
+                this.cargarValores();
          }
       
 

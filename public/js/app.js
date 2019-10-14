@@ -3137,10 +3137,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
   data: function data() {
     return {
+      array_empresa: [],
       mora: '',
       intereses: '',
       abonosocio: '',
@@ -3170,7 +3172,8 @@ __webpack_require__.r(__webpack_exports__);
     },
     cargarValores: function cargarValores() {
       var me = this;
-      axios.get(me.ruta + '/config/valores').then(function (res) {
+      axios.get('/config/valores').then(function (res) {
+        //  me.array_empresa=res.data.config;
         me.mora = me.ant_mora = res.data.config.mora;
         me.intereses = me.ant_intereses = res.data.config.interes;
         me.abonosocio = me.ant_abonosocio = res.data.config.abonosocio;
@@ -3462,6 +3465,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['id'],
   data: function data() {
@@ -3487,6 +3497,33 @@ __webpack_require__.r(__webpack_exports__);
     },
     pdfCronograma: function pdfCronograma(idcredito) {
       window.open(this.ruta + '/credito/pdfDetallecredito/' + this.id, '_blank');
+    },
+    generarboucher: function generarboucher(id) {
+      window.open('/cuota/detallecuotapdf/' + id + '', '_blank');
+    },
+    desembolsar: function desembolsar(id) {
+      var me = this;
+      Swal.fire({
+        title: '',
+        text: "¿Está seguro que desea DESEMBOLSAR EL CREDITO?",
+        type: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Si'
+      }).then(function (result) {
+        if (result.value) {
+          axios.put('/credito/desembolsar', {
+            'id': id
+          }).then(function (response) {
+            Swal.fire('', 'El credito ha sido REGISTRADO COMO DESEMBOLSADO', 'success');
+            this.detalleCredito();
+          })["catch"](function (error) {
+            console.log(error);
+          });
+        }
+      });
     },
     fechaactual: function fechaactual() {
       var date = new Date();
@@ -3935,6 +3972,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3981,7 +4025,9 @@ __webpack_require__.r(__webpack_exports__);
       ciudadg: '',
       telefonog: '',
       emailg: '',
-      garanteestado: 0
+      garanteestado: 0,
+      tasa_creditos: 0.0,
+      hoy: ''
     };
   },
   components: {
@@ -4031,9 +4077,10 @@ __webpack_require__.r(__webpack_exports__);
         var periodofecha;
         if (me.periodo == 1) periodofecha = 12;else if (me.periodo == 2) periodofecha = 6;else if (me.periodo == 4) periodofecha = 3;else if (me.periodo == 12) periodofecha = 1;
         var e = new Date(me.fechadesembolso);
-        var pe = periodofecha;
+        var pe = 0;
         var dia = me.fechadesembolso.substr(-2);
-        var unmesmas = this.editar_fecha(me.fechadesembolso, periodofecha, "m"); //INICIO DE FORMULAR
+        var unmesmas = me.fechadesembolso; // this.editar_fecha(me.fechadesembolso, periodofecha, "m");
+        //INICIO DE FORMULAR
 
         var TIN = 0;
         var TA = 0;
@@ -4096,9 +4143,6 @@ __webpack_require__.r(__webpack_exports__);
               saldopendiente: this.deci(CP2, DD),
               fechapago: unmesmas
             });
-          }
-
-          if (K != 0) {
             pe = parseInt(pe) + parseInt(periodofecha);
             unmesmas = this.editar_fecha(me.fechadesembolso, pe, "m");
           }
@@ -4138,10 +4182,17 @@ __webpack_require__.r(__webpack_exports__);
     },
     codigoprestamo: function codigoprestamo() {
       var me = this;
+      var idcreditou = 0;
       var url = this.ruta + '/credito/ultimocredito';
       axios.get(url).then(function (response) {
         var respuesta = response.data;
-        var idcreditou = respuesta.idultimocredito[0].id;
+
+        if (response.length == 0) {
+          idcreditou = 1;
+        } else {
+          idcreditou = respuesta.idultimocredito[0].id;
+        }
+
         me.numeroprestamo = 'CZ' + me.zfill(idcreditou, 6);
       })["catch"](function (error) {
         console.log(error);
@@ -4170,6 +4221,19 @@ __webpack_require__.r(__webpack_exports__);
           return zero.repeat(width - length) + numberOutput.toString();
         }
       }
+    },
+    cargarValores: function cargarValores() {
+      var me = this;
+      axios.get('/config/valores').then(function (res) {
+        //  me.array_empresa=res.data.config;
+        me.tasa_creditos = res.data.config.tasa_creditos;
+        me.tasa = me.tasa_creditos;
+        me.hoy = res.data.hoy;
+        me.fechadesembolso = me.hoy;
+      })["catch"](function (err) {
+        // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
+        console.log(err);
+      });
     },
     limpiar: function limpiar() {
       this.codigoprestamo();
@@ -4227,12 +4291,13 @@ __webpack_require__.r(__webpack_exports__);
           axios.post(_this.ruta + '/credito/registrar', {
             'numeroprestamo': _this.numeroprestamo,
             'montodesembolsado': _this.montodesembolsado,
-            'fechadesembolso': _this.fechadesembolso,
+            'fechadesembolso': _this.hoy,
             'numerocuotas': _this.numerocuotas,
             'interes': _this.totalinteres,
             'tasa': _this.tasa,
             'periodo': _this.periodo,
             'idcliente': _this.idcliente,
+            'garanteestado': _this.garanteestado,
             'dnig': _this.dnig,
             'nombreg': _this.nombreg,
             'apellidosg': _this.apellidosg,
@@ -4271,6 +4336,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     this.codigoprestamo();
+    this.cargarValores();
   }
 });
 
@@ -4287,6 +4353,20 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-select */ "./node_modules/vue-select/dist/vue-select.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_select__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -4447,18 +4527,68 @@ __webpack_require__.r(__webpack_exports__);
       detalecuota: false,
       personacredito_id: 0,
       arrayCuotas: [],
-      hoy: ''
+      hoy: '',
+      pagination: {
+        'total': 0,
+        'current_page': 0,
+        'per_page': 0,
+        'last_page': 0,
+        'from': 0,
+        'to': 0
+      },
+      offset: 3,
+      criterio: 'dni',
+      buscar: ''
     };
+  },
+  computed: {
+    isActived: function isActived() {
+      return this.pagination.current_page;
+    },
+    //Calcula los elementos de la paginación
+    pagesNumber: function pagesNumber() {
+      if (!this.pagination.to) {
+        return [];
+      }
+
+      var from = this.pagination.current_page - this.offset;
+
+      if (from < 1) {
+        from = 1;
+      }
+
+      var to = from + this.offset * 2;
+
+      if (to >= this.pagination.last_page) {
+        to = this.pagination.last_page;
+      }
+
+      var pagesArray = [];
+
+      while (from <= to) {
+        pagesArray.push(from);
+        from++;
+      }
+
+      return pagesArray;
+    }
   },
   components: {
     vSelect: vue_select__WEBPACK_IMPORTED_MODULE_0___default.a
   },
   methods: {
+    cambiarPagina: function cambiarPagina(page, buscar, criterio) {
+      var me = this; //Actualiza la página actual
+
+      me.pagination.current_page = page; //Envia la petición para visualizar la data de esa página
+
+      me.listarCuotas(page, buscar, criterio);
+    },
     selectSocio: function selectSocio(search, loading) {
       //CREAR SOLO PARA LOS SOCIOS QUE NO TIENEN CUENTA DE AHORROS
       var me = this;
       loading(true);
-      var url = this.ruta + '/aporte/selectsocio?filtro=' + search;
+      var url = this.ruta + '/cuota/selectsocio?filtro=' + search;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
 
@@ -4488,12 +4618,13 @@ __webpack_require__.r(__webpack_exports__);
         me.limpiarselect();
       }
     },
-    listarCuotas: function listarCuotas() {
+    listarCuotas: function listarCuotas(page, buscar, criterio) {
       var me = this;
-      var url = this.ruta + '/cuota/cuotassinpagar';
+      var url = this.ruta + '/cuota/cuotassinpagar?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
-        me.arrayCuotas = respuesta.cuotas;
+        me.arrayCuotas = respuesta.cuotas.data;
+        me.pagination = respuesta.pagination;
       })["catch"](function (error) {
         console.log(error);
       });
@@ -4511,7 +4642,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    this.listarCuotas();
+    this.listarCuotas(1, this.buscar, this.criterio);
     this.fechaactual();
   }
 });
@@ -4527,6 +4658,24 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -4715,7 +4864,15 @@ __webpack_require__.r(__webpack_exports__);
       identificadorcuota: 0,
       btnboucher: 1,
       //1cuota //2 porcioncuota
-      montoanterior: 0
+      montoanterior: 0,
+      //caluclo de interes
+      hoy: '',
+      tasa_compensatoria_anual: 0.0,
+      tasa_moratoria_anual: 0.0,
+      fechapago: '',
+      diasdemora: '',
+      morahastahoy: 0.0,
+      estadomora: "0"
     };
   },
   computed: {},
@@ -4726,7 +4883,8 @@ __webpack_require__.r(__webpack_exports__);
 
       var me = this;
       axios.get('/cuota/detallepagar?id=' + this.idcliente).then(function (res) {
-        _this.dataC = res.data.cuotas; //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
+        _this.dataC = res.data.cuotas;
+        _this.fechapago = _this.dataC[0].fechapago; //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
         // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
         // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
       })["catch"](function (err) {
@@ -4734,20 +4892,20 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     //pagar cuota
-    pagarCuota: function pagarCuota(idcuota, otroscostoscuota, idpersona) {
+    pagarCuota: function pagarCuota(idcuota, idpersona) {
       var _this2 = this;
 
-      axios.put('/cuota/pagar', {
+      axios.put('/cuota/pagarCuota', {
         'id': idcuota,
         'descripcion': this.descpagocuota,
-        'otrospagos': otroscostoscuota,
-        'idpersona': idpersona //'montoant':this.montoanterior,
-
+        'mora': this.morahastahoy,
+        'idsocio': idpersona,
+        'estadomora': this.estadomora
       }).then(function (res) {
         Swal.fire({
           position: 'top-end',
           type: 'success',
-          title: 'El pago se realizó correctamente',
+          title: 'El pago se realizó exitosameente',
           showConfirmButton: false,
           timer: 2000
         });
@@ -4763,15 +4921,49 @@ __webpack_require__.r(__webpack_exports__);
         });
       });
     },
-    generarboucher: function generarboucher() {
-      window.open('/credito/detallecuotapdf/' + this.identificadorcuota + '', '_blank');
+    interespormora: function interespormora() {
+      var me = this;
+      var fecha1 = moment(me.fechapago);
+      var fecha2 = moment(me.hoy);
+      me.diasdemora = fecha2.diff(fecha1, 'days');
+
+      if (me.diasdemora > 0) {
+        me.estadomora = "1";
+        var M = 0;
+        var DM = this.diasdemora / 360;
+        var S = 0;
+        var CP = this.dataC[0].monto;
+        var C = parseFloat(CP) + parseFloat(S);
+        var TC = this.tasa_compensatoria_anual / 100;
+        var TM = this.tasa_moratoria_anual / 100;
+        M = parseFloat(C) + parseFloat(CP * (Math.pow(parseFloat(1) + parseFloat(TC), DM) - 1)) + parseFloat(CP * (Math.pow(parseFloat(1) + parseFloat(TM), DM) - 1));
+        me.morahastahoy = (M - C).toFixed(2);
+        console.log(me.morahastahoy);
+      } else {
+        me.morahastahoy = 0;
+        me.estadomora = "0";
+      }
     },
-    generarboucherPorcion: function generarboucherPorcion() {
-      window.open('/credito/detalleporcioncuotapdf/' + this.identificadorcuota + '', '_blank');
+    cargarValores: function cargarValores() {
+      var me = this;
+      axios.get('/config/valores').then(function (res) {
+        //  me.array_empresa=res.data.config;
+        me.tasa_compensatoria_anual = res.data.config.tasa_compensatoria_anual;
+        me.tasa_moratoria_anual = res.data.config.tasa_moratoria_anual;
+        me.hoy = res.data.hoy;
+        me.interespormora();
+      })["catch"](function (err) {
+        //  me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
+        console.log(err);
+      });
+    },
+    generarboucher: function generarboucher() {
+      window.open('/cuota/detallecuotapdf/' + this.identificadorcuota + '', '_blank');
     }
   },
   mounted: function mounted() {
     this.obtenerCuotaDeCliente();
+    this.cargarValores();
   }
 });
 
@@ -5049,6 +5241,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5058,7 +5264,7 @@ __webpack_require__.r(__webpack_exports__);
       montodesembolsado: 1000,
       numerocuotas: 12,
       tasa: 13,
-      periodo: 1,
+      periodo: 12,
       fechadesembolso: '2019-09-01',
       fechaprimeracuota: '2019-09-01',
       //arrary Credito
@@ -5078,10 +5284,60 @@ __webpack_require__.r(__webpack_exports__);
       errorMostrarMsjCredito: [],
       arrayAuxliar: [],
       arrayCreditos: [],
-      idcredito: 0
+      idcredito: 0,
+      pagination: {
+        'total': 0,
+        'current_page': 0,
+        'per_page': 0,
+        'last_page': 0,
+        'from': 0,
+        'to': 0
+      },
+      offset: 3,
+      criterio: 'dni',
+      buscar: ''
     };
   },
+  computed: {
+    isActived: function isActived() {
+      return this.pagination.current_page;
+    },
+    //Calcula los elementos de la paginación
+    pagesNumber: function pagesNumber() {
+      if (!this.pagination.to) {
+        return [];
+      }
+
+      var from = this.pagination.current_page - this.offset;
+
+      if (from < 1) {
+        from = 1;
+      }
+
+      var to = from + this.offset * 2;
+
+      if (to >= this.pagination.last_page) {
+        to = this.pagination.last_page;
+      }
+
+      var pagesArray = [];
+
+      while (from <= to) {
+        pagesArray.push(from);
+        from++;
+      }
+
+      return pagesArray;
+    }
+  },
   methods: {
+    cambiarPagina: function cambiarPagina(page, buscar, criterio) {
+      var me = this; //Actualiza la página actual
+
+      me.pagination.current_page = page; //Envia la petición para visualizar la data de esa página
+
+      me.listarCreditos(page, buscar, criterio);
+    },
     editar_fecha: function editar_fecha(fecha, intervalo, dma, separador) {
       var separador = separador || "-";
       var arrayFecha = fecha.split(separador);
@@ -5234,7 +5490,7 @@ __webpack_require__.r(__webpack_exports__);
       this.montodesembolsado = 0;
       this.numerocuotas = 0;
       this.tasa = 0;
-      this.periodo = 0;
+      this.periodo = 12;
       this.fechadesembolso = '';
       this.idcliente = 0, this.viewCuotas = false;
     },
@@ -5295,10 +5551,10 @@ __webpack_require__.r(__webpack_exports__);
     listarCreditos: function listarCreditos(page, buscar, criterio) {
       var me = this;
       me.listado = 2;
-      var url = 'simulacion/listaSilumaciones';
+      var url = 'simulacion/listaSilumaciones?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
-        me.arrayCreditos = respuesta.simulaciones;
+        me.arrayCreditos = respuesta.simulaciones.data;
         me.pagination = respuesta.pagination;
       })["catch"](function (error) {
         console.log(error);
@@ -44279,7 +44535,11 @@ var render = function() {
                     staticClass: "font-weight-bold",
                     attrs: { for: "descripcionaporte" }
                   },
-                  [_vm._v("Tasa Ahorros")]
+                  [
+                    _vm._v(
+                      "Tasa de Rendimiento Efectivo Anual(TREA)\n                            (TREA)"
+                    )
+                  ]
                 ),
                 _vm._v(" "),
                 _c("input", {
@@ -44316,7 +44576,7 @@ var render = function() {
                     staticClass: "font-weight-bold",
                     attrs: { for: "descripcionaporte" }
                   },
-                  [_vm._v("Tasa Créditos")]
+                  [_vm._v("Tasa Efectiva Anual(TEA)")]
                 ),
                 _vm._v(" "),
                 _c("input", {
@@ -44449,287 +44709,317 @@ var render = function() {
                   "div",
                   { staticClass: "template-demo " },
                   _vm._l(_vm.arrayCreditos, function(c) {
-                    return _c("div", { key: c.id, staticClass: "row" }, [
-                      _vm._m(1, true),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-5 " }, [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btn-icon-text",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.pdfCronograma()
+                    return _c(
+                      "div",
+                      { key: c.id, staticClass: "row" },
+                      [
+                        _vm._m(1, true),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-5 " }, [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-danger btn-icon-text",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.pdfCronograma()
+                                }
                               }
-                            }
-                          },
-                          [
-                            _c("i", {
-                              staticClass: "mdi mdi-file-pdf btn-icon-prepend"
-                            }),
-                            _vm._v(
-                              "                                                    \n                                            Descargar Cronograma\n                                        "
-                            )
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _vm.arrayCreditos[0].estadodesembolso == 0
-                          ? _c("button", { staticClass: "btn btn-success" }, [
-                              _vm._v(" Desembolsar")
-                            ])
-                          : _vm._e()
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3" }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Codigo de Credito:")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.numeroprestamo) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Monto Financiado:")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", {
-                          domProps: {
-                            textContent: _vm._s("S/ " + c.montodesembolsado)
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Número de Cuotas")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", {
-                          domProps: {
-                            textContent: _vm._s(c.numerocuotas + "Cuotas")
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("TEA(Tasa de interes anual)")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", [_vm._v(_vm._s(c.tasa) + " % ")])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Interes Total")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", [_vm._v(" S/ " + _vm._s(c.interes))])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Monto total a Pagar")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", [
-                          _vm._v(
-                            " S/ " +
-                              _vm._s(
-                                parseFloat(c.montodesembolsado) +
-                                  parseFloat(c.interes)
+                            },
+                            [
+                              _c("i", {
+                                staticClass: "mdi mdi-file-pdf btn-icon-prepend"
+                              }),
+                              _vm._v(
+                                "                                                    \n                                            Descargar Cronograma\n                                        "
                               )
-                          )
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Periodo")
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _vm.arrayCreditos[0].estadodesembolso == 0
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-success",
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.desembolsar(c.id)
+                                    }
+                                  }
+                                },
+                                [_vm._v(" Desembolsar")]
+                              )
+                            : _vm._e()
                         ]),
                         _vm._v(" "),
-                        c.periodo == 1 ? _c("p", [_vm._v("Anual")]) : _vm._e(),
-                        _vm._v(" "),
-                        c.periodo == 2
-                          ? _c("p", [_vm._v("Semestral")])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        c.periodo == 4
-                          ? _c("p", [_vm._v("Trimestral")])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        c.periodo == 12
-                          ? _c("p", [_vm._v("Mensual")])
-                          : _vm._e()
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3" }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Analista del Crédito")
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Codigo de Credito:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: { textContent: _vm._s(c.numeroprestamo) }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: {
-                            textContent: _vm._s(
-                              c.usernombre + " " + c.userapellidos
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Monto Financiado:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s("S/ " + c.montodesembolsado)
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Número de Cuotas")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(c.numerocuotas + "Cuotas")
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("TEA(Tasa de interes anual)")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", [_vm._v(_vm._s(c.tasa) + " % ")])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Interes Total")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", [_vm._v(" S/ " + _vm._s(c.interes))])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Monto total a Pagar")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", [
+                            _vm._v(
+                              " S/ " +
+                                _vm._s(
+                                  parseFloat(c.montodesembolsado) +
+                                    parseFloat(c.interes)
+                                )
                             )
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _vm._m(2, true),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3" }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("DNI:")
+                          ])
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.sociodni) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Nombres y apellidos:")
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Periodo")
+                          ]),
+                          _vm._v(" "),
+                          c.periodo == 1
+                            ? _c("p", [_vm._v("Anual")])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          c.periodo == 2
+                            ? _c("p", [_vm._v("Semestral")])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          c.periodo == 4
+                            ? _c("p", [_vm._v("Trimestral")])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          c.periodo == 12
+                            ? _c("p", [_vm._v("Mensual")])
+                            : _vm._e()
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: {
-                            textContent: _vm._s(
-                              c.socionombre + " " + c.socioapellidos
-                            )
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Fecha nacimiento:")
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Analista del Crédito")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(
+                                c.usernombre + " " + c.userapellidos
+                              )
+                            }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: {
-                            textContent: _vm._s(c.sociofechanacimiento)
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Dirección:")
+                        _vm._m(2, true),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("DNI:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: { textContent: _vm._s(c.sociodni) }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.sociodireccion) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Teléfono:")
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Nombres y apellidos:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(
+                                c.socionombre + " " + c.socioapellidos
+                              )
+                            }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.sociotelefono) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3" }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Email:")
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Fecha nacimiento:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(c.sociofechanacimiento)
+                            }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.socioemail) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _vm._m(3, true),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3" }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("DNI:")
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Dirección:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: { textContent: _vm._s(c.sociodireccion) }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.garantedni) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Nombres y apellidos:")
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Teléfono:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: { textContent: _vm._s(c.sociotelefono) }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: {
-                            textContent: _vm._s(
-                              c.garantenombre + " " + c.garanteapellidos
-                            )
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Fecha nacimiento:")
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Email:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: { textContent: _vm._s(c.socioemail) }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: {
-                            textContent: _vm._s(c.garantefechanacimiento)
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Dirección:")
-                        ]),
+                        _vm._m(3, true),
                         _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.garantedireccion) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3 " }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Teléfono:")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.garantetelefono) }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3" }, [
-                        _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Email:")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", {
-                          domProps: { textContent: _vm._s(c.garanteemail) }
-                        })
-                      ])
-                    ])
+                        c.idgarante != c.idsocio
+                          ? [
+                              _c("div", { staticClass: "col-md-3" }, [
+                                _c("h5", { staticClass: "font-weight-bold " }, [
+                                  _vm._v("DNI:")
+                                ]),
+                                _vm._v(" "),
+                                _c("p", {
+                                  domProps: {
+                                    textContent: _vm._s(c.garantedni)
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-md-3 " }, [
+                                _c("h5", { staticClass: "font-weight-bold " }, [
+                                  _vm._v("Nombres y apellidos:")
+                                ]),
+                                _vm._v(" "),
+                                _c("p", {
+                                  domProps: {
+                                    textContent: _vm._s(
+                                      c.garantenombre + " " + c.garanteapellidos
+                                    )
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-md-3 " }, [
+                                _c("h5", { staticClass: "font-weight-bold " }, [
+                                  _vm._v("Fecha nacimiento:")
+                                ]),
+                                _vm._v(" "),
+                                _c("p", {
+                                  domProps: {
+                                    textContent: _vm._s(
+                                      c.garantefechanacimiento
+                                    )
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-md-3 " }, [
+                                _c("h5", { staticClass: "font-weight-bold " }, [
+                                  _vm._v("Dirección:")
+                                ]),
+                                _vm._v(" "),
+                                _c("p", {
+                                  domProps: {
+                                    textContent: _vm._s(c.garantedireccion)
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-md-3 " }, [
+                                _c("h5", { staticClass: "font-weight-bold " }, [
+                                  _vm._v("Teléfono:")
+                                ]),
+                                _vm._v(" "),
+                                _c("p", {
+                                  domProps: {
+                                    textContent: _vm._s(c.garantetelefono)
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-md-3" }, [
+                                _c("h5", { staticClass: "font-weight-bold " }, [
+                                  _vm._v("Email:")
+                                ]),
+                                _vm._v(" "),
+                                _c("p", {
+                                  domProps: {
+                                    textContent: _vm._s(c.garanteemail)
+                                  }
+                                })
+                              ])
+                            ]
+                          : [_vm._m(4, true)]
+                      ],
+                      2
+                    )
                   }),
                   0
                 )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "col-lg-12 mt-4 " }, [
-                _vm._m(4),
+                _vm._m(5),
                 _vm._v(" "),
                 _c("hr"),
                 _vm._v(" "),
                 _c("div", { staticClass: "table-responsive" }, [
                   _c("table", { staticClass: "table  table-bordered" }, [
-                    _vm._m(5),
+                    _vm._m(6),
                     _vm._v(" "),
                     _c(
                       "tbody",
@@ -44748,7 +45038,7 @@ var render = function() {
                             _c(
                               "td",
                               [
-                                cu.estado == 0 ? [_vm._m(6, true)] : _vm._e(),
+                                cu.estado == 0 ? [_vm._m(7, true)] : _vm._e(),
                                 _vm._v(" "),
                                 cu.estado == 1
                                   ? [
@@ -44760,7 +45050,7 @@ var render = function() {
                                           attrs: { type: "button" },
                                           on: {
                                             click: function($event) {
-                                              return _vm.bouchercuota(cu.id)
+                                              return _vm.generarboucher(cu.id)
                                             }
                                           }
                                         },
@@ -44791,13 +45081,13 @@ var render = function() {
                               ? [
                                   _c("td", [
                                     _vm._v(
-                                      "Fecha de Pago :" +
+                                      "Fecha de Vecnimiento :" +
                                         _vm._s(cu.fechapago) +
                                         " "
                                     ),
                                     _c("br"),
                                     _vm._v(
-                                      "\n                                                 Fecha de Cancelación :  "
+                                      "\n                                                 Fecha de Pago :  "
                                     ),
                                     _c(
                                       "label",
@@ -44855,8 +45145,8 @@ var render = function() {
                                   ])
                                 ]
                               : cu.estado == 1
-                              ? [_vm._m(7, true)]
-                              : [_vm._m(8, true)]
+                              ? [_vm._m(8, true)]
+                              : [_vm._m(9, true)]
                           ],
                           2
                         )
@@ -44923,6 +45213,14 @@ var staticRenderFns = [
       ]),
       _vm._v(" "),
       _c("hr")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-3" }, [
+      _c("p", [_vm._v(" No tiene un garante Registrado")])
     ])
   },
   function() {
@@ -45471,7 +45769,7 @@ var render = function() {
                                         staticClass: " text-dark",
                                         attrs: { for: "exampleInputUsername1" }
                                       },
-                                      [_vm._v("DNI de Socio")]
+                                      [_vm._v("DNI de Garante")]
                                     ),
                                     _vm._v(" "),
                                     _c("input", {
@@ -45526,6 +45824,8 @@ var render = function() {
                                       staticClass: "form-control",
                                       attrs: {
                                         type: "text",
+                                        onkeyup:
+                                          "this.value = this.value.toUpperCase();",
                                         placeholder: "Ingrese nombres completos"
                                       },
                                       domProps: { value: _vm.nombreg },
@@ -45566,6 +45866,8 @@ var render = function() {
                                       staticClass: "form-control",
                                       attrs: {
                                         type: "text",
+                                        onkeyup:
+                                          "this.value = this.value.toUpperCase();",
                                         placeholder:
                                           "Ingrese apellidos completos"
                                       },
@@ -45645,6 +45947,8 @@ var render = function() {
                                       staticClass: "form-control",
                                       attrs: {
                                         type: "text",
+                                        onkeyup:
+                                          "this.value = this.value.toUpperCase();",
                                         placeholder: "Departamento"
                                       },
                                       domProps: { value: _vm.departamentog },
@@ -45686,6 +45990,8 @@ var render = function() {
                                       staticClass: "form-control",
                                       attrs: {
                                         type: "text",
+                                        onkeyup:
+                                          "this.value = this.value.toUpperCase();",
                                         placeholder: "Ciudad"
                                       },
                                       domProps: { value: _vm.ciudadg },
@@ -45726,6 +46032,8 @@ var render = function() {
                                       staticClass: "form-control",
                                       attrs: {
                                         type: "text",
+                                        onkeyup:
+                                          "this.value = this.value.toUpperCase();",
                                         placeholder: "Dirección"
                                       },
                                       domProps: { value: _vm.direcciong },
@@ -45978,7 +46286,7 @@ var render = function() {
                             _c(
                               "label",
                               { attrs: { for: "exampleInputEmail1" } },
-                              [_vm._v("Tasa de Interés")]
+                              [_vm._v("Tasa Efectiva Anual(TEA) %")]
                             ),
                             _vm._v(" "),
                             _c("input", {
@@ -45986,22 +46294,23 @@ var render = function() {
                                 {
                                   name: "model",
                                   rawName: "v-model",
-                                  value: _vm.tasa,
-                                  expression: "tasa"
+                                  value: _vm.tasa_creditos,
+                                  expression: "tasa_creditos"
                                 }
                               ],
                               staticClass: "form-control",
                               attrs: {
                                 type: "text",
-                                placeholder: "Número de Telefono"
+                                placeholder: "Número de Telefono",
+                                disabled: ""
                               },
-                              domProps: { value: _vm.tasa },
+                              domProps: { value: _vm.tasa_creditos },
                               on: {
                                 input: function($event) {
                                   if ($event.target.composing) {
                                     return
                                   }
-                                  _vm.tasa = $event.target.value
+                                  _vm.tasa_creditos = $event.target.value
                                 }
                               }
                             })
@@ -46069,7 +46378,7 @@ var render = function() {
                             _c(
                               "label",
                               { attrs: { for: "exampleInputEmail1" } },
-                              [_vm._v("Fecha de Desembolso")]
+                              [_vm._v("Fecha Primera Cuota")]
                             ),
                             _vm._v(" "),
                             _c("input", {
@@ -46543,11 +46852,7 @@ var render = function() {
                         _vm._v("Cuotas por Pagar")
                       ]),
                       _vm._v(" "),
-                      _c("p", { staticClass: "card-description " }, [
-                        _vm._v(
-                          "\n                            Cuotas en orden de venciomiento \n                            "
-                        )
-                      ]),
+                      _vm._m(1),
                       _vm._v(" "),
                       _c("div", { staticClass: "row" }, [
                         _c("div", { staticClass: "col-md-6 col-sm-6" }, [
@@ -46582,20 +46887,18 @@ var render = function() {
                                 }
                               },
                               [
-                                _c(
-                                  "option",
-                                  { attrs: { value: "numeroprestamo" } },
-                                  [_vm._v("Número de prestamo")]
-                                ),
-                                _vm._v(" "),
                                 _c("option", { attrs: { value: "dni" } }, [
                                   _vm._v("DNI Socio")
                                 ]),
                                 _vm._v(" "),
+                                _c("option", { attrs: { value: "nombre" } }, [
+                                  _vm._v("Nombre del Socio")
+                                ]),
+                                _vm._v(" "),
                                 _c(
                                   "option",
-                                  { attrs: { value: "fechadesembolso" } },
-                                  [_vm._v("Fecha de Desembolso ")]
+                                  { attrs: { value: "apellidos" } },
+                                  [_vm._v("Apellidos del Socio")]
                                 )
                               ]
                             ),
@@ -46629,7 +46932,7 @@ var render = function() {
                                   ) {
                                     return null
                                   }
-                                  return _vm.listarCreditos(
+                                  return _vm.listarCuotas(
                                     1,
                                     _vm.buscar,
                                     _vm.criterio
@@ -46644,14 +46947,14 @@ var render = function() {
                               }
                             }),
                             _vm._v(" "),
-                            _vm._m(1)
+                            _vm._m(2)
                           ])
                         ])
                       ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "table-responsive" }, [
                         _c("table", { staticClass: "table  table-bordered" }, [
-                          _vm._m(2),
+                          _vm._m(3),
                           _vm._v(" "),
                           _c(
                             "tbody",
@@ -46682,11 +46985,17 @@ var render = function() {
                                     )
                                   ]),
                                   _vm._v(" "),
+                                  _c("td", {
+                                    domProps: {
+                                      textContent: _vm._s(cu.fechapago)
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("td", [_vm._v(_vm._s(cu.dni))]),
+                                  _vm._v(" "),
                                   _c("td", [
                                     _vm._v(
-                                      _vm._s(cu.dni) +
-                                        " - " +
-                                        _vm._s(cu.nombre) +
+                                      _vm._s(cu.nombre) +
                                         " " +
                                         _vm._s(cu.apellidos)
                                     )
@@ -46705,39 +47014,6 @@ var render = function() {
                                       textContent: _vm._s(cu.numerodecuota)
                                     }
                                   }),
-                                  _vm._v(" "),
-                                  cu.estado == 0
-                                    ? [
-                                        _c("td", {
-                                          domProps: {
-                                            textContent: _vm._s(cu.fechapago)
-                                          }
-                                        })
-                                      ]
-                                    : _vm._e(),
-                                  _vm._v(" "),
-                                  cu.estado == 1
-                                    ? [
-                                        _c("td", [
-                                          _vm._v(
-                                            "Fecha de Pago :" +
-                                              _vm._s(cu.fechapago) +
-                                              " "
-                                          ),
-                                          _c("br"),
-                                          _vm._v(
-                                            "\n                                                    Fecha de Cancelación :  "
-                                          ),
-                                          _c(
-                                            "label",
-                                            {
-                                              staticClass: "badge badge-danger"
-                                            },
-                                            [_vm._v(_vm._s(cu.fechacancelo))]
-                                          )
-                                        ])
-                                      ]
-                                    : _vm._e(),
                                   _vm._v(" "),
                                   _c("td", {
                                     domProps: { textContent: _vm._s(cu.monto) }
@@ -46783,6 +47059,92 @@ var render = function() {
                               )
                             }),
                             0
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("nav", [
+                          _c(
+                            "ul",
+                            { staticClass: "pagination" },
+                            [
+                              _vm.pagination.current_page > 1
+                                ? _c("li", { staticClass: "page-item" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "page-link",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.cambiarPagina(
+                                              _vm.pagination.current_page - 1,
+                                              _vm.buscar,
+                                              _vm.criterio
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Anterior")]
+                                    )
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm._l(_vm.pagesNumber, function(page) {
+                                return _c(
+                                  "li",
+                                  {
+                                    key: page,
+                                    staticClass: "page-item",
+                                    class: [
+                                      page == _vm.isActived ? "active" : ""
+                                    ]
+                                  },
+                                  [
+                                    _c("a", {
+                                      staticClass: "page-link",
+                                      attrs: { href: "#" },
+                                      domProps: { textContent: _vm._s(page) },
+                                      on: {
+                                        click: function($event) {
+                                          $event.preventDefault()
+                                          return _vm.cambiarPagina(
+                                            page,
+                                            _vm.buscar,
+                                            _vm.criterio
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]
+                                )
+                              }),
+                              _vm._v(" "),
+                              _vm.pagination.current_page <
+                              _vm.pagination.last_page
+                                ? _c("li", { staticClass: "page-item" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "page-link",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.cambiarPagina(
+                                              _vm.pagination.current_page + 1,
+                                              _vm.buscar,
+                                              _vm.criterio
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Siguiente")]
+                                    )
+                                  ])
+                                : _vm._e()
+                            ],
+                            2
                           )
                         ])
                       ])
@@ -46830,6 +47192,17 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("p", { staticClass: "card-description " }, [
+      _vm._v("\n                            Cuotas en orden de venciomiento "),
+      _c("code", [
+        _vm._v("El pago de las cuotas es en orden del número de cuota")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c(
       "button",
       {
@@ -46852,15 +47225,17 @@ var staticRenderFns = [
       _c("tr", { staticClass: "table-info text-white" }, [
         _c("th", [_vm._v("Pagar  ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Socio")]),
+        _c("th", [_vm._v("Fecha de Vencimiento ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" DNI Socio")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Nombres y Apellidos ")]),
         _vm._v(" "),
         _c("th", [_vm._v("Credito ")]),
         _vm._v(" "),
-        _c("th", [_vm._v("N °Cuota ")]),
+        _c("th", [_vm._v("N° de Cuota ")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Fecha ")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Monto de Cuota ")]),
+        _c("th", [_vm._v("Cuota")]),
         _vm._v(" "),
         _c("th", [_vm._v(" Capital ")]),
         _vm._v(" "),
@@ -46905,9 +47280,33 @@ var render = function() {
                 _vm._l(_vm.dataC, function(c) {
                   return _c("div", { key: c.id, staticClass: "row" }, [
                     _c("div", { staticClass: "col-md-12" }, [
-                      _c("h4", { staticClass: "font-weight-bold" }, [
-                        _vm._v("PAGO DE CUOTA N° " + _vm._s(c.numerodecuota))
-                      ])
+                      _c(
+                        "h4",
+                        { staticClass: "font-weight-bold" },
+                        [
+                          _vm._v(
+                            "PAGO DE CUOTA N° " +
+                              _vm._s(c.numerodecuota) +
+                              "\n                                   \n                            "
+                          ),
+                          _vm.diasdemora > 0
+                            ? [
+                                _c(
+                                  "span",
+                                  { staticClass: "bg bg-danger text-white" },
+                                  [
+                                    _vm._v(
+                                      "    " +
+                                        _vm._s(_vm.diasdemora) +
+                                        " días de incumplimiento de pago.    "
+                                    )
+                                  ]
+                                )
+                              ]
+                            : _vm._e()
+                        ],
+                        2
+                      )
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-md-6" }, [
@@ -47022,97 +47421,65 @@ var render = function() {
                       _c("table", { staticClass: "table table-bordered" }, [
                         _c("thead"),
                         _vm._v(" "),
-                        _c("tbody", [
-                          _c("tr", [
-                            _c("td", [_vm._v("Saldo Anterior Neto")]),
+                        _c(
+                          "tbody",
+                          [
+                            _c("tr"),
+                            _c("tr", [
+                              _c("td", [_vm._v("Pago Neto")]),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s("S/ " + c.amortizacion)
+                                }
+                              })
+                            ]),
                             _vm._v(" "),
-                            _c("td", {
-                              domProps: {
-                                textContent: _vm._s(
-                                  "$ " +
-                                    (
-                                      parseFloat(c.saldopendiente) +
-                                      parseFloat(c.monto)
-                                    ).toFixed(2)
-                                )
-                              }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("td", [_vm._v("Pago Neto")]),
+                            _c("tr", [
+                              _c("td", [_vm._v("Interes")]),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s("S/ " + c.interes)
+                                }
+                              })
+                            ]),
                             _vm._v(" "),
-                            _c("td", {
-                              domProps: {
-                                textContent: _vm._s(
-                                  "S/ " + (c.monto * c.tipocambio).toFixed(2)
-                                )
-                              }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("td", [_vm._v("Interes")]),
+                            _vm.morahastahoy != 0
+                              ? [
+                                  _c("tr", [
+                                    _c("td", [_vm._v("Interes Moratorio")]),
+                                    _vm._v(" "),
+                                    _c("td", {
+                                      domProps: {
+                                        textContent: _vm._s(
+                                          "S/ " + _vm.morahastahoy
+                                        )
+                                      }
+                                    })
+                                  ])
+                                ]
+                              : _vm._e(),
                             _vm._v(" "),
-                            _c("td", {
-                              domProps: {
-                                textContent: _vm._s(
-                                  "S/ " +
-                                    (_vm.interes * c.tipocambio).toFixed(2)
-                                )
-                              }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("td", [_vm._v("Otros Pagos S/")]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: c.mora,
-                                    expression: "c.mora"
-                                  }
-                                ],
-                                staticClass: "form-control",
-                                attrs: {
-                                  type: "number",
-                                  min: "0",
-                                  placeholder: "No puede dejar este campo vacio"
-                                },
-                                domProps: { value: c.mora },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.$set(c, "mora", $event.target.value)
-                                  }
+                            _c("tr", {}, [
+                              _c("td", [_vm._v("Total a Pagar")]),
+                              _vm._v(" "),
+                              _c("td", {
+                                staticClass: "bg bg-warning text-white",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    "S/. " +
+                                      (
+                                        parseFloat(_vm.morahastahoy) +
+                                        parseFloat(c.monto)
+                                      ).toFixed(2)
+                                  )
                                 }
                               })
                             ])
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", {}, [
-                            _c("td", [_vm._v("Total a Pagar")]),
-                            _vm._v(" "),
-                            _c("td", {
-                              staticClass: "bg bg-warning text-white",
-                              domProps: {
-                                textContent: _vm._s(
-                                  "S/. " +
-                                    (
-                                      parseFloat(c.mora) +
-                                      parseFloat(_vm.totalpagar)
-                                    ).toFixed(2)
-                                )
-                              }
-                            })
-                          ])
-                        ])
+                          ],
+                          2
+                        )
                       ])
                     ]),
                     _vm._v(" "),
@@ -47161,8 +47528,7 @@ var render = function() {
                                   on: {
                                     click: function($event) {
                                       return _vm.pagarCuota(
-                                        c.id,
-                                        c.otroscostos,
+                                        c.idcuota,
                                         c.idpersona
                                       )
                                     }
@@ -47327,12 +47693,14 @@ var render = function() {
                     click: function($event) {
                       _vm.viewAgregar = "listar"
                       _vm.limpiar()
-                      this.listarCreditos(1, this.buscar, this.criterio)
+                      this.listarCreditos(1, _vm.buscar, _vm.criterio)
                     }
                   }
                 },
                 [
-                  _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                  _c("i", {
+                    staticClass: "mdi mdi-format-list-numbers mdi-18px "
+                  }),
                   _vm._v(" Lista de Simulaciones\n        ")
                 ]
               ),
@@ -47399,6 +47767,8 @@ var render = function() {
                               staticClass: "form-control",
                               attrs: {
                                 type: "text",
+                                onkeyup:
+                                  "javascript:this.value=this.value.toUpperCase();",
                                 placeholder: "Nombres y apellidos  completos "
                               },
                               domProps: { value: _vm.nombresapellidos },
@@ -47640,7 +48010,7 @@ var render = function() {
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-warning mr-2 ",
+                            staticClass: "btn btn-success mr-2 ",
                             attrs: { type: "button " },
                             on: {
                               click: function($event) {
@@ -47895,7 +48265,10 @@ var render = function() {
                 }
               },
               [
-                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _c("i", {
+                  staticClass:
+                    "mdi mdi mdi-plus-circle-multiple-outline  mdi-18px "
+                }),
                 _vm._v(" Nueva simulacion\n    ")
               ]
             ),
@@ -47909,11 +48282,14 @@ var render = function() {
                   click: function($event) {
                     _vm.viewAgregar = "listar"
                     _vm.limpiar()
+                    _vm.listarCreditos(1, _vm.buscar, _vm.criterio)
                   }
                 }
               },
               [
-                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _c("i", {
+                  staticClass: "mdi mdi-format-list-numbers mdi-18px  "
+                }),
                 _vm._v(" Lista de Simulaciones\n    ")
               ]
             ),
@@ -47961,15 +48337,13 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _vm.periodo == 1
-                      ? _c("p", [_vm._v("Periodo: Mensual ")])
-                      : _vm.periodo == 2
-                      ? _c("p", [_vm._v("Periodo: Bimestral ")])
-                      : _vm.periodo == 3
+                      ? _c("p", [_vm._v("Periodo: Anual ")])
+                      : _vm.periodo == 4
                       ? _c("p", [_vm._v("Periodo: Trimestral ")])
                       : _vm.periodo == 6
                       ? _c("p", [_vm._v("Periodo: Semestral ")])
                       : _vm.periodo == 12
-                      ? _c("p", [_vm._v("Periodo: Anual ")])
+                      ? _c("p", [_vm._v("Periodo: Mensual ")])
                       : _vm._e(),
                     _vm._v(" "),
                     _c("hr"),
@@ -47999,7 +48373,9 @@ var render = function() {
                 }
               },
               [
-                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _c("i", {
+                  staticClass: "mdi  mdi-plus-circle-multiple-outline mdi-24px "
+                }),
                 _vm._v(" Nueva simulacion\n    ")
               ]
             ),
@@ -48054,20 +48430,14 @@ var render = function() {
                                 }
                               },
                               [
-                                _c(
-                                  "option",
-                                  { attrs: { value: "numeroprestamo" } },
-                                  [_vm._v("Número de prestamo")]
-                                ),
-                                _vm._v(" "),
                                 _c("option", { attrs: { value: "dni" } }, [
-                                  _vm._v("DNI Socio")
+                                  _vm._v("DNI de Solicitante")
                                 ]),
                                 _vm._v(" "),
                                 _c(
                                   "option",
-                                  { attrs: { value: "fechadesembolso" } },
-                                  [_vm._v("Fecha de Desembolso ")]
+                                  { attrs: { value: "nombresapellidos" } },
+                                  [_vm._v("Nombres de Clientes")]
                                 )
                               ]
                             ),
@@ -48173,12 +48543,6 @@ var render = function() {
                                 _vm._v(" "),
                                 _c("td", {
                                   domProps: {
-                                    textContent: _vm._s(c.fechadesembolso)
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("td", {
-                                  domProps: {
                                     textContent: _vm._s(
                                       "S/ " + c.montodesembolsado
                                     )
@@ -48196,7 +48560,7 @@ var render = function() {
                                   : c.periodo == 1
                                   ? _c("td", [_vm._v("Anual")])
                                   : c.periodo == 6
-                                  ? _c("td", [_vm._v("Anual")])
+                                  ? _c("td", [_vm._v("Semestral")])
                                   : c.periodo == 4
                                   ? _c("td", [_vm._v("Trimestral")])
                                   : _vm._e(),
@@ -48220,6 +48584,92 @@ var render = function() {
                             }),
                             0
                           )
+                        ]),
+                        _vm._v(" "),
+                        _c("nav", [
+                          _c(
+                            "ul",
+                            { staticClass: "pagination" },
+                            [
+                              _vm.pagination.current_page > 1
+                                ? _c("li", { staticClass: "page-item" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "page-link",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.cambiarPagina(
+                                              _vm.pagination.current_page - 1,
+                                              _vm.buscar,
+                                              _vm.criterio
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Anterior")]
+                                    )
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm._l(_vm.pagesNumber, function(page) {
+                                return _c(
+                                  "li",
+                                  {
+                                    key: page,
+                                    staticClass: "page-item",
+                                    class: [
+                                      page == _vm.isActived ? "active" : ""
+                                    ]
+                                  },
+                                  [
+                                    _c("a", {
+                                      staticClass: "page-link",
+                                      attrs: { href: "#" },
+                                      domProps: { textContent: _vm._s(page) },
+                                      on: {
+                                        click: function($event) {
+                                          $event.preventDefault()
+                                          return _vm.cambiarPagina(
+                                            page,
+                                            _vm.buscar,
+                                            _vm.criterio
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]
+                                )
+                              }),
+                              _vm._v(" "),
+                              _vm.pagination.current_page <
+                              _vm.pagination.last_page
+                                ? _c("li", { staticClass: "page-item" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "page-link",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.cambiarPagina(
+                                              _vm.pagination.current_page + 1,
+                                              _vm.buscar,
+                                              _vm.criterio
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Siguiente")]
+                                    )
+                                  ])
+                                : _vm._e()
+                            ],
+                            2
+                          )
                         ])
                       ])
                     ])
@@ -48238,12 +48688,14 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row bg bg-dark" }, [
-      _c("div", { staticClass: "col-md-12 mt-2 text-white" }, [
-        _c("h4", [
+    return _c("div", { staticClass: "row " }, [
+      _c("div", { staticClass: "col-md-12 mt-2 " }, [
+        _c("h4", { staticClass: "card-title" }, [
           _c("i", { staticClass: "mdi mdi-package-variant-closed mdi-36px" }),
-          _vm._v(" Simulador de Crédito")
-        ])
+          _vm._v(" Simulador de Creditos")
+        ]),
+        _vm._v(" "),
+        _c("hr")
       ])
     ])
   },
@@ -48284,12 +48736,10 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("thead", [
-      _c("tr", { staticClass: "bg bg-dark text-white " }, [
+      _c("tr", { staticClass: "bg bg-success text-white " }, [
         _c("th", [_vm._v(" Opciones")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Id Crédito ")]),
-        _vm._v(" "),
-        _c("th", [_vm._v(" Fecha de Desembolso")]),
+        _c("th", [_vm._v(" # ")]),
         _vm._v(" "),
         _c("th", [_vm._v(" Monto Capital")]),
         _vm._v(" "),
@@ -62091,7 +62541,7 @@ Vue.component('configuraciones', __webpack_require__(/*! ./components/configurac
 var app = new Vue({
   el: '#app',
   data: {
-    menu: 31,
+    menu: 100,
     ruta: 'http://127.0.0.1:8000'
   }
 });
@@ -63354,7 +63804,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

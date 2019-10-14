@@ -8,7 +8,12 @@ use Illuminate\Support\Facades\DB;
 class SimuladorController extends Controller
 {
     //
-    public function listaSilumaciones(){
+    public function listaSilumaciones(Request $request){
+       
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+
+        if ($buscar==''){ 
         $simulaciones = Simulador::
         select(
             'simulaciones.id',           
@@ -25,14 +30,46 @@ class SimuladorController extends Controller
             'simulaciones.nombresapellidos',
 
             )
-        ->orderBy('simulaciones.id','desc')
-        ->where('simulaciones.estado', '=', '1')
-        ->get();
        
+        ->where('simulaciones.estado', '=', '1')
+        ->orderBy('simulaciones.id', 'desc')->paginate(10);
 
-        return[
-            "simulaciones"=>$simulaciones
+        }else{
+            $simulaciones = Simulador::
+            select(
+                'simulaciones.id',           
+                'simulaciones.montodesembolsado',
+                'simulaciones.fechadesembolso',
+                'simulaciones.fechaprimeracuota',                   
+                'simulaciones.numerocuotas',
+               
+                'simulaciones.tasa',
+                'simulaciones.estado',
+                'simulaciones.periodo',
+    
+                'simulaciones.dni',
+                'simulaciones.nombresapellidos',
+    
+                )
+          
+            ->where('simulaciones.estado', '=', '1')
+            ->where('simulaciones.'.$criterio, 'like', '%'. $buscar . '%')
+            ->orderBy('simulaciones.id', 'desc')->paginate(10);
+    
+        }
+       
+        return [
+            'pagination' => [
+                'total'        => $simulaciones->total(),
+                'current_page' => $simulaciones->currentPage(),
+                'per_page'     => $simulaciones->perPage(),
+                'last_page'    => $simulaciones->lastPage(),
+                'from'         => $simulaciones->firstItem(),
+                'to'           => $simulaciones->lastItem(),
+            ],
+            'simulaciones' => $simulaciones
         ];
+
     }   
    
        //guardar un simulacion

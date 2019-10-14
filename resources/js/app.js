@@ -61,7 +61,7 @@ Vue.component('configuraciones', require('./components/configuracion/Configuraci
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 31,
+        menu: 100,
         ruta: 'http://127.0.0.1:8000',
 
     },

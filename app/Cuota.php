@@ -8,9 +8,20 @@ class Cuota extends Model
 {
     protected $table='cuotas';
     protected $fillable=[
-        'id','numerodecuota','fechapago','interes','amortizacion',
-        'fechacancelo','monto','saldopendiente',
-        'mora','descripcion','estado'
+        'id',
+        'idcajero',
+        'idcredito',
+        'numerodecuota',
+        'fechapago',
+        'interes',
+        'amortizacion',
+        'fechacancelo',
+        'monto',
+        'saldopendiente',
+        'mora',
+        'descripcion',
+        'estado',
+        'estado_mora'
     ];
     public function personas(){
         return  $this->belongsTo('App\Persona');

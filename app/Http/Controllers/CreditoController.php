@@ -121,6 +121,7 @@ class CreditoController extends Controller
         'creditos.id')
         ->orderBy('creditos.id', 'desc')
         ->take(1)->get();
+      
 
         return[
             'idultimocredito'=> $ultimo
@@ -146,7 +147,7 @@ class CreditoController extends Controller
                 'creditos.interes',
                 'creditos.estadodesembolso',
 
-               
+                'socio.id as idsocio',
                 'socio.dni as sociodni',
                 'socio.nombre as socionombre',
                 'socio.apellidos as socioapellidos',
@@ -154,7 +155,8 @@ class CreditoController extends Controller
                 'socio.direccion as sociodireccion',
                 'socio.telefono as sociotelefono',
                 'socio.email as socioemail',
-
+                
+                'garante.id as idgarante',
                 'garante.dni as garantedni',
                 'garante.nombre as garantenombre',
                 'garante.apellidos as garanteapellidos',
@@ -215,38 +217,62 @@ class CreditoController extends Controller
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
- 
+
+        $mytime= Carbon::now('America/Lima');
+        $mytime = $mytime->format('Y-m-d');
+        $idgarante=0;
+
+        $estadogarante= $request->garanteestado;
         try{
             DB::beginTransaction(); 
+            if($estadogarante==1){
+                $dni = $request->dnig;
+                    $personaregistrada = Persona::
+                    where('personas.dni', '=', $dni)->exists();//BUSCAMOS SI EXISTE EL DNI QUE INTENTA INGRESAR
+                   if($personaregistrada==true) 
+                   {
+                    $per = Persona::
+                    select('personas.id as id')
+                   ->where('personas.dni', '=', $dni)->first();
+                    $idgarante=$per->id;
+                   }
+                   else{
+                    $garante=new Persona();
+                    $garante->dni = $request->dnig;
+                    $garante->nombre = $request->nombreg;
+                    $garante->apellidos = $request->apellidosg;
+                    $garante->fechanacimiento = $request->fechanacimientog;
+                    $garante->direccion = $request->direcciong;
+                    $garante->departamento = $request->departamentog;
+                    $garante->ciudad = $request->ciudadg;
+                    $garante->telefono = $request->telefonog;
+                    $garante->email = $request->emailg;
+                    $garante->save();
+
+                    $idgarante=$garante->id;
+                   }
+              
+               
+            }
             
-            $garante=new Persona();
-            $garante->dni = $request->dnig;
-            $garante->nombre = $request->nombreg;
-            $garante->apellidos = $request->apellidosg;
-            $garante->fechanacimiento = $request->fechanacimientog;
-            $garante->direccion = $request->direcciong;
-            $garante->departamento = $request->departamentog;
-            $garante->ciudad = $request->ciudadg;
-            $garante->telefono = $request->telefonog;
-            $garante->email = $request->emailg;
-            $garante->save();
 
 
             $credito = new Credito();            
             $credito->idsocio = $request->idcliente;
-            $credito->idgarante = $garante->id;
-            $credito->idusuario = $request->idcliente;// \Auth::user()->id;
-            $credito->numeroprestamo = $request->numeroprestamo;
-           
+            //si existe garante registra a la personas caso contrario el es su garante
+            if($estadogarante==1)$credito->idgarante = $idgarante;
+            else $credito->idgarante = $request->idcliente;
+
+            $credito->idusuario = 14;// \Auth::user()->id;
+            $credito->numeroprestamo = $request->numeroprestamo;           
             $credito->montodesembolsado = $request->montodesembolsado;
-            $credito->fechadesembolso = $request->fechadesembolso; 
-          
+            $credito->fechadesembolso = $mytime;           
             $credito->numerocuotas = $request->numerocuotas; //cantidad de cuiotas
             $credito->tipocambio = 3.35; //de dolares a soles
             $credito->tasa = $request->tasa;
             $credito->interes = $request->interes;
             $credito->estado = '1'; 
-            $credito->estadodesembolso = '0';//Credito activo /2 credito inactivo //3 credito pagado completado
+            $credito->estadodesembolso = '0';
             $credito->periodo = $request->periodo; //1mensual/2bimensual/3trimestral/6semmestral/12anual
           
             $credito->save();
@@ -258,8 +284,8 @@ class CreditoController extends Controller
                 $cuota = new Cuota();
                 $cuota->idcredito = $credito->id;                
                 $cuota->numerodecuota = $cuot['contador'];
-                $cuota->idcajero=$credito->idusuario;
-                $cuota->fechapago = $cuot['fechapago'];               
+                $cuota->idcajero=14;  //cambiar a usuario  
+                $cuota->fechapago = $cuot['fechapago'];            
                 $cuota->saldopendiente =  $cuot['saldopendiente'];
                 $cuota->monto = $cuot['monto'];
                 $cuota->interes=$cuot['interes'];
@@ -281,6 +307,20 @@ class CreditoController extends Controller
         }
     }
 
+    //DESEMBOLSAR CREDITO
+    public function desembolsar(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+     
+
+        $cuota = Credito::findOrFail($request->id);
+        $cuota->estadodesembolso = '1';      
+        $cuota->save();
+
+    
+    }
+
+
 
     //pdf contrato y cronograma decuiotas
    
@@ -296,7 +336,7 @@ class CreditoController extends Controller
             'creditos.tipocambio',
             'creditos.tasa',
             'creditos.estado',
-            'creditos.interes',
+            'creditos.interes as credinteres',
             'creditos.periodo',
 
             'socio.nombre',

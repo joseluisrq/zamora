@@ -8,7 +8,16 @@
                         <!--detalle de pago-->
                     <div class="row" v-for="c in dataC" :key="c.id">
                             <div class="col-md-12">
-                                <h4 class="font-weight-bold">PAGO DE CUOTA N° {{c.numerodecuota}}</h4>       
+                                <h4 class="font-weight-bold">PAGO DE CUOTA N° {{c.numerodecuota}}
+                                     &nbsp;&nbsp;
+                                <template v-if="diasdemora>0">
+                                    <span class="bg bg-danger text-white">  &nbsp;&nbsp;{{diasdemora}} días de incumplimiento de pago.  &nbsp;&nbsp;</span>
+                                  
+                                </template>
+                                
+                                
+
+                                </h4>       
                             </div>
                             <!--Datos del cliente-->
                             <div class="col-md-6">
@@ -76,26 +85,35 @@
                                 </thead>
                                         <tbody>
                                             <tr>
-                                            <td>Saldo Anterior Neto</td>
-                                            <td v-text="'$ '+(parseFloat(c.saldopendiente)+parseFloat(c.monto)).toFixed(2)"></td>
-                                            </tr>
+                                            
                                         
                                             <tr>
-                                            <td>Pago Neto</td>
-                                            <td v-text="'S/ '+(c.monto*c.tipocambio).toFixed(2)"></td>
+                                                <td>Pago Neto</td>
+                                                <td v-text="'S/ '+c.amortizacion"></td>
                                             </tr>
                                             <tr>
-                                            <td>Interes</td>
-                                            <td v-text="'S/ '+(interes*c.tipocambio).toFixed(2)"></td>
-                                            </tr>
+                                                <td>Interes</td>
+                                                <td v-text="'S/ '+c.interes"></td>
+                                                </tr>
+                                          
+                                            <template v-if="morahastahoy!=0">
+                                                <tr>
+                                                    <td>Interes Moratorio</td>
+                                                    <td v-text="'S/ '+morahastahoy"></td>
+                                                </tr>
+                                              
+                                            </template>
+                                           
+                                           <!--
                                             <tr>
-                                            <td>Otros Pagos S/</td>
-                                            <td> <input type="number" class="form-control" min="0"  v-model="c.mora"  placeholder="No puede dejar este campo vacio"></td>
+                                                <td>Otros Pagos S/</td>
+                                                <td> <input type="number" class="form-control" min="0"  v-model="c.mora"  placeholder="No puede dejar este campo vacio"></td>
                                             </tr>
+                                            -->
                                         
                                             <tr class="">
                                             <td>Total a Pagar</td>
-                                            <td v-text="'S/. '+(parseFloat(c.mora)+parseFloat(totalpagar)).toFixed(2)" class="bg bg-warning text-white"></td>
+                                            <td v-text="'S/. '+(parseFloat(morahastahoy)+parseFloat(c.monto)).toFixed(2)" class="bg bg-warning text-white"></td>
 
                                             </tr>
                                         
@@ -113,7 +131,7 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-9">
-                                        <button type="button" v-if="botoncuota" @click="pagarCuota(c.id,c.otroscostos,c.idpersona)" class="btn btn-success col-md-4" >Pagar Cuota</button>
+                                        <button type="button" v-if="botoncuota" @click="pagarCuota(c.idcuota,c.idpersona)" class="btn btn-success col-md-4" >Pagar Cuota</button>
                                     </div>
                                    
                                 </div>
@@ -196,6 +214,18 @@ export default {
 
                  montoanterior:0,
 
+                 //caluclo de interes
+              
+                 hoy:'',
+                 tasa_compensatoria_anual:0.0,
+                 tasa_moratoria_anual:0.0,
+
+                 fechapago:'',
+                 diasdemora:'',
+
+                 morahastahoy:0.0,
+                 estadomora:"0",
+
             }
             
         },
@@ -214,6 +244,7 @@ export default {
                 axios.get('/cuota/detallepagar?id='+this.idcliente)
                     .then(res => {
                     this.dataC = res.data.cuotas;
+                    this.fechapago=this.dataC[0].fechapago
                   //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
                    // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
                    // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
@@ -224,19 +255,20 @@ export default {
             },
 
             //pagar cuota
-            pagarCuota: function(idcuota,otroscostoscuota,idpersona){
-                axios.put('/cuota/pagar',{
+            pagarCuota (idcuota,idpersona){
+                axios.put('/cuota/pagarCuota',{
                     'id': idcuota,
                     'descripcion': this.descpagocuota,
-                    'otrospagos': otroscostoscuota,
-                    'idpersona':idpersona,
-                    //'montoant':this.montoanterior,
+                    'mora': this.morahastahoy,
+                    'idsocio':idpersona,
+                    'estadomora':this.estadomora
+                  
                 })
                     .then(res => {
                     Swal.fire({
                         position: 'top-end',
                         type: 'success',
-                        title: 'El pago se realizó correctamente',
+                        title: 'El pago se realizó exitosameente',
                         showConfirmButton: false,
                         timer: 2000
                         })
@@ -255,17 +287,67 @@ export default {
                     });
             },
 
+            interespormora(){
+               let me=this;
+               var fecha1=moment(me.fechapago)
+               var fecha2=moment(me.hoy);
+               me.diasdemora =fecha2.diff(fecha1, 'days')
+               if(me.diasdemora>0){
+                   me.estadomora="1";
+                
+                    var M=0;
+                   var DM=this.diasdemora/360;
+                   var S=0;
+                   
+                   var CP=this.dataC[0].monto;
+                   var C=parseFloat(CP)+parseFloat(S);
+                   var TC=this.tasa_compensatoria_anual/100;
+                   var TM=this.tasa_moratoria_anual/100;
+
+
+                   
+                   M=
+                   parseFloat(C)+
+                   parseFloat(CP*(Math.pow(parseFloat(1)+parseFloat(TC),DM)-1))+
+                   parseFloat(CP*(Math.pow(parseFloat(1)+parseFloat(TM),DM)-1))
+                   ;
+                   me.morahastahoy=(M-C).toFixed(2);
+                   console.log(me.morahastahoy)
+               }
+               else{
+                    me.morahastahoy=0;
+                    me.estadomora="0";
+               }
+            },
+
+            cargarValores(){
+            let me = this;
+
+            axios.get('/config/valores')
+                .then(res => {
+                    //  me.array_empresa=res.data.config;
+                    me.tasa_compensatoria_anual =  res.data.config.tasa_compensatoria_anual;
+                    me.tasa_moratoria_anual = res.data.config.tasa_moratoria_anual;
+                    me.hoy = res.data.hoy;
+                    me.interespormora();
+                })
+                .catch(err => {
+                  //  me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
+                    console.log(err);
+                });
+            },
+
+
             generarboucher(){
-                window.open('/credito/detallecuotapdf/'+this.identificadorcuota+'','_blank');
+                window.open('/cuota/detallecuotapdf/'+this.identificadorcuota+'','_blank');
             },
-            generarboucherPorcion(){
-                window.open('/credito/detalleporcioncuotapdf/'+this.identificadorcuota+'','_blank');
-            },
+           
 
           
         },
         mounted() {
             this.obtenerCuotaDeCliente();
+              this.cargarValores();
         }
     }
 </script>

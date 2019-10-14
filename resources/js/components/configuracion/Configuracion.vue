@@ -22,11 +22,12 @@
                             <input id="descripcionaporte" type="text" v-model="abonosocio" class="form-control" placeholder="Detalle de operación">
                         </div>
                         <div class="form-group">
-                            <label for="descripcionaporte" class="font-weight-bold">Tasa Ahorros</label>
+                            <label for="descripcionaporte" class="font-weight-bold">Tasa de Rendimiento Efectivo Anual(TREA)
+                                (TREA)</label>
                             <input id="descripcionaporte" type="text" v-model="tasa_ahorros" class="form-control" placeholder="Detalle de operación">
                         </div>
                         <div class="form-group">
-                            <label for="descripcionaporte" class="font-weight-bold">Tasa Créditos</label>
+                            <label for="descripcionaporte" class="font-weight-bold">Tasa Efectiva Anual(TEA)</label>
                             <input id="descripcionaporte" type="text" v-model="tasa_creditos" class="form-control" placeholder="Detalle de operación">
                         </div>
                         <div class="form-group">
@@ -46,6 +47,7 @@
         props:['ruta'],
         data: function(){
             return {
+                array_empresa:[],
                 mora: '',
                 intereses: '',
                 abonosocio: '',
@@ -77,8 +79,9 @@
             cargarValores(){
                 let me = this;
 
-                axios.get(me.ruta + '/config/valores')
+                axios.get('/config/valores')
                     .then(res => {
+                      //  me.array_empresa=res.data.config;
                         me.mora = me.ant_mora = res.data.config.mora;
                         me.intereses = me.ant_intereses = res.data.config.interes;
                         me.abonosocio = me.ant_abonosocio = res.data.config.abonosocio;

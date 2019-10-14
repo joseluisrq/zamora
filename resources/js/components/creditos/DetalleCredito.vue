@@ -29,7 +29,7 @@
                                                 <i class="mdi mdi-file-pdf btn-icon-prepend"></i>                                                    
                                                 Descargar Cronograma
                                             </button>
-                                             <button v-if="arrayCreditos[0].estadodesembolso==0" class="btn btn-success"> Desembolsar</button>
+                                             <button v-if="arrayCreditos[0].estadodesembolso==0" class="btn btn-success" @click="desembolsar(c.id)"> Desembolsar</button>
                                 
 
                                         </div>
@@ -110,7 +110,7 @@
                                                 <i class="mdi mdi-account-location mdi-36px"></i>Información del Garante </h4>
                                             <hr>
                                         </div>
-
+                                    <template v-if="c.idgarante!=c.idsocio">
                                         <div class="col-md-3">
                                             <h5 class="font-weight-bold ">DNI:</h5>
                                             <p v-text="c.garantedni"></p>
@@ -135,6 +135,13 @@
                                             <h5 class="font-weight-bold ">Email:</h5>
                                             <p v-text="c.garanteemail"></p>
                                         </div>
+                                        </template>
+                                        <template v-else>
+                                        <div class="col-md-3">
+                                              
+                                                <p> No tiene un garante Registrado</p>
+                                        </div>
+                                        </template>
                                     </div>
 
                                 </div>
@@ -170,7 +177,7 @@
                                                         </button>
                                                     </template>
                                                     <template v-if="cu.estado==1">
-                                                         <button type="button" @click="bouchercuota(cu.id)" class="btn btn-success btn-rounded btn-icon ">
+                                                         <button type="button" @click="generarboucher(cu.id)" class="btn btn-success btn-rounded btn-icon ">
                                                             <i class="mdi mdi-file-import mdi-24px"></i>
                                                         </button>
                                                     </template>
@@ -180,8 +187,8 @@
                                                     <td v-text="cu.fechapago" ></td>
                                                 </template>
                                                 <template  v-if="cu.estado==1">
-                                                     <td >Fecha de Pago :{{cu.fechapago}} <br>
-                                                     Fecha de Cancelación :  <label class="badge badge-danger">{{cu.fechacancelo}}</label></td>
+                                                     <td >Fecha de Vecnimiento :{{cu.fechapago}} <br>
+                                                     Fecha de Pago :  <label class="badge badge-danger">{{cu.fechacancelo}}</label></td>
                                                 </template>
                                                 
                                                 <td v-text="cu.monto"></td>
@@ -262,6 +269,39 @@ export default {
             },
             pdfCronograma(idcredito){
                  window.open(this.ruta + '/credito/pdfDetallecredito/'+this.id,'_blank');
+            },
+             generarboucher(id){
+                window.open('/cuota/detallecuotapdf/'+id+'','_blank');
+            },
+            desembolsar(id){
+                
+                  let me = this;
+                    Swal.fire({
+                    title: '',
+                    text: "¿Está seguro que desea DESEMBOLSAR EL CREDITO?",
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                     cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Si'
+                    }).then((result) => {
+                    if (result.value) {
+                       axios.put('/credito/desembolsar',{
+                    'id': id,
+                        }).then(function (response) {
+
+                        Swal.fire(
+                        '', 'El credito ha sido REGISTRADO COMO DESEMBOLSADO',
+                        'success'
+                        )  
+                          this.detalleCredito();
+                               
+                      }).catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+                 })
             },
            
             fechaactual() 

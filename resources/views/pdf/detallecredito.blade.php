@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
   
-    <title>Reporte de Credito</title>
+    <title>Cronograma de Pagos</title>
     <style>
      body {
             margin: 20px;
@@ -98,11 +98,11 @@ td, th {
          <div class="page">
             <div align='center'>
                 <img src="./images/logo.png" width="120px" alt="">
-                <h4> Contrato de Credito/Pagaré</h4>
+                <h4> Contrato de Crédito/Pagaré</h4>
             </div>
             <p>
-                ID PRESTAMO :  {{$c->numeroprestamo}}<br><br>
-                ID CLIENTE:  {{$c->dni}}<br><br>
+                ID CRÉDITO :  {{$c->numeroprestamo}}<br><br>
+                ID SOCIO:  {{$c->dni}}<br><br>
                
             </p>
              <p>
@@ -119,7 +119,7 @@ td, th {
             <table  style="width:100%">
                 <tr>
                     <td style="width:35%">Monto de Prestamo y moneda</td>
-                    <td style="width:15%">$ {{$c->montodesembolsado}}</td>
+                    <td style="width:15%">S/ {{$c->montodesembolsado}}</td>
                     <td style="width:35%">Fecha de desembolso</td>
                     <td style="width:15%">{{$c->fechadesembolso}}</td>
                 </tr>
@@ -130,7 +130,7 @@ td, th {
                     <td style="width:15%"> 
                     <?php $fecha='';?>
                     @foreach ($cuotas as $cuot)
-                     <?php if($cuot->numerocuota==$c->numerocuotas) $fecha=$cuot->fechapago;?>
+                     <?php if($cuot->numerodecuota==$c->numerocuotas) $fecha=$cuot->fechapago;?>
                      @endforeach
                      <?php echo $fecha;?>
                 </td>
@@ -140,11 +140,11 @@ td, th {
                     <td style="width:35%">Frecuencia de Pagos (Semana, Mensual,etc)</td>
                     <td style="width:15%">
                     <?php
-                    if($c->periodo==1)echo "Mensual";
-                    elseif($c->periodo==2)echo "Bimestral";
-                    elseif($c->periodo==3)echo "Trimestral";
+                    if($c->periodo==12)echo "Mensual";
+                 
+                    elseif($c->periodo==4)echo "Trimestral";
                     elseif($c->periodo==6)echo "Semestral";
-                    elseif($c->periodo==12)echo "Anual";
+                    elseif($c->periodo==1)echo "Anual";
                     ?>
                    
                 
@@ -161,75 +161,49 @@ td, th {
             <h4>II.Plan de Pagos </h4>
                 <table style="width:100%">
                     <tr>
-                       <td style="width:17%">Fecha de Pago</th>
-                       <td style="width:17%">Saldo Pendiente</th>
-                       <td style="width:17%">Principal</th>
+                        <td style="width:5%">#</th>
+                       <td style="width:17%">Fecha de Pago</th>                      
+                       <td style="width:17%">Cuota</th>
                        <td style="width:17%">Interes</th>
-                       <td style="width:17%">Otros Costos</th>
-                       <td style="width:15%">Pago total</th>
+                        <td style="width:17%">Amortización</th>
+                        <td style="width:17%">Capital Pendiente</th>                        
+                       
                     </tr>
                     <tr>
+                         <td style="width:5%"></td>
                         <td style="width:17%">{{$c->fechadesembolso}}</td>
-                        <td style="width:17%">{{$c->montodesembolsado}}</td>
+                        <td style="width:17%">0.00</td>                       
                         <td style="width:17%">0.00</td>
-                        <td style="width:17%">0.00</td>
-                        <td style="width:17%">0.00</td>
-                        <td style="width:17%">0.00</td>
+                        <td style="width:17%">0.00</td>  
+                        <td style="width:17%">{{$c->montodesembolsado}}</td>                  
+                       
                         
                     </tr>
-                    <?php $sumaotros=0; ?>
+                   
                     @foreach ($cuotas as $cuot)
                    
                     <tr>
+                        <td style="width:5%">{{$cuot->numerodecuota}}</td>
                         <td style="width:17%">{{$cuot->fechapago}}</td>
-                        <td style="width:17%">{{round($cuot->saldopendiente,2)}}</td>
-                        <td style="width:17%">{{
-                            round(
-                            $cuot->monto
-                            ,2)
-                        }}</td>
-                        <td style="width:17%">{{
-                            round(
-                            ($c->montodesembolsado*($c->tasa / 100)) / $c->numerocuotas
-                            ,2)
+                        <td style="width:17%">{{$cuot->monto}}</td>
+                        <td style="width:17%">{{$cuot->interes}}</td>
+                        <td style="width:17%">{{$cuot->amortizacion}}</td>
+                        <td style="width:17%">{{$cuot->saldopendiente}}</td>
                         
-                        }}</td>
-                        <td style="width:17%">{{$cuot->otroscostos}}</td>
-                        <td style="width:15%">{{round(($cuot->monto)+($cuot->otroscostos)+( ($c->montodesembolsado*($c->tasa / 100)) / $c->numerocuotas),2)}}</td>
-                        <?php 
-                        
-                        $sumaotros=($cuot->otroscostos)+$sumaotros?>
                     </tr>
                     @endforeach
                     <tr>
+                         <td style="width:5%"><strong></strong></td>
                         <td style="width:17%"><strong>TOTAL</strong> </td>
-                        <td style="width:17%"><strong>0</strong></td>
-                        <td style="width:17%"><strong>{{$c->montodesembolsado}}</strong></td>
-                        <td style="width:17%"><strong>{{
-                            round(
-                            $c->montodesembolsado*($c->tasa / 100)
-                            ,2)
-                        
-                        }}</strong></td>
-                        <td style="width:17%"><strong><?php echo $sumaotros?></strong></td>
-                        <td style="width:15%"><strong>{{
-                            round(
-                            $c->montodesembolsado+$sumaotros+  ($c->montodesembolsado*($c->tasa / 100))
-                            ,2)
-                        
-                        }}</strong></td>
+                       
+                        <td style="width:17%"><strong>{{$c->montodesembolsado+$c->credinteres}}</strong></td>
+                        <td style="width:17%"><strong>{{$c->credinteres }}</strong></td>
+                        <td style="width:17%"><strong>{{$c->montodesembolsado }}<</strong></td>
+                        <td style="width:15%"><strong>0</strong></td>
                     </tr>
 
                 </table>
-            <p>
-            III.Política de Morosidad- Si no recibimos un pago dentro de la fecha programada en su cronograma
-            , entonces el acreditado estará en mora y [APT del norte] tiene el derecho de [ aplicar cargo de 
-            morisidad al acreditado del __% mensual ].
-            </p>
-            <p>
-            IV.Política de Incumplimiento - Después de [__] días de morosidad [ Cooperativa Zamora] tiene el derecho
-            de [ iniciar acción legal por incumplimiento de contrato ].
-            </p>
+           
             <p>
                 Si tiene cualquier pregunta o queja acerca de un producto , nuestro servicio, o un empleado por 
                 favor llame [ Cooperatvia Zamora : correo electrónico zamora@gmail.com o teléfono fijo 076-558336]

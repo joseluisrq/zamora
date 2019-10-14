@@ -44,17 +44,18 @@
                             <div class="card-body ">
                                 <h4 class="card-title ">Cuotas por Pagar</h4>
                                 <p class="card-description ">
-                                Cuotas en orden de venciomiento 
+                                Cuotas en orden de venciomiento <code>El pago de las cuotas es en orden del número de cuota</code>
                                 </p>
                                 <div class="row">
                                     <div class="col-md-6 col-sm-6">
                                         <div class="input-group">
                                             <select class="form-control col-md-12" v-model="criterio">
-                                                <option value="numeroprestamo">Número de prestamo</option>
+                                             
                                                 <option value="dni">DNI Socio</option>
-                                                <option value="fechadesembolso">Fecha de Desembolso </option>
+                                                <option value="nombre">Nombre del Socio</option>
+                                                <option value="apellidos">Apellidos del Socio</option>
                                             </select>
-                                            <input type="text" v-model="buscar" @keyup.enter="listarCreditos(1,buscar,criterio)" 
+                                            <input type="text" v-model="buscar" @keyup.enter="listarCuotas(1,buscar,criterio)" 
                                             class="form-control form-control-lg" placeholder="Texto a buscar">
                                             <button type="submit" 
                                             class="btn btn-outline-primary btn-sm"><i class="fa fa-search"></i>  <i class="mdi mdi-magnify"></i> Buscar</button>
@@ -65,12 +66,14 @@
                                         <table class="table  table-bordered">
                                             <thead>
                                                 <tr class="table-info text-white">
-                                                    <th>Pagar  </th> 
-                                                    <th> Socio</th>   
+                                                    
+                                                     <th>Pagar  </th>  <th>Fecha de Vencimiento </th>
+                                                    
+                                                     <th> DNI Socio</th> 
+                                                    <th> Nombres y Apellidos </th>   
                                                     <th>Credito </th>                                                 
-                                                    <th>N °Cuota </th>                                                
-                                                    <th>Fecha </th>
-                                                    <th>Monto de Cuota </th>
+                                                    <th>N° de Cuota </th> 
+                                                    <th>Cuota</th>
                                                     <th> Capital </th>
                                                     <th> Interés </th>
                                                     <th> Saldo </th>
@@ -88,17 +91,15 @@
                                                         <i class="mdi mdi-currency-usd mdi-24px"></i>
                                                     </button>
                                                     </td>
-                                                    <td >{{cu.dni}} - {{cu.nombre}} {{cu.apellidos}}</td>
+                                                       <td v-text="cu.fechapago" ></td>
+                                                    <td >{{cu.dni}}</td>
+                                                        <td >{{cu.nombre}} {{cu.apellidos}}</td>
                                                     <td class="py-1" v-text="cu.numeroprestamo"></td>
                                                     <td class="py-1" v-text="cu.numerodecuota"></td>
                                                 
-                                                    <template v-if="cu.estado==0">
-                                                        <td v-text="cu.fechapago" ></td>
-                                                    </template>
-                                                    <template  v-if="cu.estado==1">
-                                                        <td >Fecha de Pago :{{cu.fechapago}} <br>
-                                                        Fecha de Cancelación :  <label class="badge badge-danger">{{cu.fechacancelo}}</label></td>
-                                                    </template>
+                                                  
+                                                     
+                                                  
                                                     
                                                     <td v-text="cu.monto"></td>
                                                     <td v-text="cu.monto"></td>
@@ -124,6 +125,19 @@
 
                                             </tbody>
                                         </table>
+                                          <nav>
+                                <ul class="pagination">
+                                    <li class="page-item" v-if="pagination.current_page > 1">
+                                        <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Anterior</a>
+                                    </li>
+                                    <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                                        <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
+                                    </li>
+                                    <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                        <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Siguiente</a>
+                                    </li>
+                                </ul>
+                            </nav>
                                     </div>
                             </div>
                         </div>
@@ -170,16 +184,67 @@ export default {
                 arrayCuotas:[],
                  hoy:'',
 
+
+                    pagination : {
+                    'total' : 0,
+                    'current_page' : 0,
+                    'per_page' : 0,
+                    'last_page' : 0,
+                    'from' : 0,
+                    'to' : 0,
+                },
+                offset : 3,
+                criterio : 'dni',
+                buscar : '',
+
         }
     },
+      computed:{
+            isActived: function(){
+                return this.pagination.current_page;
+            },
+            //Calcula los elementos de la paginación
+            pagesNumber: function() {
+                if(!this.pagination.to) {
+                    return [];
+                }
+                
+                var from = this.pagination.current_page - this.offset; 
+                if(from < 1) {
+                    from = 1;
+                }
+
+                var to = from + (this.offset * 2); 
+                if(to >= this.pagination.last_page){
+                    to = this.pagination.last_page;
+                }  
+
+                var pagesArray = [];
+                while(from <= to) {
+                    pagesArray.push(from);
+                    from++;
+                }
+                return pagesArray;             
+
+            }
+        },
      components:{
             vSelect
         },
     methods:{
+
+          cambiarPagina(page,buscar,criterio)
+            {
+                let me = this;
+                //Actualiza la página actual
+                me.pagination.current_page = page;
+                //Envia la petición para visualizar la data de esa página
+                me.listarCuotas(page,buscar,criterio);
+            },
           selectSocio(search, loading){//CREAR SOLO PARA LOS SOCIOS QUE NO TIENEN CUENTA DE AHORROS
                 let me=this;
                  loading(true)
-                var url= this.ruta+'/aporte/selectsocio?filtro='+search;
+                var url= this.ruta+'/cuota/selectsocio?filtro='+search;
                 axios.get(url).then(function (response) {
                     let respuesta = response.data;
                     q:search;
@@ -204,13 +269,14 @@ export default {
                     me.limpiarselect();
                 }
             },
-               listarCuotas()
+               listarCuotas(page,buscar,criterio)
             {
                 let me=this;                
-                var url= this.ruta+'/cuota/cuotassinpagar';
+                var url= this.ruta+'/cuota/cuotassinpagar?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;                   
-                    me.arrayCuotas = respuesta.cuotas;
+                    me.arrayCuotas = respuesta.cuotas.data;
+                     me.pagination= respuesta.pagination;
                    
                 })
                 .catch(function (error) {
@@ -230,7 +296,7 @@ export default {
             },
     },
      mounted() {
-            this.listarCuotas();
+            this.listarCuotas(1,this.buscar,this.criterio);
              this.fechaactual();
           
     }
