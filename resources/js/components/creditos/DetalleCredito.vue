@@ -187,7 +187,7 @@
                                                     <td v-text="cu.fechapago" ></td>
                                                 </template>
                                                 <template  v-if="cu.estado==1">
-                                                     <td >Fecha de Vecnimiento :{{cu.fechapago}} <br>
+                                                     <td >Fecha de Vencimiento :{{cu.fechapago}} <br>
                                                      Fecha de Pago :  <label class="badge badge-danger">{{cu.fechacancelo}}</label></td>
                                                 </template>
                                                 

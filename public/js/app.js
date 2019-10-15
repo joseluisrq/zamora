@@ -45252,7 +45252,7 @@ var render = function() {
                               ? [
                                   _c("td", [
                                     _vm._v(
-                                      "Fecha de Vecnimiento :" +
+                                      "Fecha de Vencimiento :" +
                                         _vm._s(cu.fechapago) +
                                         " "
                                     ),
