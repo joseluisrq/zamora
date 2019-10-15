@@ -32,8 +32,8 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                        <label for="tasainteres" class="font-weight-bold">Tasa de Interés</label>
-                                        <input id="tasainteres" type="number" min="1" max="99"  step="any" v-model="tasa" class="form-control" placeholder="Tasa de interes por aporte" oninvalid="this.setCustomValidity('ingrese la tasa de interés')" oninput="this.setCustomValidity('')" required>
+                                        <label for="tasainteres" class="font-weight-bold">Tasa de Aportes(%)</label>
+                                        <input id="tasainteres" type="number" min="1" max="99"  step="any" v-model="tasa" class="form-control" placeholder="Tasa de interes por aporte" oninvalid="this.setCustomValidity('ingrese la tasa de interés')" oninput="this.setCustomValidity('')" disabled required>
                                 </div>
                                 <div class="form-group">
                                     <label for="montoaporte" class="font-weight-bold">Monto de Aporte(S/)</label>
@@ -345,6 +345,24 @@
                     me.limpiarselect();
                 }
             },
+
+               cargarValores()
+            {
+                let me = this;
+
+                axios.get('/config/valores')
+                    .then(res => {
+                        //  me.array_empresa=res.data.config;
+                      
+                        me.tasa=res.data.config.tasa_aportes;
+                     
+                    
+                    })
+                    .catch(err => {
+                    // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
+                        console.log(err);
+                    });
+            },
             mostrarComponente(valregistro, valmensaje, vallista){
                 let me = this;
                 me.showregistro = valregistro;
@@ -360,6 +378,7 @@
         },
         mounted() {
             this.listaraportes(1, '', '');
+              this.cargarValores();
         }
     };
 </script>

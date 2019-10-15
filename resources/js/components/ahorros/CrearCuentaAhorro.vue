@@ -70,7 +70,7 @@
                                  <p v-text="'S/.'+monto"></p>
                             </div>
                             <div class="col-md-3">
-                                <h5 class="font-weight-bold ">Tasa</h5>
+                                <h5 class="font-weight-bold ">Tasa de Rendimiento Efectivo Anual(%)</h5>
                                  <p v-text="tasa"></p>
                             </div>
                             <div class="col-md-12">

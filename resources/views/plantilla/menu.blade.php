@@ -40,7 +40,7 @@
                             <li class="nav-item" @click="menu=70"><a class="nav-link"  href="#">Registrar movimientos</a></li>
                             <li class="nav-item" @click="menu=71"><a class="nav-link"  href="#">Crear cuenta de Ahorros</a></li>
                             <li class="nav-item" @click="menu=72"><a class="nav-link"  href="#">Historial de Ahorros</a></li>
-                            <li class="nav-item" @click="menu=73"><a class="nav-link"  href="#">Configuracion</a></li>
+                         
                           </ul>
                       </div>
                 </li>
@@ -57,8 +57,7 @@
                               <li class="nav-item" @click="menu=2"><a class="nav-link"  href="#">Lista de Socios</a></li>
                               <li class="nav-item" @click="menu=3"><a class="nav-link" href="#">Agregar Socios</a></li>
                               <li class="nav-item" @click="menu=4"><a class="nav-link"  href="#">Aportes</a></li>
-                              <li class="nav-item" @click="menu=5"><a class="nav-link"  href="#">Historial de Cambios</a></li>
-                              <li class="nav-item" @click="menu=6"><a class="nav-link" href="#">Configuracion</a></li>
+                                                        
                           </ul>
                       </div>
                 </li>

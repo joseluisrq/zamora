@@ -15,6 +15,8 @@
     <div id="app">
         <div class="container-scroller">
             <div class="horizontal-menu">
+
+         
                 <!--cabecera del app--->
                 <nav class="navbar top-navbar col-lg-12 col-12 p-0">
                     <div class="container-fluid">
@@ -54,21 +56,29 @@
                                     
                                 </div>
                         </li>
-                            
-                        <li class="nav-item nav-profile dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-                            <span class="nav-profile-name">Usuario</span>
-                            <span class="online-status"></span>
-                            <img src="images/dashboard/face29.png" alt="profile"/>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                                
-                                <a class="dropdown-item">
-                                <i class="mdi mdi-logout text-primary"></i>
-                                Cerrar Sesión
-                                </a>
-                            </div>
+                        <li>
+
+                        <nav class="bottom-navbar ">                                
+                            <ul class="nav page-navigation">
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                   
+                                    <span class="">Usuario</span>
+                                    <img src="images/dashboard/face29.png" alt="profile"/>
+                                    </a>
+                                    <div class="submenu">
+                                        <ul>
+                                            <li class=""><a class="" href="#">   <i class="mdi mdi-logout text-primary"></i>  Cerrar Sesión</a></li>                                       
+                                        </ul>
+                                    </div>
+                                </li>    
+                            </ul>                            
+                        </nav>
+
                         </li>
+                       
+                     
+                 
                     </ul>
                     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="horizontal-menu-toggle">
                         <span class="mdi mdi-menu"></span>
@@ -94,6 +104,7 @@
 
  
     <script src="vendors/base/vendor.bundle.base.js"></script>
+
     <script src="http://momentjs.com/downloads/moment.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/all.js"></script>
@@ -106,6 +117,7 @@
 	<script src="vendors/justgage/raphael-2.1.4.min.js"></script>
     <script src="vendors/justgage/justgage.js"></script>
     <script src="http://momentjs.com/downloads/moment.min.js"></script>
+
    
     
     

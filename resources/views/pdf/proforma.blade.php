@@ -139,190 +139,118 @@ td, th {
                                   
                     
                 </tr>
+           
+
+
+             
+                        <?php
+                                $TIN = 0;
+                                $TA = 0;
+                                $TAN = 0;
+                                $AA = 0;
+                                $CUOTA = "";
+                                $I = 0;
+                                $AN = 0;
+                                $IN = 0;
+                                $A1 = 0;
+                                $CP2 = 0;
+                                $POT = 0;
+                                $CP1 = 0;
+                                $C =  $c->montodesembolsado;
+                                $J =  $c->tasa/ 100;
+                                $N = $c->numerocuotas;
+                                $D = 0;
+
+
+                                
+                                $N =round($N,2);
+                                $M = $c->periodo;
+                            
+                            
+
+                            
+                                $DD = 2;
+                                if ($M == 1) {
+                                    $CUOTA = "ANUALES";
+                                }
+                                if ($M == 2) {
+                                    $CUOTA = "SEMESTRALES"
+                                    ;
+                                }
+                                if ($M == 4) {
+                                    $CUOTA = "TRIMESTRALES";
+                                }
+                                if ($M == 12) {
+                                    $CUOTA = "MENSUALES";
+                                }
+
+                                
+
+                                    $I = (pow((1 + $J), 1 / $M)) - 1;
+                                    $AN = 0;
+                                    $IN = 0;
+                                    $A1 = 0;
+                                    $CP2 = $C;
+                                    $POT = $D-$N;
+                                    $TIN = 0;
+                                    $TA = 0;
+                                    $TAN = 0;
+                                
+                                    for ($K = 0; $K<=$N; $K++) {
+
+                                        $TIN = $TIN + $IN;
+                                        $TA = $TA + $A1;
+                                        $TAN = $TAN + $AN;
+                                        if ($K < $D) {
+                                        
+                                                $AN = $C * $I;
+                                                $IN = $C * $I;
+                                                $A1 = 0;
+                                                $CP2 = $C;
+                                            
+                                        }
+                                        if ($K == $D) {
+                                        
+                                                $AN = ($C * $I) / (1 - pow((1 + $I), $POT));
+                                                $IN = $C * $I;
+                                                $A1 = $N - $IN;
+                                                $CP2 = $C - $A1;
+                                                $CP1 = $CP2;
+                                        
+
+                                        if ($K > $D) {
+                                            $IN = $CP1 * $I;
+                                            $A1 = $AN - $IN;
+                                            $CP2 = $CP1 - $A1;
+                                            $CP1 = $CP2;
+                                        }
+
+                                    } 
+                                    
+                                    }
+
+
+                        
+                        ?>  
+
+                          
+                 <tr>
+                    <td style="width:35%">{{ $c->numerocuotas}} Cuotas de </td>
+                    <td style="width:15%">S/ <?php echo  round($AN,2)?></td>
+                 </tr>
+                 <tr>
+                    <td style="width:35%">Interes Total</td>
+                    <td style="width:15%">S/ <?php echo round($TIN,2) ?></td>
+                 </tr>
+                 <tr>
+                    <td style="width:35%">Total a Pagar</td>
+                    <td style="width:15%">S/ <?php echo round($TIN+$c->montodesembolsado,2) ?></td>
+                 </tr>
             </table>
-
-
-            <h4>II.Plan de Pagos </h4>
-                <table style="width:100%">
-                    <tr>
-                        <td style="width:5%">#</th>
-                       <td style="width:17%">Fecha de Pago</th>                      
-                       <td style="width:17%">Cuota</th>
-                       <td style="width:17%">Interes</th>
-                        <td style="width:17%">Amortización</th>
-                        <td style="width:17%">Capital Pendiente</th>                        
-                       
-                    </tr>
-                    <tr>
-                         <td style="width:5%"></td>
-                        <td style="width:17%">{{$c->fechadesembolso}}</td>
-                        <td style="width:17%">0.00</td>                       
-                        <td style="width:17%">0.00</td>
-                        <td style="width:17%">0.00</td>  
-                        <td style="width:17%">{{$c->montodesembolsado}}</td>                 
-                       
-
-
-   
-                    </tr>
-                   
-                </table>
-               
-           
-           
         </div>
         
     </div>
 
-
-    <SCRIPT language=JavaScript>
-        var FRANCES = false;
-
-        var TIN = 0;
-        var TA = 0;
-        var TAN = 0;
-        var AA = 0;
-        var CUOTA = "";
-        var I = 0;
-        var AN = 0;
-        var IN = 0;
-        var A1 = 0;
-        var CP2 = 0;
-        var POT = 0;
-        var CP1 = 0;
-
-     
-            // DATOS DEL FORMULARIO
-            var FRANCES = false;
-
-            var TIN = 0;
-            var TA = 0;
-            var TAN = 0;
-            var AA = 0;
-            var CUOTA = "";
-            var I = 0;
-            var AN = 0;
-            var IN = 0;
-            var A1 = 0;
-            var CP2 = 0;
-            var POT = 0;
-            var CP1 = 0;
-            var C = "<?php echo $c->montodesembolsado; ?>";
-            var J = "<?php echo $c->tasa; ?>" / 100;
-            var N ="<?php echo $c->numerocuotas; ?>" ;
-            var D = 0;
-
-            N = Math.round(N);
-            var M = "<?php echo $c->periodo; ?>";
-            var DETALLE = true;
-            var FRANCES = true;
-
-            var INCARENCIA = true;
-            var DD = 2;
-            if (M == 1) {
-                CUOTA = "ANUALES"
-            }
-            if (M == 2) {
-                CUOTA = "SEMESTRALES"
-            }
-            if (M == 4) {
-                CUOTA = "TRIMESTRALES"
-            }
-            if (M == 12) {
-                CUOTA = "MENSUALES"
-            }
-
-
-            if (FRANCES) {
-                I = Math.pow(1 + J, 1 / M) - 1;
-                AN = 0;
-                IN = 0;
-                A1 = 0;
-                CP2 = C;
-                POT = parseInt(D) - N;
-                TIN = 0;
-                TA = 0;
-                TAN = 0;
-
-             document.write(
-                    `<center>
-                        <table border="0" bgcolor="white" width="100%">
-                           <tr><td><center><font size="+0" face="Arial" color="#000000"><b>´PRESTAMO -CALCULO<br><font size="2" color="#000000">Prestamo duracion ` + Math.round(N * 10 / M) / 10 + ` años</td></tr></table></center>
-                    `);
-                document.write('<P>');
-                document.write('<div align="center"><center><table border="1" bgcolor="white" width="50%"><tr><td align="right"><font face="Verdana" size="2" color="black"><b>Monto:</td><td align="center"><font face="Verdana" size="2" color="black"><b>' + C + '</td></tr><tr><td align="right"><font face="Verdana" size="2" color="black"><b>T.A.E en %</td><td align="center"><font face="Verdana" size="2" color="black"><b>' + J * 100 + '</td></tr><tr><td align="right"><font face="Verdana" size="2" color="black"><b>Periodo de cuotas</td><td align="center"><font face="Verdana" size="2" color="black"><b>' + CUOTA + '</td></tr><tr><td align="right"><font face="Verdana" size="2" color="black"><b>Número de Cuotas: </td><td align="center"><font face="Verdana" size="2" color="black"><b>' + N + '</td></tr></table></center></div>');
-                document.write('<P>');
-
-                //Vista
-                if (DETALLE) {
-                /*    document.write('<center><table border="1" bgcolor="white"><tr bgcolor="white"><td align="center"><font face="Verdana" size="2" color="000000"><b>PERIODO</td><td align="center"><font face="Verdana" size="2" color="000000"><b>CUOTAS</td><td align="center"><font face="Verdana" size="2" color="000000"><b>INTERESES</td><td align="center"><font face="Verdana" size="2" color="000000"><b>AMORTIZACION</td><td align="center"><font face="Verdana" size="2" color="000000"><b>CAPITAL PENDIENTE</td></tr>');
-                */ }
-                for (var K = 0; K <= N; K++) {
-
-                    TIN = TIN + IN;
-                    TA = TA + A1;
-                    TAN = TAN + AN;
-                    if (DETALLE) {
-                     document.write('<tr><td align="center"><font face="Verdana" size="2" color="black"><b>' + K + '</td><td align="center"><font face="Verdana" size="2" color="black"><b>' + deci(AN, DD) + '</td><td align="center"><font face="Verdana" size="2" color="black"><b>' + deci(IN, DD) + '</td><td align="center"><font face="Verdana" size="2" color="black"><b>' + deci(A1, DD) + '</td><td align="center"><font face="Verdana" size="2" color="black"><b>' + deci(CP2, DD) + '</td></tr>');
-                   }
-                    if (K < D) {
-                        if (INCARENCIA) {
-                            AN = C * I;
-                            IN = C * I;
-                            A1 = 0;
-                            CP2 = C;
-                        }
-                        if (!INCARENCIA) {
-                            AN = 0;
-                            IN = 0;
-                            CP2 = C * Math.pow(1 + I, K);
-                        }
-                    }
-                    if (K == D) {
-                        if (INCARENCIA) {
-                            AN = (C * I) / (1 - Math.pow(1 + I, POT));
-                            IN = C * I;
-                            A1 = AN - IN;
-                            CP2 = C - A1;
-                            CP1 = CP2;
-                        }
-                        if (!INCARENCIA) {
-                            CP1 = C * Math.pow(1 + I, D);
-                            AN = (CP1 * I) / (1 - Math.pow(1 + I, POT));
-                            IN = CP1 * I;
-                            A1 = AN - IN;
-                            CP2 = CP1 - A1
-                        }
-                    }
-
-                    if (K > D) {
-                        IN = CP1 * I;
-                        A1 = AN - IN;
-                        CP2 = CP1 - A1;
-                        CP1 = CP2;
-                    }
-
-                }
-                if (DETALLE) {
-
-                document.write('<tr bgcolor="white"><td align="center"><font face="Verdana" size="2" color="000000"><b>TOTALES:</td><td align="center"><font face="Verdana" size="2" color="000000"><b>' + deci(TAN, DD) + '</td><td align="center"><font face="Verdana" size="2" color="000000"><b>' + deci(TIN, DD) + '</td><td align="center"><b><font face="Verdana" size="2" color="000000"><b>' + deci(TA, DD) + '</td><td align="center">&nbsp;</td></tr>');
-                    document.write('</table></center>');
-                }
-
-                if (!DETALLE) {
-                  document.write('<center><table border="1" width="50%"><tr bgcolor="white"><td align="center">&nbsp;</td><td align="center"><font face="Verdana" size="2" color="000000"><b>CUOTAS</td><td align="center"><font face="Verdana" size="2" color="000000"><b>INTERESES</td><td align="center"><font face="Verdana" size="2" color="000000"><b>AMORTIZACION</td></tr>');
-                    document.write('<tr bgcolor="#007bce"><td align="center"><font face="Verdana" size="2" color="ffff00"><b>TOTALES:</td><td align="center"><font face="Verdana" size="2" color="ffff00"><b>' + deci(TAN, DD) + '</td><td align="center"><font face="Verdana" size="2" color="ffff00"><b>' + deci(TIN, DD) + '</td><td align="center"><font face="Verdana" size="2" color="ffff00"><b>' + deci(TA, DD) + '</td></tr>');
-                    document.write('</table></center>');
-                     }
-            }
-
-            function deci(GG, KK) {
-                return (Math.round(GG * Math.pow(10, KK)) / Math.pow(10, KK))
-            }
-      
-
-        //-->
-    </SCRIPT>
 
 
     @endforeach

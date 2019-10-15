@@ -161,7 +161,7 @@
                         'tasa_compensatoria_anual':me.tasa_compensatoria_anual,
                         'tasa_moratoria_anual':me.tasa_moratoria_anual,  
 
-                        'tasa_ahorros':me.tasa_ahorros_comisiones,
+                        'tasa_ahorros':me.tasa_ahorros,
                         'tasa_ahorros_comisiones':me.tasa_ahorros_comisiones,
                         'tasa_ahorros_gastos':me.tasa_ahorros_gastos,   
 

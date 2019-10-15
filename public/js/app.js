@@ -3065,6 +3065,16 @@ __webpack_require__.r(__webpack_exports__);
         me.limpiarselect();
       }
     },
+    cargarValores: function cargarValores() {
+      var me = this;
+      axios.get('/config/valores').then(function (res) {
+        //  me.array_empresa=res.data.config;
+        me.tasa = res.data.config.tasa_aportes;
+      })["catch"](function (err) {
+        // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
+        console.log(err);
+      });
+    },
     mostrarComponente: function mostrarComponente(valregistro, valmensaje, vallista) {
       var me = this;
       me.showregistro = valregistro;
@@ -3080,6 +3090,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     this.listaraportes(1, '', '');
+    this.cargarValores();
   }
 });
 
@@ -3243,7 +3254,7 @@ __webpack_require__.r(__webpack_exports__);
         'tasa_creditos': me.tasa_creditos,
         'tasa_compensatoria_anual': me.tasa_compensatoria_anual,
         'tasa_moratoria_anual': me.tasa_moratoria_anual,
-        'tasa_ahorros': me.tasa_ahorros_comisiones,
+        'tasa_ahorros': me.tasa_ahorros,
         'tasa_ahorros_comisiones': me.tasa_ahorros_comisiones,
         'tasa_ahorros_gastos': me.tasa_ahorros_gastos,
         'tasa_aportes': me.tasa_aportes
@@ -42731,7 +42742,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "col-md-3" }, [
                 _c("h5", { staticClass: "font-weight-bold " }, [
-                  _vm._v("Tasa")
+                  _vm._v("Tasa de Rendimiento Efectivo Anual(%)")
                 ]),
                 _vm._v(" "),
                 _c("p", { domProps: { textContent: _vm._s(_vm.tasa) } })
@@ -42839,7 +42850,7 @@ var render = function() {
                     _vm._v(" "),
                     _c("div", { staticClass: "col-md-3 " }, [
                       _c("h5", { staticClass: "font-weight-bold " }, [
-                        _vm._v("Tasa de Interes:")
+                        _vm._v("TREA(%):")
                       ]),
                       _vm._v(" "),
                       _c("p", {
@@ -42994,7 +43005,7 @@ var render = function() {
                             domProps: { textContent: _vm._s(movimiento.monto) }
                           }),
                           _vm._v(" "),
-                          movimiento.tipo == 0
+                          movimiento.tipomovimiento == 0
                             ? _c("td", [
                                 _c(
                                   "label",
@@ -43014,10 +43025,6 @@ var render = function() {
                             domProps: {
                               textContent: _vm._s(movimiento.usuario)
                             }
-                          }),
-                          _vm._v(" "),
-                          _c("td", {
-                            domProps: { textContent: _vm._s(movimiento.estado) }
                           })
                         ])
                       }),
@@ -43095,9 +43102,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Tipo")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Cajaro")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Estado")])
+        _c("th", [_vm._v("Cajaro")])
       ])
     ])
   }
@@ -43874,7 +43879,7 @@ var render = function() {
                               staticClass: "font-weight-bold",
                               attrs: { for: "tasainteres" }
                             },
-                            [_vm._v("Tasa de Interés")]
+                            [_vm._v("Tasa de Aportes(%)")]
                           ),
                           _vm._v(" "),
                           _c("input", {
@@ -43897,6 +43902,7 @@ var render = function() {
                               oninvalid:
                                 "this.setCustomValidity('ingrese la tasa de interés')",
                               oninput: "this.setCustomValidity('')",
+                              disabled: "",
                               required: ""
                             },
                             domProps: { value: _vm.tasa },
@@ -64014,7 +64020,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
