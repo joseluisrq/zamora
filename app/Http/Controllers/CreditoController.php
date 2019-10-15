@@ -316,15 +316,14 @@ class CreditoController extends Controller
         $cuota = Credito::findOrFail($request->id);
         $cuota->estadodesembolso = '1';      
         $cuota->save();
-
-    
     }
 
 
 
     //pdf contrato y cronograma decuiotas
    
-      public function pdfDetallecredito(Request $request, $id){
+      public function pdfDetallecredito(Request $request, $id)
+      {
         $credito = Credito::join('personas as socio','creditos.idsocio','=','socio.id')       
         ->join('personas as usuario','creditos.idusuario','=','usuario.id')
         ->select(

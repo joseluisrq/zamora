@@ -73,8 +73,8 @@ class SimuladorController extends Controller
     }   
    
        //guardar un simulacion
-       public function guardarSimulacion(Request $request)
-       {
+    public function guardarSimulacion(Request $request)
+    {
            if (!$request->ajax()) return redirect('/');
     
            try{
@@ -99,6 +99,36 @@ class SimuladorController extends Controller
            } catch (Exception $e){
                DB::rollBack();
            }
-       }
+    }
+    public function pdfDetallecredito(Request $request, $id)
+    {
+      $credito = Simulador::
+       select(
+        'simulaciones.id',           
+        'simulaciones.montodesembolsado',
+        'simulaciones.fechadesembolso',
+        'simulaciones.fechaprimeracuota',                   
+        'simulaciones.numerocuotas',
+       
+        'simulaciones.tasa',
+        'simulaciones.estado',
+        'simulaciones.periodo',
+
+        'simulaciones.dni',
+        'simulaciones.nombresapellidos' )
+        ->where('simulaciones.id','=',$id)->take(1)->get();
+
+         
+
+        $numerocredito=Simulador::select('id')
+          ->where('id',$id)->get();
+
+        
+          $pdf= \PDF::loadView('pdf.proforma',[
+              'credito'=>$credito]
+             );
+          return $pdf->download('Proforma-'.$numerocredito[0]->id.'.pdf');
+      
+  }
    
 }

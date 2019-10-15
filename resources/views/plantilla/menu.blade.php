@@ -19,7 +19,7 @@
                     </a>
                     <div class="submenu">
                         <ul>
-                            <li @click="menu=100" class="nav-item"><a class="nav-link" href="">Pagar Cuota</a></li>
+                            <li @click="menu=100" class="nav-item"><a class="nav-link" href="#">Pagar Cuota</a></li>
                             <li  @click="menu=30" class="nav-item"><a class="nav-link" href="#">Agregar Credito</a></li>
                             <li @click="menu=40"><a class="nav-link" href="#">Historial de Creditos</a></li>
                             <li @click="menu=31"><a class="nav-link" href="#">Simulador de Creditos</a></li>

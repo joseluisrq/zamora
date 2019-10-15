@@ -52,6 +52,8 @@ class CuotaController extends Controller
                     'socio.nombre as nombre',
                     'socio.apellidos as apellidos',      
                     )->where('cuotas.estado','=','0')
+                    ->where('creditos.estado', '=', '1')
+                    ->where('creditos.estadodesembolso','=','1')
                     ->orderby('fechapago','asc')->paginate(10);
                     
 
@@ -84,6 +86,7 @@ class CuotaController extends Controller
                 )
                 ->where('creditos.estado', '=', '1')
                 ->where('cuotas.estado','=','0')
+                ->where('creditos.estadodesembolso','=','1')
                 ->where('socio.'.$criterio, 'like', '%'. $buscar . '%')
                 ->orderby('fechapago','asc')->paginate(10);
               

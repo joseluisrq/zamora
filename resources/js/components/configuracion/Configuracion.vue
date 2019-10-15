@@ -9,31 +9,76 @@
                         Verifique la Información antes de aceptar los cambios
                     </p>
                     <form id="formRegistro" @submit="enviarForm" class="forms-sample">
-                        <div class="form-group">
-                            <label for="montoaporte" class="font-weight-bold">Mora</label>
-                            <input id="montoaporte" type="number" v-model="mora" class="form-control" placeholder="Ingrese el monto" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="descripcionaporte" class="font-weight-bold">Interés</label>
-                            <input id="descripcionaporte" type="text" v-model="intereses" class="form-control" placeholder="Detalle de operación">
-                        </div>
-                        <div class="form-group">
-                            <label for="descripcionaporte" class="font-weight-bold">Abono socio</label>
-                            <input id="descripcionaporte" type="text" v-model="abonosocio" class="form-control" placeholder="Detalle de operación">
-                        </div>
-                        <div class="form-group">
-                            <label for="descripcionaporte" class="font-weight-bold">Tasa de Rendimiento Efectivo Anual(TREA)
-                                (TREA)</label>
-                            <input id="descripcionaporte" type="text" v-model="tasa_ahorros" class="form-control" placeholder="Detalle de operación">
-                        </div>
-                        <div class="form-group">
-                            <label for="descripcionaporte" class="font-weight-bold">Tasa Efectiva Anual(TEA)</label>
-                            <input id="descripcionaporte" type="text" v-model="tasa_creditos" class="form-control" placeholder="Detalle de operación">
-                        </div>
-                        <div class="form-group">
-                            <label for="descripcionaporte" class="font-weight-bold">Tasa Aportes</label>
-                            <input id="descripcionaporte" type="text" v-model="tasa_aportes" class="form-control" placeholder="Detalle de operación">
-                        </div>
+                       
+                       <div class="row">
+                           <div class="col-md-12">
+                               <h3>Configuración Créditos</h3>
+                               <hr>
+                           </div>
+                            <div class="col-md-3">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Tasa Efectiva Anual(TEA)(%)</label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_creditos" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-3">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Tasa Moratoria Anual (%) </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_moratoria_anual" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                           <div class="col-md-3">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Tasa Compensatoria Anual (%) </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_compensatoria_anual" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-12">
+                               <div class="form-group">
+                                    <h3>Configuración Cuenta de Ahorros</h3>
+                                    <hr>
+                               </div>
+                           </div>
+                           <div class="col-md-3">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Tasa de Rendimiento Efectivo Anual (%)
+                                        (TREA)</label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorros" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-3">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Comisiones de Consultas (S/)
+                                       </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorros_comisiones" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                             <div class="col-md-3">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Seguros de Protección (S/)
+                                      </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorros_gastos" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>                           
+                         <div class="col-md-12">
+                               <div class="form-group">
+                                    <h3>Configuración Aportes - Socios</h3>
+                                    <hr>
+                               </div>
+                           </div>
+                           <div class="col-md-3">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Tasa Aportes (%)</label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_aportes" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                       </div>
+                       
+                       
+                        
+                        
+                        
+                        
                         <input type="submit" class="btn btn-primary mr-2" value="Guardar cambios" @click="guardarCambios"/>
                         <a class="btn btn-light" @click="restaurarValores">Cancelar</a>
                     </form>
@@ -48,19 +93,24 @@
         data: function(){
             return {
                 array_empresa:[],
-                mora: '',
-                intereses: '',
-                abonosocio: '',
-                tasa_ahorros: '',
-                tasa_creditos: '',
-                tasa_aportes: '',
+               
+                tasa_creditos:'',           
+                tasa_ahorros:'',
+                tasa_ahorros_comisiones:'',
+                tasa_ahorros_gastos:'',           
+                tasa_aportes:'',         
+                tasa_compensatoria_anual:'',
+                tasa_moratoria_anual:'',
 
-                ant_mora: '',
-                ant_intereses: '',
-                ant_abonosocio: '',
-                ant_tasa_ahorros: '',
-                ant_tasa_creditos: '',
-                ant_tasa_aportes: ''
+                ant_tasa_creditos:'',           
+                ant_tasa_ahorros:'',
+                ant_tasa_ahorros_comisiones:'',
+                ant_tasa_ahorros_gastos:'',           
+                ant_tasa_aportes:'',         
+                ant_tasa_compensatoria_anual:'',
+                ant_tasa_moratoria_anual:'',
+                idempresa:''
+
             }
         },
         methods: {
@@ -82,16 +132,22 @@
                 axios.get('/config/valores')
                     .then(res => {
                       //  me.array_empresa=res.data.config;
-                        me.mora = me.ant_mora = res.data.config.mora;
-                        me.intereses = me.ant_intereses = res.data.config.interes;
-                        me.abonosocio = me.ant_abonosocio = res.data.config.abonosocio;
-                        me.tasa_ahorros = me.ant_tasa_ahorros = res.data.config.tasa_ahorros;
-                        me.tasa_creditos = me.ant_tasa_creditos = res.data.config.tasa_creditos;
-                        me.tasa_aportes = me.ant_tasa_aportes = res.data.config.tasa_aportes;
+                        me.idempresa=res.data.config.id;
+                         me.tasa_ahorros = me.ant_tasa_ahorros = res.data.config.tasa_ahorros;
+                         me.tasa_ahorros_comisiones = me.ant_tasa_ahorros_comisiones = res.data.config.tasa_ahorros_comisiones;
+                         me.tasa_ahorros_gastos = me.ant_tasa_ahorros_gastos = res.data.config.tasa_ahorros_gastos;
+
+                         me.tasa_creditos = me.ant_tasa_creditos = res.data.config.tasa_creditos;
+                         me.tasa_compensatoria_anual = me.ant_tasa_compensatoria_anual  = res.data.config.tasa_compensatoria_anual;
+                         me.tasa_moratoria_anual = me.ant_tasa_moratoria_anual = res.data.config.tasa_moratoria_anual;
+
+
+                         me.tasa_aportes = me.ant_tasa_aportes = res.data.config.tasa_aportes;
+                        
                         console.log(res.data);
                     })
                     .catch(err => {
-                        me.mostraralerta('top-end', 'error', '¡¡¡ Error, las actualizaciones no se completaron correctamente !!!', false, 2500);
+                        me.mostraralerta('top-end', 'error', '¡¡¡ Error, las configuraciones no se cargaron correctamente !!!', false, 2500);
                         console.log(err);
                     });
             },
@@ -99,20 +155,31 @@
                 let me = this;
 
                 axios.put(me.ruta + '/config/actualizar', {
-                    'mora': me.mora,
-                    'intereses': me.intereses,
-                    'abonosocio': me.abonosocio,
-                    'tasa_ahorros': me.tasa_ahorros,
-                    'tasa_creditos': me.tasa_creditos,
-                    'tasa_aportes': me.tasa_aportes
+                   
+                        'id':me.idempresa,
+                        'tasa_creditos':me.tasa_creditos,
+                        'tasa_compensatoria_anual':me.tasa_compensatoria_anual,
+                        'tasa_moratoria_anual':me.tasa_moratoria_anual,  
+
+                        'tasa_ahorros':me.tasa_ahorros_comisiones,
+                        'tasa_ahorros_comisiones':me.tasa_ahorros_comisiones,
+                        'tasa_ahorros_gastos':me.tasa_ahorros_gastos,   
+
+                        'tasa_aportes':me.tasa_aportes,       
+                        
                 })
                     .then(res => {
-                        me.ant_mora = me.mora;
-                        me.ant_intereses = me.intereses;
-                        me.ant_abonosocio = me.abonosocio;
+                       
                         me.ant_tasa_ahorros = me.tasa_ahorros;
+                        me.ant_tasa_ahorros_comisiones = me.tasa_ahorros_comisiones;
+                        me.ant_tasa_ahorros_gastos= me.tasa_ahorros_gastos;
+
                         me.ant_tasa_creditos = me.tasa_creditos;
-                        me.ant_tasa_aportes = me.tasa_aportes;
+                        me.ant_tasa_moratoria_anual= me.tasa_compensatoria_anual;
+                        me.ant_tasa_moratoria_anual= me.tasa_moratoria_anual 
+
+                        me.ant_tasa_aportes = me.tasa_aportes;                       
+
                         me.mostraralerta('top-end', 'success', '¡¡¡ Las configuraciones se actualizaron correctamente !!!', false, 2500);
                     })
                     .catch(err => {
@@ -123,11 +190,14 @@
             restaurarValores(){
                 let me = this;
 
-                me.mora = me.ant_mora;
-                me.intereses = me.ant_intereses;
-                me.abonosocio = me.ant_abonosocio;
                 me.tasa_ahorros = me.ant_tasa_ahorros;
+                me.tasa_ahorros_comisiones = me.ant_tasa_ahorros_comisiones;
+                me.tasa_ahorros_gastos = me.ant_tasa_ahorros_gastos;
+
                 me.tasa_creditos = me.ant_tasa_creditos;
+                me.tasa_compensatoria_anual = me.ant_tasa_moratoria_anual;
+                me.tasa_moratoria_anual = me.ant_tasa_moratoria_anual;
+
                 me.tasa_aportes = me.ant_tasa_aportes;
             }
         },

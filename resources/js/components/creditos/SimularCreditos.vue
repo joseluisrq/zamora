@@ -145,9 +145,9 @@
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h1>
+                        <h3>
                             Simulación de Préstamo
-                        </h1>
+                        </h3>
                         <hr>
                         <h3 class="text-dark font-weight-bold">Información del Cliente</h3>
                         <p>Dni : {{dni}}</p>
@@ -164,7 +164,7 @@
                            <p v-else-if="periodo==6" >Periodo: Semestral </p>
                             <p v-else-if="periodo==12" >Periodo: Mensual </p>
                         <hr>
-                        <button class="btn  btn-success">Descargar Tabla de amortización</button>
+                        <button class="btn  btn-success" @click="proforma()">Descargar Tabla de amortización</button>
                     </div>
                 </div>
             </div>
@@ -224,6 +224,9 @@
                                                             <!--detalle de credito-->
                                                             <button type="button" @click="viewDetalle=true;idcredito=c.id;viewLista=false" class="btn btn-success btn-rounded btn-icon ">
                                                                     <i class="mdi mdi-eye "></i>
+                                                            </button>
+                                                           <button type="button" @click="proforma(c.id)" class="btn btn-danger btn-rounded btn-icon ">
+                                                                    <i class="mdi mdi-file-pdf "></i>
                                                             </button>
                                                         </td>
                                                         <td>{{c.id}}</td>
@@ -631,6 +634,9 @@
                 .catch(function (error) {
                     console.log(error);
                 });
+            },
+              proforma(id){
+                window.open('/simulacion/pdfDetallecredito/'+id+'','_blank');
             },
             
          },

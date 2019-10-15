@@ -79,7 +79,12 @@
                                     <td v-if="c.estado==0">
                                         <label class="badge badge-success text-white ">Inactivo</label>
                                     <td  v-else-if="c.estado==1">
-                                        <label class="badge badge-success text-white ">En proceso</label>
+                                         <template v-if="c.estadodesembolso==0">
+                                          <label class="badge badge-danger text-white ">Sin Desembolsar</label>                                        
+                                        </template>
+                                        <template v-else>
+                                            <label class="badge badge-success text-white ">En proceso</label>                                       
+                                        </template>
                                     <td  v-else-if="c.estado==2">
                                         <label  class="badge badge-success text-white ">Finalizado</label>
                                     </td>

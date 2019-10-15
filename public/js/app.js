@@ -3138,23 +3138,71 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
   data: function data() {
     return {
       array_empresa: [],
-      mora: '',
-      intereses: '',
-      abonosocio: '',
-      tasa_ahorros: '',
       tasa_creditos: '',
+      tasa_ahorros: '',
+      tasa_ahorros_comisiones: '',
+      tasa_ahorros_gastos: '',
       tasa_aportes: '',
-      ant_mora: '',
-      ant_intereses: '',
-      ant_abonosocio: '',
-      ant_tasa_ahorros: '',
+      tasa_compensatoria_anual: '',
+      tasa_moratoria_anual: '',
       ant_tasa_creditos: '',
-      ant_tasa_aportes: ''
+      ant_tasa_ahorros: '',
+      ant_tasa_ahorros_comisiones: '',
+      ant_tasa_ahorros_gastos: '',
+      ant_tasa_aportes: '',
+      ant_tasa_compensatoria_anual: '',
+      ant_tasa_moratoria_anual: '',
+      idempresa: ''
     };
   },
   methods: {
@@ -3174,33 +3222,38 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       axios.get('/config/valores').then(function (res) {
         //  me.array_empresa=res.data.config;
-        me.mora = me.ant_mora = res.data.config.mora;
-        me.intereses = me.ant_intereses = res.data.config.interes;
-        me.abonosocio = me.ant_abonosocio = res.data.config.abonosocio;
+        me.idempresa = res.data.config.id;
         me.tasa_ahorros = me.ant_tasa_ahorros = res.data.config.tasa_ahorros;
+        me.tasa_ahorros_comisiones = me.ant_tasa_ahorros_comisiones = res.data.config.tasa_ahorros_comisiones;
+        me.tasa_ahorros_gastos = me.ant_tasa_ahorros_gastos = res.data.config.tasa_ahorros_gastos;
         me.tasa_creditos = me.ant_tasa_creditos = res.data.config.tasa_creditos;
+        me.tasa_compensatoria_anual = me.ant_tasa_compensatoria_anual = res.data.config.tasa_compensatoria_anual;
+        me.tasa_moratoria_anual = me.ant_tasa_moratoria_anual = res.data.config.tasa_moratoria_anual;
         me.tasa_aportes = me.ant_tasa_aportes = res.data.config.tasa_aportes;
         console.log(res.data);
       })["catch"](function (err) {
-        me.mostraralerta('top-end', 'error', '¡¡¡ Error, las actualizaciones no se completaron correctamente !!!', false, 2500);
+        me.mostraralerta('top-end', 'error', '¡¡¡ Error, las configuraciones no se cargaron correctamente !!!', false, 2500);
         console.log(err);
       });
     },
     guardarCambios: function guardarCambios() {
       var me = this;
       axios.put(me.ruta + '/config/actualizar', {
-        'mora': me.mora,
-        'intereses': me.intereses,
-        'abonosocio': me.abonosocio,
-        'tasa_ahorros': me.tasa_ahorros,
+        'id': me.idempresa,
         'tasa_creditos': me.tasa_creditos,
+        'tasa_compensatoria_anual': me.tasa_compensatoria_anual,
+        'tasa_moratoria_anual': me.tasa_moratoria_anual,
+        'tasa_ahorros': me.tasa_ahorros_comisiones,
+        'tasa_ahorros_comisiones': me.tasa_ahorros_comisiones,
+        'tasa_ahorros_gastos': me.tasa_ahorros_gastos,
         'tasa_aportes': me.tasa_aportes
       }).then(function (res) {
-        me.ant_mora = me.mora;
-        me.ant_intereses = me.intereses;
-        me.ant_abonosocio = me.abonosocio;
         me.ant_tasa_ahorros = me.tasa_ahorros;
+        me.ant_tasa_ahorros_comisiones = me.tasa_ahorros_comisiones;
+        me.ant_tasa_ahorros_gastos = me.tasa_ahorros_gastos;
         me.ant_tasa_creditos = me.tasa_creditos;
+        me.ant_tasa_moratoria_anual = me.tasa_compensatoria_anual;
+        me.ant_tasa_moratoria_anual = me.tasa_moratoria_anual;
         me.ant_tasa_aportes = me.tasa_aportes;
         me.mostraralerta('top-end', 'success', '¡¡¡ Las configuraciones se actualizaron correctamente !!!', false, 2500);
       })["catch"](function (err) {
@@ -3210,11 +3263,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     restaurarValores: function restaurarValores() {
       var me = this;
-      me.mora = me.ant_mora;
-      me.intereses = me.ant_intereses;
-      me.abonosocio = me.ant_abonosocio;
       me.tasa_ahorros = me.ant_tasa_ahorros;
+      me.tasa_ahorros_comisiones = me.ant_tasa_ahorros_comisiones;
+      me.tasa_ahorros_gastos = me.ant_tasa_ahorros_gastos;
       me.tasa_creditos = me.ant_tasa_creditos;
+      me.tasa_compensatoria_anual = me.ant_tasa_moratoria_anual;
+      me.tasa_moratoria_anual = me.ant_tasa_moratoria_anual;
       me.tasa_aportes = me.ant_tasa_aportes;
     }
   },
@@ -3550,6 +3604,11 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
 //
 //
 //
@@ -5255,6 +5314,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5559,6 +5621,9 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    proforma: function proforma(id) {
+      window.open('/simulacion/pdfDetallecredito/' + id + '', '_blank');
     }
   },
   mounted: function mounted() {
@@ -44416,231 +44481,297 @@ var render = function() {
               on: { submit: _vm.enviarForm }
             },
             [
-              _c("div", { staticClass: "form-group" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "font-weight-bold",
-                    attrs: { for: "montoaporte" }
-                  },
-                  [_vm._v("Mora")]
-                ),
+              _c("div", { staticClass: "row" }, [
+                _vm._m(1),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.mora,
-                      expression: "mora"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "montoaporte",
-                    type: "number",
-                    placeholder: "Ingrese el monto",
-                    required: ""
-                  },
-                  domProps: { value: _vm.mora },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _c("div", { staticClass: "col-md-3" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "font-weight-bold",
+                        attrs: { for: "descripcionaporte" }
+                      },
+                      [_vm._v("Tasa Efectiva Anual(TEA)(%)")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.tasa_creditos,
+                          expression: "tasa_creditos"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "descripcionaporte",
+                        type: "text",
+                        placeholder: "Detalle de operación"
+                      },
+                      domProps: { value: _vm.tasa_creditos },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.tasa_creditos = $event.target.value
+                        }
                       }
-                      _vm.mora = $event.target.value
-                    }
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "form-group" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "font-weight-bold",
-                    attrs: { for: "descripcionaporte" }
-                  },
-                  [_vm._v("Interés")]
-                ),
+                    })
+                  ])
+                ]),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.intereses,
-                      expression: "intereses"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "descripcionaporte",
-                    type: "text",
-                    placeholder: "Detalle de operación"
-                  },
-                  domProps: { value: _vm.intereses },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _c("div", { staticClass: "col-md-3" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "font-weight-bold",
+                        attrs: { for: "descripcionaporte" }
+                      },
+                      [_vm._v("Tasa Moratoria Anual (%) ")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.tasa_moratoria_anual,
+                          expression: "tasa_moratoria_anual"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "descripcionaporte",
+                        type: "text",
+                        placeholder: "Detalle de operación"
+                      },
+                      domProps: { value: _vm.tasa_moratoria_anual },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.tasa_moratoria_anual = $event.target.value
+                        }
                       }
-                      _vm.intereses = $event.target.value
-                    }
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "form-group" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "font-weight-bold",
-                    attrs: { for: "descripcionaporte" }
-                  },
-                  [_vm._v("Abono socio")]
-                ),
+                    })
+                  ])
+                ]),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.abonosocio,
-                      expression: "abonosocio"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "descripcionaporte",
-                    type: "text",
-                    placeholder: "Detalle de operación"
-                  },
-                  domProps: { value: _vm.abonosocio },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _c("div", { staticClass: "col-md-3" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "font-weight-bold",
+                        attrs: { for: "descripcionaporte" }
+                      },
+                      [_vm._v("Tasa Compensatoria Anual (%) ")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.tasa_compensatoria_anual,
+                          expression: "tasa_compensatoria_anual"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "descripcionaporte",
+                        type: "text",
+                        placeholder: "Detalle de operación"
+                      },
+                      domProps: { value: _vm.tasa_compensatoria_anual },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.tasa_compensatoria_anual = $event.target.value
+                        }
                       }
-                      _vm.abonosocio = $event.target.value
-                    }
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "form-group" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "font-weight-bold",
-                    attrs: { for: "descripcionaporte" }
-                  },
-                  [
-                    _vm._v(
-                      "Tasa de Rendimiento Efectivo Anual(TREA)\n                            (TREA)"
-                    )
-                  ]
-                ),
+                    })
+                  ])
+                ]),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.tasa_ahorros,
-                      expression: "tasa_ahorros"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "descripcionaporte",
-                    type: "text",
-                    placeholder: "Detalle de operación"
-                  },
-                  domProps: { value: _vm.tasa_ahorros },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.tasa_ahorros = $event.target.value
-                    }
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "form-group" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "font-weight-bold",
-                    attrs: { for: "descripcionaporte" }
-                  },
-                  [_vm._v("Tasa Efectiva Anual(TEA)")]
-                ),
+                _vm._m(2),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.tasa_creditos,
-                      expression: "tasa_creditos"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "descripcionaporte",
-                    type: "text",
-                    placeholder: "Detalle de operación"
-                  },
-                  domProps: { value: _vm.tasa_creditos },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _c("div", { staticClass: "col-md-3" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "font-weight-bold",
+                        attrs: { for: "descripcionaporte" }
+                      },
+                      [
+                        _vm._v(
+                          "Tasa de Rendimiento Efectivo Anual (%)\n                                    (TREA)"
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.tasa_ahorros,
+                          expression: "tasa_ahorros"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "descripcionaporte",
+                        type: "text",
+                        placeholder: "Detalle de operación"
+                      },
+                      domProps: { value: _vm.tasa_ahorros },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.tasa_ahorros = $event.target.value
+                        }
                       }
-                      _vm.tasa_creditos = $event.target.value
-                    }
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "form-group" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "font-weight-bold",
-                    attrs: { for: "descripcionaporte" }
-                  },
-                  [_vm._v("Tasa Aportes")]
-                ),
+                    })
+                  ])
+                ]),
                 _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.tasa_aportes,
-                      expression: "tasa_aportes"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "descripcionaporte",
-                    type: "text",
-                    placeholder: "Detalle de operación"
-                  },
-                  domProps: { value: _vm.tasa_aportes },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                _c("div", { staticClass: "col-md-3" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "font-weight-bold",
+                        attrs: { for: "descripcionaporte" }
+                      },
+                      [
+                        _vm._v(
+                          "Comisiones de Consultas (S/)\n                                   "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.tasa_ahorros_comisiones,
+                          expression: "tasa_ahorros_comisiones"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "descripcionaporte",
+                        type: "text",
+                        placeholder: "Detalle de operación"
+                      },
+                      domProps: { value: _vm.tasa_ahorros_comisiones },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.tasa_ahorros_comisiones = $event.target.value
+                        }
                       }
-                      _vm.tasa_aportes = $event.target.value
-                    }
-                  }
-                })
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-3" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "font-weight-bold",
+                        attrs: { for: "descripcionaporte" }
+                      },
+                      [
+                        _vm._v(
+                          "Seguros de Protección (S/)\n                                  "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.tasa_ahorros_gastos,
+                          expression: "tasa_ahorros_gastos"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "descripcionaporte",
+                        type: "text",
+                        placeholder: "Detalle de operación"
+                      },
+                      domProps: { value: _vm.tasa_ahorros_gastos },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.tasa_ahorros_gastos = $event.target.value
+                        }
+                      }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _vm._m(3),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-3" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "font-weight-bold",
+                        attrs: { for: "descripcionaporte" }
+                      },
+                      [_vm._v("Tasa Aportes (%)")]
+                    ),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.tasa_aportes,
+                          expression: "tasa_aportes"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "descripcionaporte",
+                        type: "text",
+                        placeholder: "Detalle de operación"
+                      },
+                      domProps: { value: _vm.tasa_aportes },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.tasa_aportes = $event.target.value
+                        }
+                      }
+                    })
+                  ])
+                ])
               ]),
               _vm._v(" "),
               _c("input", {
@@ -44672,6 +44803,40 @@ var staticRenderFns = [
     return _c("h4", { staticClass: "card-title text-dark" }, [
       _c("i", { staticClass: "mdi mdi-cash-multiple mdi-36px" }),
       _vm._v("Configuraciones generales")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12" }, [
+      _c("h3", [_vm._v("Configuración Créditos")]),
+      _vm._v(" "),
+      _c("hr")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12" }, [
+      _c("div", { staticClass: "form-group" }, [
+        _c("h3", [_vm._v("Configuración Cuenta de Ahorros")]),
+        _vm._v(" "),
+        _c("hr")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12" }, [
+      _c("div", { staticClass: "form-group" }, [
+        _c("h3", [_vm._v("Configuración Aportes - Socios")]),
+        _vm._v(" "),
+        _c("hr")
+      ])
     ])
   }
 ]
@@ -45520,16 +45685,33 @@ var render = function() {
                                   )
                                 ])
                               : c.estado == 1
-                              ? _c("td", [
-                                  _c(
-                                    "label",
-                                    {
-                                      staticClass:
-                                        "badge badge-success text-white "
-                                    },
-                                    [_vm._v("En proceso")]
-                                  )
-                                ])
+                              ? _c(
+                                  "td",
+                                  [
+                                    c.estadodesembolso == 0
+                                      ? [
+                                          _c(
+                                            "label",
+                                            {
+                                              staticClass:
+                                                "badge badge-danger text-white "
+                                            },
+                                            [_vm._v("Sin Desembolsar")]
+                                          )
+                                        ]
+                                      : [
+                                          _c(
+                                            "label",
+                                            {
+                                              staticClass:
+                                                "badge badge-success text-white "
+                                            },
+                                            [_vm._v("En proceso")]
+                                          )
+                                        ]
+                                  ],
+                                  2
+                                )
                               : c.estado == 2
                               ? _c("td", [
                                   _c(
@@ -48298,7 +48480,7 @@ var render = function() {
               _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
                 _c("div", { staticClass: "card" }, [
                   _c("div", { staticClass: "card-body" }, [
-                    _c("h1", [
+                    _c("h3", [
                       _vm._v(
                         "\n                        Simulación de Préstamo\n                    "
                       )
@@ -48348,9 +48530,18 @@ var render = function() {
                     _vm._v(" "),
                     _c("hr"),
                     _vm._v(" "),
-                    _c("button", { staticClass: "btn  btn-success" }, [
-                      _vm._v("Descargar Tabla de amortización")
-                    ])
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn  btn-success",
+                        on: {
+                          click: function($event) {
+                            return _vm.proforma()
+                          }
+                        }
+                      },
+                      [_vm._v("Descargar Tabla de amortización")]
+                    )
                   ])
                 ])
               ])
@@ -48536,6 +48727,25 @@ var render = function() {
                                       }
                                     },
                                     [_c("i", { staticClass: "mdi mdi-eye " })]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass:
+                                        "btn btn-danger btn-rounded btn-icon ",
+                                      attrs: { type: "button" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.proforma(c.id)
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass: "mdi mdi-file-pdf "
+                                      })
+                                    ]
                                   )
                                 ]),
                                 _vm._v(" "),

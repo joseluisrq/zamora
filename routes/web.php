@@ -60,6 +60,7 @@ Route::post('/movimiento/registrar', 'MovimientoController@store');
 //simulaciones
 Route::get('/simulacion/listaSilumaciones', 'SimuladorController@listaSilumaciones');//listar creditos
 Route::post('/simulacion/guardarSimulacion', 'SimuladorController@guardarSimulacion');
+Route::get('/simulacion/pdfDetallecredito/{id}', 'SimuladorController@pdfDetallecredito')->name('proforma_pdf');
 
 // OPCIONES DE CONFIGURACION
 Route::get('/config/valores', 'EmpresaController@index');
