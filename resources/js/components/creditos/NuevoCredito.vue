@@ -234,7 +234,7 @@
         data(){
             return{
                 //datos de nuevo credito
-                ruta:'http://127.0.0.1:8000',
+                ruta:'http://localhost/zamora/public',
                 idcliente:0,
                 numeroprestamo:'CZ-05',
                 montodesembolsado:1000,
@@ -507,7 +507,7 @@
             {
                 let me = this;
 
-                axios.get('/config/valores')
+                axios.get(this.ruta+'/config/valores')
                     .then(res => {
                         //  me.array_empresa=res.data.config;
                         me.tasa_creditos =  res.data.config.tasa_creditos;

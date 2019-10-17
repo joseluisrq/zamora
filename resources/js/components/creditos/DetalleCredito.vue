@@ -241,7 +241,7 @@ export default {
     props : ['id'],
     data(){
         return{
-            ruta:'http://127.0.0.1:8000',
+            ruta:'http://localhost/zamora/public',
             arrayCreditos:[],
             arrayCuotas:[],
 
@@ -287,7 +287,7 @@ export default {
                     confirmButtonText: 'Si'
                     }).then((result) => {
                     if (result.value) {
-                       axios.put('/credito/desembolsar',{
+                       axios.put(this.ruta+'/credito/desembolsar',{
                     'id': id,
                         }).then(function (response) {
 

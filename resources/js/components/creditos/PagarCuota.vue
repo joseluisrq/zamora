@@ -323,7 +323,7 @@ export default {
             cargarValores(){
             let me = this;
 
-            axios.get('/config/valores')
+            axios.get(this.ruta+'/config/valores')
                 .then(res => {
                     //  me.array_empresa=res.data.config;
                     me.tasa_compensatoria_anual =  res.data.config.tasa_compensatoria_anual;

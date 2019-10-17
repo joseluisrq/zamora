@@ -129,7 +129,7 @@
             cargarValores(){
                 let me = this;
 
-                axios.get('/config/valores')
+                axios.get(me.ruta +'/config/valores')
                     .then(res => {
                       //  me.array_empresa=res.data.config;
                         me.idempresa=res.data.config.id;

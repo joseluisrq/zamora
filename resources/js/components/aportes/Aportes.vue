@@ -350,7 +350,7 @@
             {
                 let me = this;
 
-                axios.get('/config/valores')
+                axios.get(this.ruta+'/config/valores')
                     .then(res => {
                         //  me.array_empresa=res.data.config;
                       

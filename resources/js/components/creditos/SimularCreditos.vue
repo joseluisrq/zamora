@@ -285,7 +285,7 @@
         data(){
             return{
                 //datos de nuevo credito
-                ruta:'http://127.0.0.1:8000',
+                ruta:'http://localhost/zamora/public',
                 idcliente:0,
                
                 montodesembolsado:1000,

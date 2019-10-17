@@ -3067,7 +3067,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     cargarValores: function cargarValores() {
       var me = this;
-      axios.get('/config/valores').then(function (res) {
+      axios.get(this.ruta + '/config/valores').then(function (res) {
         //  me.array_empresa=res.data.config;
         me.tasa = res.data.config.tasa_aportes;
       })["catch"](function (err) {
@@ -3231,7 +3231,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     cargarValores: function cargarValores() {
       var me = this;
-      axios.get('/config/valores').then(function (res) {
+      axios.get(me.ruta + '/config/valores').then(function (res) {
         //  me.array_empresa=res.data.config;
         me.idempresa = res.data.config.id;
         me.tasa_ahorros = me.ant_tasa_ahorros = res.data.config.tasa_ahorros;
@@ -3541,7 +3541,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ['id'],
   data: function data() {
     return {
-      ruta: 'http://127.0.0.1:8000',
+      ruta: 'http://localhost/zamora/public',
       arrayCreditos: [],
       arrayCuotas: [],
       hoy: ''
@@ -3567,6 +3567,8 @@ __webpack_require__.r(__webpack_exports__);
       window.open('/cuota/detallecuotapdf/' + id + '', '_blank');
     },
     desembolsar: function desembolsar(id) {
+      var _this = this;
+
       var me = this;
       Swal.fire({
         title: '',
@@ -3579,7 +3581,7 @@ __webpack_require__.r(__webpack_exports__);
         confirmButtonText: 'Si'
       }).then(function (result) {
         if (result.value) {
-          axios.put('/credito/desembolsar', {
+          axios.put(_this.ruta + '/credito/desembolsar', {
             'id': id
           }).then(function (response) {
             Swal.fire('', 'El credito ha sido REGISTRADO COMO DESEMBOLSADO', 'success');
@@ -3792,7 +3794,7 @@ __webpack_require__.r(__webpack_exports__);
     listarCreditos: function listarCreditos(page, buscar, criterio) {
       var me = this;
       me.listado = 2;
-      var url = 'http://127.0.0.1:8000/credito?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+      var url = 'http://localhost/zamora/public/credito?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
         me.arrayCreditos = respuesta.creditos.data;
@@ -4054,7 +4056,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       //datos de nuevo credito
-      ruta: 'http://127.0.0.1:8000',
+      ruta: 'http://localhost/zamora/public',
       idcliente: 0,
       numeroprestamo: 'CZ-05',
       montodesembolsado: 1000,
@@ -4294,7 +4296,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     cargarValores: function cargarValores() {
       var me = this;
-      axios.get('/config/valores').then(function (res) {
+      axios.get(this.ruta + '/config/valores').then(function (res) {
         //  me.array_empresa=res.data.config;
         me.tasa_creditos = res.data.config.tasa_creditos;
         me.tasa = me.tasa_creditos;
@@ -5016,7 +5018,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     cargarValores: function cargarValores() {
       var me = this;
-      axios.get('/config/valores').then(function (res) {
+      axios.get(this.ruta + '/config/valores').then(function (res) {
         //  me.array_empresa=res.data.config;
         me.tasa_compensatoria_anual = res.data.config.tasa_compensatoria_anual;
         me.tasa_moratoria_anual = res.data.config.tasa_moratoria_anual;
@@ -5332,7 +5334,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       //datos de nuevo credito
-      ruta: 'http://127.0.0.1:8000',
+      ruta: 'http://localhost/zamora/public',
       idcliente: 0,
       montodesembolsado: 1000,
       numerocuotas: 12,
@@ -62758,7 +62760,7 @@ var app = new Vue({
   el: '#app',
   data: {
     menu: 100,
-    ruta: 'http://127.0.0.1:8000'
+    ruta: 'http://localhost/zamora/public'
   }
 });
 

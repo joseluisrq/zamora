@@ -62,7 +62,7 @@ const app = new Vue({
     el: '#app',
     data: {
         menu: 100,
-        ruta: 'http://127.0.0.1:8000',
+        ruta: 'http://localhost/zamora/public',
 
     },
 
