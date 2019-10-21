@@ -285,7 +285,7 @@
         data(){
             return{
                 //datos de nuevo credito
-                ruta:'http://localhost/zamora/public',
+                ruta:'http://127.0.0.1:8000',
                 idcliente:0,
                
                 montodesembolsado:1000,
@@ -625,7 +625,7 @@
             {
                 let me=this;
                 me.listado=2;
-                var url= 'simulacion/listaSilumaciones?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= this.ruta+'simulacion/listaSilumaciones?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayCreditos = respuesta.simulaciones.data;
@@ -636,7 +636,7 @@
                 });
             },
               proforma(id){
-                window.open('/simulacion/pdfDetallecredito/'+id+'','_blank');
+                window.open( this.ruta+'/simulacion/pdfDetallecredito/'+id+'','_blank');
             },
             
          },

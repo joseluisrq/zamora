@@ -3541,7 +3541,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ['id'],
   data: function data() {
     return {
-      ruta: 'http://localhost/zamora/public',
+      ruta: 'http://127.0.0.1:8000',
       arrayCreditos: [],
       arrayCuotas: [],
       hoy: ''
@@ -3564,7 +3564,7 @@ __webpack_require__.r(__webpack_exports__);
       window.open(this.ruta + '/credito/pdfDetallecredito/' + this.id, '_blank');
     },
     generarboucher: function generarboucher(id) {
-      window.open('/cuota/detallecuotapdf/' + id + '', '_blank');
+      window.open(this.ruta + '/cuota/detallecuotapdf/' + id + '', '_blank');
     },
     desembolsar: function desembolsar(id) {
       var _this = this;
@@ -3794,7 +3794,7 @@ __webpack_require__.r(__webpack_exports__);
     listarCreditos: function listarCreditos(page, buscar, criterio) {
       var me = this;
       me.listado = 2;
-      var url = 'http://localhost/zamora/public/credito?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+      var url = me.ruta + '/credito?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
         me.arrayCreditos = respuesta.creditos.data;
@@ -4053,10 +4053,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['ruta'],
   data: function data() {
     return {
       //datos de nuevo credito
-      ruta: 'http://localhost/zamora/public',
       idcliente: 0,
       numeroprestamo: 'CZ-05',
       montodesembolsado: 1000,
@@ -4692,7 +4692,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     listarCuotas: function listarCuotas(page, buscar, criterio) {
       var me = this;
-      var url = this.ruta + '/cuota/cuotassinpagar?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+      var url = me.ruta + '/cuota/cuotassinpagar?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
         me.arrayCuotas = respuesta.cuotas.data;
@@ -4920,7 +4920,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       //ruta
-      ruta: '',
+      ruta: 'http://127.0.0.1:8000',
       dataC: [],
       //detalle de cuota
       totalpagar: 0.0,
@@ -4954,7 +4954,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var me = this;
-      axios.get('/cuota/detallepagar?id=' + this.idcliente).then(function (res) {
+      axios.get(this.ruta + '/cuota/detallepagar?id=' + this.idcliente).then(function (res) {
         _this.dataC = res.data.cuotas;
         _this.fechapago = _this.dataC[0].fechapago; //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
         // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
@@ -4967,7 +4967,7 @@ __webpack_require__.r(__webpack_exports__);
     pagarCuota: function pagarCuota(idcuota, idpersona) {
       var _this2 = this;
 
-      axios.put('/cuota/pagarCuota', {
+      axios.put(this.ruta + '/cuota/pagarCuota', {
         'id': idcuota,
         'descripcion': this.descpagocuota,
         'mora': this.morahastahoy,
@@ -5030,7 +5030,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     generarboucher: function generarboucher() {
-      window.open('/cuota/detallecuotapdf/' + this.identificadorcuota + '', '_blank');
+      window.open(this.ruta + '/cuota/detallecuotapdf/' + this.identificadorcuota + '', '_blank');
     }
   },
   mounted: function mounted() {
@@ -5334,7 +5334,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       //datos de nuevo credito
-      ruta: 'http://localhost/zamora/public',
+      ruta: 'http://127.0.0.1:8000',
       idcliente: 0,
       montodesembolsado: 1000,
       numerocuotas: 12,
@@ -5626,7 +5626,7 @@ __webpack_require__.r(__webpack_exports__);
     listarCreditos: function listarCreditos(page, buscar, criterio) {
       var me = this;
       me.listado = 2;
-      var url = 'simulacion/listaSilumaciones?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+      var url = this.ruta + 'simulacion/listaSilumaciones?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
         me.arrayCreditos = respuesta.simulaciones.data;
@@ -5636,7 +5636,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     proforma: function proforma(id) {
-      window.open('/simulacion/pdfDetallecredito/' + id + '', '_blank');
+      window.open(this.ruta + '/simulacion/pdfDetallecredito/' + id + '', '_blank');
     }
   },
   mounted: function mounted() {
@@ -62760,7 +62760,7 @@ var app = new Vue({
   el: '#app',
   data: {
     menu: 100,
-    ruta: 'http://localhost/zamora/public'
+    ruta: 'http://127.0.0.1:8000'
   }
 });
 
@@ -64022,7 +64022,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

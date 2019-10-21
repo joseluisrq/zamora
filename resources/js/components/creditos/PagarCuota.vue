@@ -189,7 +189,7 @@ export default {
     data (){
             return {
                 //ruta
-                 ruta: '',
+                 ruta: 'http://127.0.0.1:8000',
                
                 dataC:[],//detalle de cuota
 
@@ -241,7 +241,7 @@ export default {
             obtenerCuotaDeCliente(){
                 let me=this;
                 
-                axios.get('/cuota/detallepagar?id='+this.idcliente)
+                axios.get(this.ruta+'/cuota/detallepagar?id='+this.idcliente)
                     .then(res => {
                     this.dataC = res.data.cuotas;
                     this.fechapago=this.dataC[0].fechapago
@@ -256,7 +256,7 @@ export default {
 
             //pagar cuota
             pagarCuota (idcuota,idpersona){
-                axios.put('/cuota/pagarCuota',{
+                axios.put(this.ruta+'/cuota/pagarCuota',{
                     'id': idcuota,
                     'descripcion': this.descpagocuota,
                     'mora': this.morahastahoy,
@@ -339,7 +339,7 @@ export default {
 
 
             generarboucher(){
-                window.open('/cuota/detallecuotapdf/'+this.identificadorcuota+'','_blank');
+                window.open(this.ruta+'/cuota/detallecuotapdf/'+this.identificadorcuota+'','_blank');
             },
            
 

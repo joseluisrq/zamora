@@ -241,7 +241,7 @@ export default {
     props : ['id'],
     data(){
         return{
-            ruta:'http://localhost/zamora/public',
+            ruta:'http://127.0.0.1:8000',
             arrayCreditos:[],
             arrayCuotas:[],
 
@@ -271,7 +271,7 @@ export default {
                  window.open(this.ruta + '/credito/pdfDetallecredito/'+this.id,'_blank');
             },
              generarboucher(id){
-                window.open('/cuota/detallecuotapdf/'+id+'','_blank');
+                window.open(this.ruta +'/cuota/detallecuotapdf/'+id+'','_blank');
             },
             desembolsar(id){
                 

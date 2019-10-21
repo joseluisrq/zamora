@@ -11,10 +11,10 @@
             </template>
 
             <template v-if="menu==30">
-                    <nuevocredito></nuevocredito>
+                    <nuevocredito :ruta="ruta"></nuevocredito>
              </template>
              <template v-if="menu==31">
-                    <simularcreditos></simularcreditos>
+                    <simularcreditos :ruta="ruta"></simularcreditos>
              </template>
              <template v-if="menu==40">
                     <listarcredito :ruta="ruta"></listarcredito>

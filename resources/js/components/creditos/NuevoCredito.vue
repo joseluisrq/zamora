@@ -230,11 +230,11 @@
 <script>
    import vSelect from 'vue-select'
     export default {
-       
+        props : ['ruta'],
         data(){
             return{
                 //datos de nuevo credito
-                ruta:'http://localhost/zamora/public',
+            
                 idcliente:0,
                 numeroprestamo:'CZ-05',
                 montodesembolsado:1000,

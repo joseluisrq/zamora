@@ -75,8 +75,9 @@ class PersonaController extends Controller
         return $personas;
     }
 
-    private function listarusuarios($tipo, $buscar, $criterio)
+    public function listarusuarios($tipo, $buscar, $criterio)
     {
+        $buscar='';
         if ($buscar==''){
             $personas = Persona::join('users', 'personas.id', '=', 'users.id')
             ->join('roles', 'roles.id', '=', 'users.idrol')

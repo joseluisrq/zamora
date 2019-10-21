@@ -9,7 +9,16 @@
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
+
 */
+Route::get('/main', function () {
+    return view('contenido/contenido');
+})->name('main');
+
+//Login
+Route::get('/','Auth\LoginController@mostrarFormularioLogin'); 
+Route::post('/login','Auth\LoginController@login')->name('login');
+
 //CREDITOS
 Route::get('/credito', 'CreditoController@index');//listar creditos
 Route::get('/credito/detallecredito','CreditoController@detallecredito');//detalle credito
@@ -18,6 +27,7 @@ Route::get('/credito/ultimocredito', 'CreditoController@ultimocredito');//listar
 Route::put('/credito/desembolsar', 'CreditoController@desembolsar');
 // PERSONAS
 Route::get('/listapersonas', 'PersonaController@index');
+//Route::get('/listarusuarios', 'PersonaController@listarusuarios');
 Route::get('/detallepersona', 'PersonaController@detalle');
 Route::post('/registrarpersona', 'PersonaController@store');
 Route::put('/actualizarpersona', 'PersonaController@update');
@@ -69,6 +79,10 @@ Route::put('/config/actualizar', 'EmpresaController@update');
 //pdf
 Route::get('/credito/pdfDetallecredito/{id}', 'CreditoController@pdfDetallecredito')->name('detallecredito_pdf');
 
-Route::get('/', function () {
-    return view('contenido/contenido');
-});
+
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -272,7 +272,7 @@ export default {
                listarCuotas(page,buscar,criterio)
             {
                 let me=this;                
-                var url= this.ruta+'/cuota/cuotassinpagar?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= me.ruta+'/cuota/cuotassinpagar?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;                   
                     me.arrayCuotas = respuesta.cuotas.data;
