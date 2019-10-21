@@ -77,14 +77,18 @@
                                     <td v-text="c.socionombre+' '+c.socioapellido"></td>
                                  
                                     <td v-if="c.estado==0">
-                                        <label class="badge badge-success text-white ">Inactivo</label>
+                                        <label class="badge badge-danger text-white ">Inactivo</label>
                                     <td  v-else-if="c.estado==1">
                                          <template v-if="c.estadodesembolso==0">
-                                          <label class="badge badge-danger text-white ">Sin Desembolsar</label>                                        
+                                          <label class="badge badge-danger text-white ">Por Aprobar</label>                                        
                                         </template>
-                                        <template v-else>
-                                            <label class="badge badge-success text-white ">En proceso</label>                                       
+                                        <template v-else-if="c.estadodesembolso==1">
+                                            <label class="badge badge-warning text-white ">Por Desembolsar</label>                                       
+                                             <label class="badge badge-primary text-white ">Aprobado</label> 
                                         </template>
+                                        <template v-else-if="c.estadodesembolso==2">
+                                            <label class="badge badge-success text-white ">En Proceso</label>                                       
+                                             </template>
                                     <td  v-else-if="c.estado==2">
                                         <label  class="badge badge-success text-white ">Finalizado</label>
                                     </td>
@@ -105,7 +109,7 @@
         <button type="button" class="btn btn-warning" @click="listarCreditos(1,buscar,criterio);viewDetalle=false;viewLista=true">
            <i class="mdi mdi-arrow-left-bold"></i> Historial de Créditos
         </button>   
-        <detallecredito  v-bind:id="idcredito" ></detallecredito>
+        <detallecredito  v-bind:id="idcredito"  :rol="rol"></detallecredito>
     </template>
      <!--fin de detalle de credito-->
     
@@ -113,10 +117,11 @@
 </template>
 <script>
 export default {
-    props : ['ruta'],
+   props : ['ruta','rol'],
     data(){
         return{
            arrayCreditos:[],
+
            
 
             viewDetalle:false,

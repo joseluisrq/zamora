@@ -53,7 +53,7 @@ class CuotaController extends Controller
                     'socio.apellidos as apellidos',      
                     )->where('cuotas.estado','=','0')
                     ->where('creditos.estado', '=', '1')
-                    ->where('creditos.estadodesembolso','=','1')
+                    ->where('creditos.estadodesembolso','=','2')
                     ->orderby('fechapago','asc')->paginate(10);
                     
 
@@ -86,7 +86,7 @@ class CuotaController extends Controller
                 )
                 ->where('creditos.estado', '=', '1')
                 ->where('cuotas.estado','=','0')
-                ->where('creditos.estadodesembolso','=','1')
+                ->where('creditos.estadodesembolso','=','2')
                 ->where('socio.'.$criterio, 'like', '%'. $buscar . '%')
                 ->orderby('fechapago','asc')->paginate(10);
               
@@ -104,6 +104,70 @@ class CuotaController extends Controller
         'cuotas'=>$cuotas
             ];
     }
+
+
+        public function notificacion(Request $request){       
+          
+
+        $mytime= Carbon::now('America/Lima');
+        $mytime = $mytime->format('Y-m-d');
+
+            $cuotas = Cuota::join('creditos','cuotas.idcredito','=','creditos.id')
+            ->join('personas as socio','creditos.idsocio','=','socio.id')
+                        
+            ->select(
+                'cuotas.id', 
+                'cuotas.numerodecuota',                
+                'cuotas.fechapago', 
+                'cuotas.estado',
+
+                'creditos.numeroprestamo',
+                
+                'socio.id as idsocio',
+                'socio.dni as dni',
+                'socio.nombre as nombre',
+                'socio.apellidos as apellidos',      
+                )->where('cuotas.estado','=','0')
+                ->where('creditos.estado', '=', '1')
+                ->where('creditos.estadodesembolso','=','2')
+                ->where('fechapago','<',$mytime)->get();
+
+
+                $creditosporaprobar = Credito::join('personas as socio','creditos.idsocio','=','socio.id')                            
+                ->select(
+                       
+                    'creditos.numeroprestamo',
+                    
+                    'socio.id as idsocio',
+                    'socio.dni as dni',
+                    'socio.nombre as nombre',
+                    'socio.apellidos as apellidos')    
+               
+                    ->where('creditos.estado', '=', '1')
+                    ->where('creditos.estadodesembolso','=','0') ->get();
+
+
+                $creditospordesembolsar = Credito::join('personas as socio','creditos.idsocio','=','socio.id')                            
+                ->select(
+                        
+                    'creditos.numeroprestamo',
+                    
+                    'socio.id as idsocio',
+                    'socio.dni as dni',
+                    'socio.nombre as nombre',
+                    'socio.apellidos as apellidos')    
+                
+                    ->where('creditos.estado', '=', '1')
+                    ->where('creditos.estadodesembolso','=','1') ->get();
+          
+       
+        return [          
+            'cuotas'=>$cuotas,
+            'creditosporaprobar'=> $creditosporaprobar,
+            'creditospordesembolsar'=> $creditospordesembolsar
+                ];
+        }
+
 
 
     //detalle de la cuota a pagar

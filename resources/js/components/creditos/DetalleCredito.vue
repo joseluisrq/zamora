@@ -7,9 +7,11 @@
                     <div class="card-body ">
                         <div class="row bg bg-dark ">
                             <div class="col-md-12 mt-2 text-white ">
-                                <h4>Detalle de Crédtio
-
-                                    </h4>
+                                <h4>Detalle de Crédtio  
+                                <template v-if="estadodes==3">
+                                    <span class="bg bg-danger">  CREDIDO INACTIVO</span> 
+                                </template>
+                                 </h4>
 
                             </div>
                         </div>
@@ -25,11 +27,26 @@
                                             <hr>
                                         </div>
                                         <div class="col-md-5 ">
-                                            <button type="button" @click="pdfCronograma()" class="btn btn-danger btn-icon-text">
+                                            <button type="button" @click="pdfCronograma()" class="btn btn-primary btn-icon-text">
                                                 <i class="mdi mdi-file-pdf btn-icon-prepend"></i>                                                    
                                                 Descargar Cronograma
                                             </button>
-                                             <button v-if="arrayCreditos[0].estadodesembolso==0" class="btn btn-success" @click="desembolsar(c.id)"> Desembolsar</button>
+                                            <template v-if="rol==1">
+                                                    <template v-if="arrayCreditos[0].estadodesembolso==0">
+                                                        <button  class="btn btn-warning" @click="aprobar(c.id)"> Aprobar Credito</button>
+                                                        <button  class="btn btn-danger" @click="desaprobar(c.id)"> Desaprobar Credito</button>
+                                                    </template>
+                                                    <template v-else-if="arrayCreditos[0].estadodesembolso==1">
+                                                        <button  class="btn btn-success" @click="desembolsar(c.id)">Desembolsar</button>
+                                                    </template>
+
+                                            
+                                            </template>
+                                            <template v-else>
+                                                 <button v-if="arrayCreditos[0].estadodesembolso==0" class="btn btn-success" disabled> Credito por aprobar</button>
+                                                  <button v-else-if="arrayCreditos[0].estadodesembolso==1" class="btn btn-success" @click="desembolsar(c.id)">Desembolsar</button>
+                                            </template>
+                                            
                                 
 
                                         </div>
@@ -238,11 +255,12 @@
 
 <script>
 export default {
-    props : ['id'],
+    props : ['id','rol'],
     data(){
         return{
-            ruta:'http://127.0.0.1:8000',
+            ruta:'http://localhost/zamora/public',
             arrayCreditos:[],
+            estadodes:0,
             arrayCuotas:[],
 
             hoy:'',
@@ -260,6 +278,7 @@ export default {
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayCreditos = respuesta.detallecredito;
+                      me.estadodes = me.arrayCreditos[0].estadodesembolso;
                     me.arrayCuotas = respuesta.cuotas;
                    
                 })
@@ -293,6 +312,67 @@ export default {
 
                         Swal.fire(
                         '', 'El credito ha sido REGISTRADO COMO DESEMBOLSADO',
+                        'success'
+                        )  
+                          this.detalleCredito();
+                               
+                      }).catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+                 })
+            },
+                     aprobar(id){
+                
+                  let me = this;
+                    Swal.fire({
+                    title: '',
+                    text: "¿Está seguro que desea APROBAR EL CREDITO?",
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                     cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Si'
+                    }).then((result) => {
+                    if (result.value) {
+                       axios.put(this.ruta+'/credito/aprobar',{
+                    'id': id,
+                        }).then(function (response) {
+
+                        Swal.fire(
+                        '', 'El credito ha sido APROBADO ',
+                        'success'
+                        )  
+                          this.detalleCredito();
+                               
+                      }).catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+                 })
+            },
+
+              desaprobar(id){
+                
+                  let me = this;
+                    Swal.fire({
+                    title: '',
+                    text: "¿Está seguro que desea DESAPROBAR EL CREDITO?",
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                     cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Si'
+                    }).then((result) => {
+                    if (result.value) {
+                       axios.put(this.ruta+'/credito/desaprobar',{
+                    'id': id,
+                        }).then(function (response) {
+
+                        Swal.fire(
+                        '', 'El credito ha sido DESAPROBADO ',
                         'success'
                         )  
                           this.detalleCredito();

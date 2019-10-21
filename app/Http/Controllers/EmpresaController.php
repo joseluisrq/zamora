@@ -10,7 +10,7 @@ class EmpresaController extends Controller
 {
 	public function index(Request $request)
 	{
-		if (!$request->ajax()) return redirect('/');
+	//	if (!$request->ajax()) return redirect('/');
 
         $mytime= Carbon::now('America/Lima');
         $mytime = $mytime->format('Y-m-d');
@@ -27,7 +27,7 @@ class EmpresaController extends Controller
             'empresa.tasa_ahorroplazo_30',
             'empresa.tasa_ahorroplazo_90',
             'empresa.tasa_ahorroplazo_180',
-            'empresa.tasa_ahorroplazo_361',
+            'empresa.tasa_ahorroplazo_360',
             'empresa.tasa_ahorroplazo_361',
              //tasa de aportes
             'empresa.tasa_aportes',
@@ -55,6 +55,16 @@ class EmpresaController extends Controller
             $empresa->tasa_ahorros_comisiones=$request->tasa_ahorros_comisiones;
             $empresa->tasa_ahorros_gastos=$request->tasa_ahorros_gastos;
             $empresa->tasa_aportes=$request->tasa_aportes;
+
+            $empresa->tasa_ahorroplazo_30=$request->tasa_ahorroplazo_30;
+            $empresa->tasa_ahorroplazo_90=$request->tasa_ahorroplazo_90;
+            $empresa->tasa_ahorroplazo_180=$request->tasa_ahorroplazo_180;
+            $empresa->tasa_ahorroplazo_360=$request->tasa_ahorroplazo_360;
+            $empresa->tasa_ahorroplazo_361=$request->tasa_ahorroplazo_361;
+            
+
+
+
             
         $empresa->save();
              DB::commit();

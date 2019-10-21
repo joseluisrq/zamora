@@ -35,7 +35,7 @@
                            </div>
                             <div class="col-md-12">
                                <div class="form-group">
-                                    <h3>Configuración Cuenta de Ahorros</h3>
+                                    <h3>Configuración Cuenta de Ahorros-Cuenta Cor</h3>
                                     <hr>
                                </div>
                            </div>
@@ -59,14 +59,56 @@
                                       </label>
                                     <input id="descripcionaporte" type="text" v-model="tasa_ahorros_gastos" class="form-control" placeholder="Detalle de operación">
                                 </div>
-                           </div>                           
+                           </div>  
+                         <div class="col-md-12">
+                               <div class="form-group">
+                                    <h3>Configuración Cuenta de Ahorros - A plazo Fijo</h3>
+                                    <hr>
+                               </div>
+                           </div>
+                           <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">30 Días (%)
+                                       </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorroplazo_30" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">31 - 90 Días  (%)
+                                       </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorroplazo_90" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                             <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">91 - 180 Días (%)
+                                      </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorroplazo_180" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>    
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">181 -360 días  (%)
+                                      </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorroplazo_360" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>  
+                              <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">+ de 360 Días (%)
+                                      </label>
+                                    <input id="descripcionaporte" type="text" v-model="tasa_ahorroplazo_361" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>    
+
                          <div class="col-md-12">
                                <div class="form-group">
                                     <h3>Configuración Aportes - Socios</h3>
                                     <hr>
                                </div>
                            </div>
-                           <div class="col-md-3">
+                           <div class="col-md-2">
                                <div class="form-group">
                                     <label for="descripcionaporte" class="font-weight-bold">Tasa Aportes (%)</label>
                                     <input id="descripcionaporte" type="text" v-model="tasa_aportes" class="form-control" placeholder="Detalle de operación">
@@ -109,7 +151,15 @@
                 ant_tasa_aportes:'',         
                 ant_tasa_compensatoria_anual:'',
                 ant_tasa_moratoria_anual:'',
-                idempresa:''
+                idempresa:'',
+
+                tasa_ahorroplazo_30:'',
+                tasa_ahorroplazo_90:'',
+                tasa_ahorroplazo_180:'',
+                tasa_ahorroplazo_360:'',
+                tasa_ahorroplazo_361:'',
+
+
 
             }
         },
@@ -143,6 +193,13 @@
 
 
                          me.tasa_aportes = me.ant_tasa_aportes = res.data.config.tasa_aportes;
+
+                            me.tasa_ahorroplazo_30=res.data.config.tasa_ahorroplazo_30;
+                            me.tasa_ahorroplazo_90=res.data.config.tasa_ahorroplazo_90;
+                            me.tasa_ahorroplazo_180=res.data.config.tasa_ahorroplazo_180;
+                            me.tasa_ahorroplazo_360=res.data.config.tasa_ahorroplazo_360;
+                            me.tasa_ahorroplazo_361=res.data.config.tasa_ahorroplazo_361;
+
                         
                         console.log(res.data);
                     })
@@ -165,21 +222,19 @@
                         'tasa_ahorros_comisiones':me.tasa_ahorros_comisiones,
                         'tasa_ahorros_gastos':me.tasa_ahorros_gastos,   
 
-                        'tasa_aportes':me.tasa_aportes,       
+                        'tasa_aportes':me.tasa_aportes, 
+                        
+                        
+                       'tasa_ahorroplazo_30':me.tasa_ahorroplazo_30,
+                       'tasa_ahorroplazo_90':me.tasa_ahorroplazo_90,
+                       'tasa_ahorroplazo_180':me.tasa_ahorroplazo_180,
+                       'tasa_ahorroplazo_360':me.tasa_ahorroplazo_360,
+                       'tasa_ahorroplazo_361':me.tasa_ahorroplazo_361
                         
                 })
                     .then(res => {
                        
-                        me.ant_tasa_ahorros = me.tasa_ahorros;
-                        me.ant_tasa_ahorros_comisiones = me.tasa_ahorros_comisiones;
-                        me.ant_tasa_ahorros_gastos= me.tasa_ahorros_gastos;
-
-                        me.ant_tasa_creditos = me.tasa_creditos;
-                        me.ant_tasa_moratoria_anual= me.tasa_compensatoria_anual;
-                        me.ant_tasa_moratoria_anual= me.tasa_moratoria_anual 
-
-                        me.ant_tasa_aportes = me.tasa_aportes;                       
-
+                       
                         me.mostraralerta('top-end', 'success', '¡¡¡ Las configuraciones se actualizaron correctamente !!!', false, 2500);
                     })
                     .catch(err => {

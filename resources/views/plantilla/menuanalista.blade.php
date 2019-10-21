@@ -29,7 +29,7 @@
                 
                 <!--Ahorros-->
                 <li  class="nav-item">
-                    <a href="pages/forms/basic_elements.html" class="nav-link">
+                    <a href="#" class="nav-link">
                      
                       <i class="mdi mdi-cash-usd menu-icon"></i>
                       <span class="menu-title">Ahorros</span>
@@ -63,13 +63,7 @@
                 </li>
                 
                  <!--Caja-->
-                <li @click="menu=15" class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="mdi mdi-grid menu-icon"></i>
-                      <span class="menu-title">Caja</span>
-                      <i class="menu-arrow"></i>
-                    </a>
-                </li>
+          
                 
                 <!--reportes-->
                 <li @click="menu=16" class="nav-item">
@@ -81,33 +75,9 @@
                 </li>
                 
                 <!--Acesso-->
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="mdi mdi-codepen menu-icon"></i>
-                      <span class="menu-title">Acceso</span>
-                      <i class="menu-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li @click="menu=20" class="nav-item"><a class="nav-link" href="#">Lista de Usuarios</a></li>
-                            <li @click="menu=21" class="nav-item"><a class="nav-link" href="#">Agregar de Usuarios</a></li>
-                            <li @click="menu=22" class="nav-item"><a class="nav-link" href="#">Roles</a></li>
-                        </ul>
-                    </div>
-                </li>
+              
                         <!--Configracion-->
-                        <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="mdi mdi-codepen menu-icon"></i>
-                      <span class="menu-title">Configuraciones</span>
-                      <i class="menu-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <ul class="submenu-item">
-                            <li @click="menu=90" class="nav-item"><a class="nav-link" href="#">Configurar tasas</a></li>
-                        </ul>
-                    </div>
-                </li>
+                      
               </ul>
           </div>
         </nav>

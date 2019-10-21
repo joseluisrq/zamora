@@ -18,6 +18,7 @@
                                 :options="arraycuentas"
                                 placeholder="Ingrese un número de cuenta"
                                 :onChange="getDatosCuenta"
+                                class="col-md-12"
                             >
                             </v-select>
                             <div v-if="idcuenta!=0">

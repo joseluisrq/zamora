@@ -25,6 +25,7 @@
                                         :options="arraysocios"
                                         placeholder="Ingrese DNI del socio..."
                                         :onChange="getDatosSocio"
+                                        class="col-md-12"
                                     >
                                     </v-select>
                                     <div v-if="idsocio!=0">

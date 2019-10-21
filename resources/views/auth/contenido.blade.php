@@ -8,7 +8,11 @@
     <meta name="description" content="San Marcos">
     <meta name="author" content="Itec">
     <meta name="keyword" content="">
-    <title>APT San Marcos</title>
+    <title>Cooperativa Zamora</title>
+     <link rel="stylesheet" href="vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="vendors/base/vendor.bundle.base.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="images/logo.png" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
   

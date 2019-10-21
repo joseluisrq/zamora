@@ -104,7 +104,7 @@
                                                 <td v-text="movimiento.fecharegistro" ></td>   
                                                 <td v-text="movimiento.monto"></td>
                                                 <td v-if="movimiento.tipomovimiento==0">
-                                                    <label class="badge badge-info">Retiro</label>
+                                                    <label class="badge badge-danger">Retiro</label>
                                                 </td>
                                                 <td v-else>
                                                     <label class="badge badge-success">Aporte</label>

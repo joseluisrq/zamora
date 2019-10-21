@@ -52,13 +52,10 @@
                                     </select>
                                 </div>
                                 <div class=" col-md-2 form-group">
-                                    <label for="exampleInputEmail1">Fecha de Desembolso</label>
+                                    <label for="exampleInputEmail1">Fecha de Primera Cuota</label>
                                     <input type="date" class="form-control" v-model="fechadesembolso" placeholder="Número de Telefono">
                                 </div>
-                                <div class=" col-md-2 form-group">
-                                    <label for="exampleInputEmail1">Fecha de Primera Cuota</label>
-                                    <input type="date" class="form-control" v-model="fechaprimeracuota" placeholder="Número de Telefono">
-                                </div>
+                               
                             </div>
                             <button type="button " class="btn btn-success mr-2 " @click.prevent="agregarCuotas()">
                                 <i class="mdi mdi-arrange-send-to-back mdi-24px"></i> Generar Cuotas 
@@ -164,7 +161,7 @@
                            <p v-else-if="periodo==6" >Periodo: Semestral </p>
                             <p v-else-if="periodo==12" >Periodo: Mensual </p>
                         <hr>
-                        <button class="btn  btn-success" @click="proforma()">Descargar Tabla de amortización</button>
+                      
                     </div>
                 </div>
             </div>
@@ -222,9 +219,7 @@
                                                         
                                                         <td>
                                                             <!--detalle de credito-->
-                                                            <button type="button" @click="viewDetalle=true;idcredito=c.id;viewLista=false" class="btn btn-success btn-rounded btn-icon ">
-                                                                    <i class="mdi mdi-eye "></i>
-                                                            </button>
+                                                          
                                                            <button type="button" @click="proforma(c.id)" class="btn btn-danger btn-rounded btn-icon ">
                                                                     <i class="mdi mdi-file-pdf "></i>
                                                             </button>
@@ -285,7 +280,7 @@
         data(){
             return{
                 //datos de nuevo credito
-                ruta:'http://127.0.0.1:8000',
+                ruta:'http://localhost/zamora/public',
                 idcliente:0,
                
                 montodesembolsado:1000,
@@ -625,7 +620,7 @@
             {
                 let me=this;
                 me.listado=2;
-                var url= this.ruta+'simulacion/listaSilumaciones?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= me.ruta+'/simulacion/listaSilumaciones?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayCreditos = respuesta.simulaciones.data;

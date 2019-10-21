@@ -58,16 +58,22 @@
                                                     <i class="mdi mdi-eye"></i>
                                             </button>
                                             <!--editar de socio-->  
-                                            <button type="button" class="btn btn-warning btn-rounded btn-icon" @click="cargardatosactualizar(persona.id)">
-                                                    <i class="mdi mdi-lead-pencil"></i>
-                                            </button>
-                                            <!--eliminar de socio-->    
+                                             <template v-if="rol==1">
+                                                <button type="button" class="btn btn-warning btn-rounded btn-icon" @click="cargardatosactualizar(persona.id)">
+                                                        <i class="mdi mdi-lead-pencil"></i>
+                                                </button>
+                                             </template>  
+
+                                            <!--eliminar de socio-->  
+                                            <template v-if="rol==1">
                                             <button v-if="persona.condicion==1 || tipo==0" type="button" class="btn btn-danger btn-rounded btn-icon" @click="eliminarpersona(persona.id)">
                                                     <i class="mdi mdi-delete-forever"></i>
                                             </button>
+                                            </template>  
+                                            <!--
                                             <button v-show="tipo==0" type="button" class="btn btn-info btn-rounded btn-icon">
                                                     <i class="mdi mdi-currency-usd"></i>
-                                            </button>
+                                            </button>-->
                                         </td>
                                         <td v-show="tipo==1" v-text="persona.rol"></td>
                                         <td v-text="persona.dni"></td>
@@ -117,7 +123,7 @@
 
 <script>
     export default {
-        props:['ruta', 'tipo'],
+        props:['ruta', 'tipo','rol'],
         data: function(){
             return {
                 bus: new Vue(),

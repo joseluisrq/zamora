@@ -314,10 +314,31 @@ class CreditoController extends Controller
      
 
         $cuota = Credito::findOrFail($request->id);
-        $cuota->estadodesembolso = '1';      
+        $cuota->estadodesembolso = '2';      
         $cuota->save();
     }
 
+      //aprobar CREDITO
+      public function aprobar(Request $request)
+      {
+          if (!$request->ajax()) return redirect('/');
+       
+  
+          $cuota = Credito::findOrFail($request->id);
+          $cuota->estadodesembolso = '1';      
+          $cuota->save();
+      }
+          //aprobar DESAPROBAR
+          public function desaprobar(Request $request)
+          {
+              if (!$request->ajax()) return redirect('/');
+           
+      
+              $cuota = Credito::findOrFail($request->id);
+              $cuota->estadodesembolso = '3'; 
+              $cuota->estado = '0';           
+              $cuota->save();
+          }
 
 
     //pdf contrato y cronograma decuiotas

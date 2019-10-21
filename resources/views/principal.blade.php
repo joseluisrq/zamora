@@ -32,30 +32,12 @@
                 
                     <ul class="navbar-nav navbar-nav-right">
                         
-                    
-                        <li class="nav-item dropdown">
-                                <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center" id="notificationDropdown" href="#" data-toggle="dropdown">
-                                    <i class="mdi mdi-bell mx-0"></i>
-                                    <span class="count bg-primary">1</span>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-                                    <p class="mb-0 font-weight-normal float-left dropdown-header">Notificaciones</p>
-                                    <a class="dropdown-item preview-item">
-                                    <div class="preview-thumbnail">
-                                        <div class="preview-icon bg-warning">
-                                            <i class="mdi mdi-information mx-0"></i>
-                                        </div>
-                                    </div>
-                                    <div class="preview-item-content">
-                                        <h6 class="preview-subject font-weight-normal">Cuota por vencer</h6>
-                                        <p class="font-weight-light small-text mb-0 text-muted">
-                                            25/10/2019
-                                        </p>
-                                    </div>
-                                    </a>
-                                    
-                                </div>
-                        </li>
+                        <notificacion ></notificacion>
+                       
+
+
+
+
                         <li>
 
                         <nav class="bottom-navbar ">                                
@@ -63,12 +45,21 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link">
                                    
-                                    <span class="">Usuario</span>
+                                    <span class="">{{Auth::user()->usuario}} </span>
                                     <img src="images/dashboard/face29.png" alt="profile"/>
                                     </a>
                                     <div class="submenu">
                                         <ul>
-                                            <li class=""><a class="" href="#">   <i class="mdi mdi-logout text-primary"></i>  Cerrar Sesión</a></li>                                       
+                                        <li class="">
+                                            <a class=""  href="{{ route('cerrarsesion') }}"
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">   <i class="mdi mdi-logout text-primary"></i>
+                                            Salir
+                                            </a>
+                                            
+                                            <form id="logout-form" action="{{ route('cerrarsesion') }}" method="POST" style="display: none;">
+                                                {{ csrf_field() }}
+                                            </form>                                                                
+                                        </li>                                       
                                         </ul>
                                     </div>
                                 </li>    
@@ -88,8 +79,20 @@
                 </nav>
                 <!--fin de cabecera del app--->
 
+                @if(Auth::check()) <!--si el usuario esta autentificado-->
+                    @if (Auth::user()->idrol == 1)
+                        @include('plantilla.menuadministrador')
+                    @elseif (Auth::user()->idrol == 2)
+                        @include('plantilla.menuanalista')
+                    @elseif (Auth::user()->idrol == 3)
+                        @include('plantilla.menucajero')
+                    @else
+                
+                    @endif
+
+                @endif
                 <!--inicio menu-->
-                @include('plantilla/menu')
+            
                 <!--fin menu-->
 
             </div>

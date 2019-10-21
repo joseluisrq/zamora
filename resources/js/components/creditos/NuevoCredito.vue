@@ -22,7 +22,8 @@
                                             label="dni"
                                             :options="arrayCliente"
                                             placeholder="Ingrese DNI del cliente..."
-                                            :onChange="getDatosCliente"     
+                                            :onChange="getDatosCliente"   
+                                            class="col-md-12"  
                                     >
                                     </v-select>
                                     <div v-if="idcliente!=0">

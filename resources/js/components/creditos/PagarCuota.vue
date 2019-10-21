@@ -189,7 +189,7 @@ export default {
     data (){
             return {
                 //ruta
-                 ruta: 'http://127.0.0.1:8000',
+                 ruta: 'http://localhost/zamora/public',
                
                 dataC:[],//detalle de cuota
 
