@@ -129,6 +129,10 @@
                                 <label for="exampleInputEmail1">Tasa Efectiva Anual(TEA) %</label>
                                 <input type="text"   class="form-control"  v-model="tasa_creditos" placeholder="Número de Telefono" disabled> 
                             </div>
+                             <div class=" col-md-2 form-group">
+                                <label for="exampleInputEmail1">Tasa Efectiva Mensual(TEM) %</label>
+                                <input type="text"   class="form-control"  v-model="tasa_mensual" placeholder="Número de Telefono" disabled> 
+                            </div>
                             <div class=" col-md-2 form-group">
                                 <label for="exampleInputEmail1">Periodo dce Cuotas</label>
                                 <select class="form-control "  v-model="periodo"> 
@@ -241,6 +245,7 @@
                 montodesembolsado:1000,
                 numerocuotas:12,
                 tasa:13,
+                tasa_mensual:0,
                 periodo:1,
                 interesprestamo:0,
                 fechadesembolso:'2019-09-01',
@@ -515,6 +520,9 @@
                         me.tasa=me.tasa_creditos;
                         me.hoy = res.data.hoy;
                         me.fechadesembolso=me.hoy;
+
+
+                        me.tasa_mensual=Math.pow((parseFloat(1)+parseFloat(me.tasa_creditos)),(1/12))-1;
                     
                     })
                     .catch(err => {

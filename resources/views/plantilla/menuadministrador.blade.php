@@ -1,7 +1,7 @@
 <!-- menu -->
 
 <nav class="bottom-navbar">
-          <div class="container">
+          <div class="pl-sm-5">
               <ul class="nav page-navigation">
                 <li @click="menu=0" class="nav-item">
                   <a class="nav-link" href="#">
@@ -95,8 +95,10 @@
                         </ul>
                     </div>
                 </li>
+            
                         <!--Configracion-->
-                        <li class="nav-item">
+                
+                <li class="nav-item">
                     <a href="#" class="nav-link">
                       <i class="mdi mdi-codepen menu-icon"></i>
                       <span class="menu-title">Configuraciones</span>
@@ -108,6 +110,9 @@
                         </ul>
                     </div>
                 </li>
+                
+               
+             
               </ul>
           </div>
         </nav>

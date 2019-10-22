@@ -9,17 +9,19 @@
                 parseInt(creditospordesembolsar.length) }}</span></button>
         <div class="dropdown-content">
             <template v-for="c in cuotasAtrasadas">
-                <a :key="c.id" href="#" class="bg bg-danger text-white" style=""><font size="3">{{c.fechapago}}<br>
+                <a :key="c.id" href="#" ><font size="3">{{c.fechapago}}<br>
                 DNI : {{c.dni}}</font ><br> <font size="2">{{c.nombre}} {{c.apellidos}}</font ></a>
+                <hr>
             </template>
 
              <template v-for="ca in creditosporaprobar">
-                <a :key="ca.id" href="#" class="bg bg-warning text-white" style=""><font size="3">POR APROBAR<br>
+                <a :key="ca.id" href="#"  style=""><font size="3">POR APROBAR<br>
                 DNI : {{ca.dni}}</font ><br> <font size="2">{{ca.nombre}} {{ca.apellidos}}</font ></a>
+                 <hr>
             </template>
 
              <template v-for="cd in creditospordesembolsar">
-                <a :key="cd.id" href="#" class="bg bg-success text-white" style=""><font size="3">POR DESEMBOLSAR<br>
+                <a :key="cd.id" href="#"  style=""><font size="3">POR DESEMBOLSAR<br>
                 DNI : {{cd.dni}}</font ><br> <font size="2">{{cd.nombre}} {{cd.apellidos}}</font ></a>
             </template>
             
@@ -28,29 +30,7 @@
     </div>
   
 
-    <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center" id="notificationDropdown" href="#" data-toggle="dropdown">
-
-        
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-            <p class="mb-0 font-weight-normal float-left dropdown-header">Notificaciones</p>
-            <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-                <div class="preview-icon bg-warning">
-                    <i class="mdi mdi-information mx-0"></i>
-                </div>
-            </div>
-            <div class="preview-item-content">
-                <h6 class="preview-subject font-weight-normal">Cuota por vencer</h6>
-                <p class="font-weight-light small-text mb-0 text-muted">
-                    25/10/2019
-                </p>
-            </div>
-            </a>
-            
-        </div>
-    </li>
+  
     </main>
 
 </template>
@@ -95,7 +75,7 @@ export default {
 
 <style >
 .dropbtn {
-  background-color: #4CAF50;
+  background-color: rgb(252, 0, 0);
   color: white;
   padding: 16px;
   font-size: 16px;
@@ -112,7 +92,7 @@ export default {
   display: none;
   position: absolute;
   background-color: #f9f9f9;
-  min-width: 160px;
+  min-width: 200px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }
@@ -131,6 +111,6 @@ export default {
 }
 
 .dropdown:hover .dropbtn {
-  background-color: #3e8e41;
+  background-color: #e95b38;
 }
 </style>

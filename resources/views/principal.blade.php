@@ -24,29 +24,27 @@
                     <ul class="navbar-nav navbar-nav-left">
         
                         <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-                            <span class="navbar-brand brand-logo" href="index.html"><img src="images/logo.png" alt="logo"/> Cooperativa de ahorro Zamora</span>
+                            <span class="navbar-brand brand-logo" href="index.html"><img src="images/logo.png" alt="logo"/>   <font size="4" style="color:black">Cooperativa de  Ahorros y Créditos </font> </span>
                             
                             <a class="navbar-brand brand-logo-mini" href="index.html"><img src="images/logo.png"  class="img-fluid" width="20px" height="20px" alt="logo"/></a>
                         </div>  
                     </ul>
+
                 
-                    <ul class="navbar-nav navbar-nav-right">
+                    <ul class="navbar-nav navbar-nav-right">                      
+         
                         
                         <notificacion ></notificacion>
-                       
-
-
-
-
                         <li>
-
-                        <nav class="bottom-navbar ">                                
+                    
+                        
+                        <nav class="bottom-navbar  bg bg-white">                                
                             <ul class="nav page-navigation">
                                 <li class="nav-item">
                                     <a href="#" class="nav-link">
                                    
-                                    <span class="">{{Auth::user()->usuario}} </span>
-                                    <img src="images/dashboard/face29.png" alt="profile"/>
+                                    <span class="text-dark">{{Auth::user()->usuario}} </span>
+                                    <img src="images/dashboard/face29.png" height="42" width="42" alt="profile"/>
                                     </a>
                                     <div class="submenu">
                                         <ul>
@@ -120,6 +118,10 @@
 	<script src="vendors/justgage/raphael-2.1.4.min.js"></script>
     <script src="vendors/justgage/justgage.js"></script>
     <script src="http://momentjs.com/downloads/moment.min.js"></script>
+    <script>
+    $('#myDropdown').on('show.bs.dropdown', function () {
+  // do something…
+})</script>
 
    
     

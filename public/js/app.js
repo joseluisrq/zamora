@@ -1908,26 +1908,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4240,6 +4220,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
@@ -4251,6 +4235,7 @@ __webpack_require__.r(__webpack_exports__);
       montodesembolsado: 1000,
       numerocuotas: 12,
       tasa: 13,
+      tasa_mensual: 0,
       periodo: 1,
       interesprestamo: 0,
       fechadesembolso: '2019-09-01',
@@ -4491,6 +4476,7 @@ __webpack_require__.r(__webpack_exports__);
         me.tasa = me.tasa_creditos;
         me.hoy = res.data.hoy;
         me.fechadesembolso = me.hoy;
+        me.tasa_mensual = Math.pow(parseFloat(1) + parseFloat(me.tasa_creditos), 1 / 12) - 1;
       })["catch"](function (err) {
         // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
         console.log(err);
@@ -11081,7 +11067,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.dropbtn {\r\n  background-color: #4CAF50;\r\n  color: white;\r\n  padding: 16px;\r\n  font-size: 16px;\r\n  border: none;\r\n  cursor: pointer;\n}\n.dropdown {\r\n  position: relative;\r\n  display: inline-block;\n}\n.dropdown-content {\r\n  display: none;\r\n  position: absolute;\r\n  background-color: #f9f9f9;\r\n  min-width: 160px;\r\n  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\r\n  z-index: 1;\n}\n.dropdown-content a {\r\n  color: black;\r\n  padding: 12px 16px;\r\n  text-decoration: none;\r\n  display: block;\n}\n.dropdown-content a:hover {background-color: #f1f1f1}\n.dropdown:hover .dropdown-content {\r\n  display: block;\n}\n.dropdown:hover .dropbtn {\r\n  background-color: #3e8e41;\n}\r\n", ""]);
+exports.push([module.i, "\n.dropbtn {\r\n  background-color: rgb(252, 0, 0);\r\n  color: white;\r\n  padding: 16px;\r\n  font-size: 16px;\r\n  border: none;\r\n  cursor: pointer;\n}\n.dropdown {\r\n  position: relative;\r\n  display: inline-block;\n}\n.dropdown-content {\r\n  display: none;\r\n  position: absolute;\r\n  background-color: #f9f9f9;\r\n  min-width: 200px;\r\n  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\r\n  z-index: 1;\n}\n.dropdown-content a {\r\n  color: black;\r\n  padding: 12px 16px;\r\n  text-decoration: none;\r\n  display: block;\n}\n.dropdown-content a:hover {background-color: #f1f1f1}\n.dropdown:hover .dropdown-content {\r\n  display: block;\n}\n.dropdown:hover .dropbtn {\r\n  background-color: #e95b38;\n}\r\n", ""]);
 
 // exports
 
@@ -42683,11 +42669,7 @@ var render = function() {
             return [
               _c(
                 "a",
-                {
-                  key: c.id,
-                  staticClass: "bg bg-danger text-white",
-                  attrs: { href: "#" }
-                },
+                { key: c.id, attrs: { href: "#" } },
                 [
                   _c("font", { attrs: { size: "3" } }, [
                     _vm._v(_vm._s(c.fechapago)),
@@ -42701,7 +42683,9 @@ var render = function() {
                   ])
                 ],
                 1
-              )
+              ),
+              _vm._v(" "),
+              _c("hr")
             ]
           }),
           _vm._v(" "),
@@ -42709,11 +42693,7 @@ var render = function() {
             return [
               _c(
                 "a",
-                {
-                  key: ca.id,
-                  staticClass: "bg bg-warning text-white",
-                  attrs: { href: "#" }
-                },
+                { key: ca.id, attrs: { href: "#" } },
                 [
                   _c("font", { attrs: { size: "3" } }, [
                     _vm._v("POR APROBAR"),
@@ -42727,7 +42707,9 @@ var render = function() {
                   ])
                 ],
                 1
-              )
+              ),
+              _vm._v(" "),
+              _c("hr")
             ]
           }),
           _vm._v(" "),
@@ -42735,11 +42717,7 @@ var render = function() {
             return [
               _c(
                 "a",
-                {
-                  key: cd.id,
-                  staticClass: "bg bg-success text-white",
-                  attrs: { href: "#" }
-                },
+                { key: cd.id, attrs: { href: "#" } },
                 [
                   _c("font", { attrs: { size: "3" } }, [
                     _vm._v("POR DESEMBOLSAR"),
@@ -42759,67 +42737,10 @@ var render = function() {
         ],
         2
       )
-    ]),
-    _vm._v(" "),
-    _vm._m(0)
+    ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("li", { staticClass: "nav-item dropdown" }, [
-      _c("a", {
-        staticClass:
-          "nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center",
-        attrs: {
-          id: "notificationDropdown",
-          href: "#",
-          "data-toggle": "dropdown"
-        }
-      }),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass:
-            "dropdown-menu dropdown-menu-right navbar-dropdown preview-list",
-          attrs: { "aria-labelledby": "notificationDropdown" }
-        },
-        [
-          _c(
-            "p",
-            {
-              staticClass: "mb-0 font-weight-normal float-left dropdown-header"
-            },
-            [_vm._v("Notificaciones")]
-          ),
-          _vm._v(" "),
-          _c("a", { staticClass: "dropdown-item preview-item" }, [
-            _c("div", { staticClass: "preview-thumbnail" }, [
-              _c("div", { staticClass: "preview-icon bg-warning" }, [
-                _c("i", { staticClass: "mdi mdi-information mx-0" })
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "preview-item-content" }, [
-              _c("h6", { staticClass: "preview-subject font-weight-normal" }, [
-                _vm._v("Cuota por vencer")
-              ]),
-              _vm._v(" "),
-              _c(
-                "p",
-                { staticClass: "font-weight-light small-text mb-0 text-muted" },
-                [_vm._v("\n                 25/10/2019\n             ")]
-              )
-            ])
-          ])
-        ]
-      )
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -47133,6 +47054,40 @@ var render = function() {
                                     return
                                   }
                                   _vm.tasa_creditos = $event.target.value
+                                }
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: " col-md-2 form-group" }, [
+                            _c(
+                              "label",
+                              { attrs: { for: "exampleInputEmail1" } },
+                              [_vm._v("Tasa Efectiva Mensual(TEM) %")]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.tasa_mensual,
+                                  expression: "tasa_mensual"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Número de Telefono",
+                                disabled: ""
+                              },
+                              domProps: { value: _vm.tasa_mensual },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.tasa_mensual = $event.target.value
                                 }
                               }
                             })
