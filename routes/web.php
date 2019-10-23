@@ -75,6 +75,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/ahorro/selectsocio', 'CuentaAhorroController@selectSocio');
         Route::post('/cuentaahorros/crear', 'CuentaAhorroController@store');
         Route::get('/ahorro/movimiento/imprimirboucher', 'CuentaAhorroController@imprimirBoucherMovimiento');
+        Route::get('/ahorro/cuenta/imprimirdetalle', 'CuentaAhorroController@imprimirDetalleCuenta');
         //MOVIMIENTOS
         Route::get('/movimiento/selectCuenta', 'MovimientoController@selectCuenta');
         Route::post('/movimiento/registrar', 'MovimientoController@store');
@@ -96,6 +97,8 @@ Route::group(['middleware' => ['auth']], function () {
         //notifiacion
         Route::get('/notificacion', 'CuotaController@notificacion');//listar creditos
        
+        //EMPRESA
+        Route::get('/empresa/tasaCuenta', 'EmpresaController@tasaCrearCuenta');
     });  
 
 

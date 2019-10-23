@@ -58,22 +58,13 @@
                                                     <i class="mdi mdi-eye"></i>
                                             </button>
                                             <!--editar de socio-->  
-                                             <template v-if="rol==1">
-                                                <button type="button" class="btn btn-warning btn-rounded btn-icon" @click="cargardatosactualizar(persona.id)">
-                                                        <i class="mdi mdi-lead-pencil"></i>
-                                                </button>
-                                             </template>  
-
-                                            <!--eliminar de socio-->  
-                                            <template v-if="rol==1">
+                                            <button type="button" class="btn btn-warning btn-rounded btn-icon" @click="cargardatosactualizar(persona.id)">
+                                                    <i class="mdi mdi-lead-pencil"></i>
+                                            </button>
+                                            <!--eliminar de socio-->    
                                             <button v-if="persona.condicion==1 || tipo==0" type="button" class="btn btn-danger btn-rounded btn-icon" @click="eliminarpersona(persona.id)">
                                                     <i class="mdi mdi-delete-forever"></i>
                                             </button>
-                                            </template>  
-                                            <!--
-                                            <button v-show="tipo==0" type="button" class="btn btn-info btn-rounded btn-icon">
-                                                    <i class="mdi mdi-currency-usd"></i>
-                                            </button>-->
                                         </td>
                                         <td v-show="tipo==1" v-text="persona.rol"></td>
                                         <td v-text="persona.dni"></td>
@@ -123,7 +114,7 @@
 
 <script>
     export default {
-        props:['ruta', 'tipo','rol'],
+        props:['ruta', 'tipo'],
         data: function(){
             return {
                 bus: new Vue(),
@@ -228,7 +219,11 @@
                     {
                         axios.delete(url).then(res => {
                             me.listarPersona(1,'','');
-                            me.mostrarAlerta('center', 'success', '¡¡¡ Eliminación correcta !!!', false, 2000);
+
+                            if(res.data.hascreditos)
+                                me.mostrarAlerta('center', 'error', '¡¡¡ No se puede eliminar al socio debido a que tiene créditos activos !!!', false, 2000);
+                            else
+                                me.mostrarAlerta('center', 'success', '¡¡¡ Eliminación correcta !!!', false, 2000);
                         })
                         .catch(function (error) {
                             me.mostrarAlerta('top-end', 'error', '¡¡¡ Ocurrió algún error, No se logró eliminar !!!', false, 2500);

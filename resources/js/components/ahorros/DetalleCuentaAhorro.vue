@@ -29,7 +29,7 @@
                                              <p v-text="'S/.'+infocuenta.saldoefectivo"></p>
                                         </div>
                                         <div class="col-md-3 ">
-                                            <h5 class="font-weight-bold ">TREA(%):</h5>
+                                            <h5 class="font-weight-bold ">Tasa de Interes:</h5>
                                             <p v-text="infocuenta.tasa"></p>
                                         </div>
                                         <div class="col-md-3 ">
@@ -90,7 +90,7 @@
                                                 <th>Monto</th>
                                                 <th>Tipo</th>
                                                 <th>Cajaro</th>
-                                               
+                                                <th>Estado</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -104,13 +104,13 @@
                                                 <td v-text="movimiento.fecharegistro" ></td>   
                                                 <td v-text="movimiento.monto"></td>
                                                 <td v-if="movimiento.tipomovimiento==0">
-                                                    <label class="badge badge-danger">Retiro</label>
+                                                    <label class="badge badge-warning">Retiro</label>
                                                 </td>
                                                 <td v-else>
                                                     <label class="badge badge-success">Aporte</label>
                                                 </td>
                                                 <td v-text="movimiento.usuario"></td>
-                                               
+                                                <td v-text="movimiento.estado"></td>     
                                             </tr>
                                         </tbody>
                                     </table>

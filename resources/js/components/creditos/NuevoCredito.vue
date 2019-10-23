@@ -125,10 +125,12 @@
                                 <label for="exampleInputEmail1">N° Cuotas</label>
                                 <input type="number" class="form-control" v-model="numerocuotas" placeholder="Número de Cuotas">
                             </div>
+                            <!--
                             <div class=" col-md-2 form-group">
                                 <label for="exampleInputEmail1">Tasa Efectiva Anual(TEA) %</label>
                                 <input type="text"   class="form-control"  v-model="tasa_creditos" placeholder="Número de Telefono" disabled> 
                             </div>
+                            -->
                              <div class=" col-md-2 form-group">
                                 <label for="exampleInputEmail1">Tasa Efectiva Mensual(TEM) %</label>
                                 <input type="text"   class="form-control"  v-model="tasa_mensual" placeholder="Número de Telefono" disabled> 
@@ -521,8 +523,11 @@
                         me.hoy = res.data.hoy;
                         me.fechadesembolso=me.hoy;
 
+                        var base=1+parseFloat(me.tasa_creditos);
 
-                        me.tasa_mensual=Math.pow((parseFloat(1)+parseFloat(me.tasa_creditos)),(1/12))-1;
+                        var tnominal=(Math.pow(1+me.tasa_creditos/100,0.0833333333333333)-1)*12*100;
+                        var mensual=tnominal/12;            
+                        me.tasa_mensual=this.deci(mensual,2)
                     
                     })
                     .catch(err => {

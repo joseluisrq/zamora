@@ -23,6 +23,12 @@
                            </div>
                             <div class="col-md-3">
                                <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Tasa Efectiva Mensual(TEM)(%) </label>
+                                    <p class="form-control" placeholder="Detalle de operación" disabled>{{(((Math.pow(1+tasa_creditos/100,0.0833333333333333)-1)*12*100)/12).toFixed(2)}}</p>
+                                </div>
+                           </div>
+                            <div class="col-md-3">
+                               <div class="form-group">
                                     <label for="descripcionaporte" class="font-weight-bold">Tasa Moratoria Anual (%) </label>
                                     <input id="descripcionaporte" type="text" v-model="tasa_moratoria_anual" class="form-control" placeholder="Detalle de operación">
                                 </div>
@@ -159,6 +165,8 @@
                 tasa_ahorroplazo_360:'',
                 tasa_ahorroplazo_361:'',
 
+                tasa_mensual:''
+
 
 
             }
@@ -200,6 +208,13 @@
                             me.tasa_ahorroplazo_360=res.data.config.tasa_ahorroplazo_360;
                             me.tasa_ahorroplazo_361=res.data.config.tasa_ahorroplazo_361;
 
+
+                    var tnominal=(Math.pow(1+me.tasa_creditos/100,0.0833333333333333)-1)*12*100;
+                    var mensual=tnominal/12;
+                    me.tasa_mensual=this.deci(mensual,2)
+
+                   
+
                         
                         console.log(res.data);
                     })
@@ -233,8 +248,7 @@
                         
                 })
                     .then(res => {
-                       
-                       
+                                              
                         me.mostraralerta('top-end', 'success', '¡¡¡ Las configuraciones se actualizaron correctamente !!!', false, 2500);
                     })
                     .catch(err => {
@@ -254,6 +268,11 @@
                 me.tasa_moratoria_anual = me.ant_tasa_moratoria_anual;
 
                 me.tasa_aportes = me.ant_tasa_aportes;
+
+              
+            },
+             deci(GG, KK){
+                 return (Math.round(GG * Math.pow(10, KK)) / Math.pow(10, KK));
             }
         },
         mounted() {

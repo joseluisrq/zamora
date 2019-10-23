@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Aporte;
+use App\Empresa;
 use App\Persona;
 use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
@@ -97,9 +98,21 @@ class AporteController extends Controller
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
+
+        $request->validate([
+            'idsocio' => 'required',
+            'dni' => 'required|size:8',
+            'monto' => 'required',
+            'descripcion' => 'required'
+        ]);
  
         try{
 			DB::beginTransaction();
+
+            $tasa = Empresa::select('tasa_aportes')
+            ->orderBy('empresa.id', 'desc')
+            ->take(1)
+            ->get()[0]->tasa_aportes;
 
 			$aporte = new Aporte();
             $aporte->idsocio = $request->idsocio;
@@ -109,12 +122,14 @@ class AporteController extends Controller
             $aporte->fecharegistro = Carbon::now('America/Lima');
           
             $aporte->descripcion = $request->descripcion; //cantidad de cuiotas
-            $aporte->tasa = $request->tasa;
+            $aporte->tasa = $tasa;
             $aporte->estado = '1';
           
             $aporte->save();
 
 			DB::commit();
+
+            return ["idaporte" => $aporte->id];
         } catch (Exception $e){
             DB::rollBack();
         }
@@ -123,13 +138,14 @@ class AporteController extends Controller
     // DESCARGAR BOUCHER PDF
 	public function pdfDetalleAporte(Request $request)//, $id
 	{
+        $id = $request->id;
+
 		$aporte = Aporte::join('personas', 'personas.id', '=', 'aportaciones.idsocio')
 	    	->select(
 		        'aportaciones.monto',
 		        'aportaciones.fecharegistro',
 		        'aportaciones.descripcion',
 		        'aportaciones.tasa',
-		        // 'aportaciones.estado',
 
                 'personas.nombre',
                 'personas.apellidos',
@@ -138,14 +154,12 @@ class AporteController extends Controller
 
                 DB::raw('(select usuario from users where users.id = aportaciones.idusuario) as usuario')
 	    	)
-	    	// ->where('aportaciones.id', '=', $id)
+	    	->where('aportaciones.id', '=', $id)
 	    	->orderBy('aportaciones.id', 'desc')
 	    	->take(1)
 	    	->get();
 
-      	$numaporte = Aporte::select(DB::raw('count(*) + 1 as cantidadaportes'))->get();
-
 		$pdf= \PDF::loadView('pdf.detalleaporte',['aporte'=>$aporte]);
-		return $pdf->download('Aporte-'.$numaporte[0]->cantidadaportes.'.pdf');		
+		return $pdf->download('Aporte-'.$id.'.pdf');
     }
 }

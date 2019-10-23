@@ -40,7 +40,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!--
                         <div class="col-lg-12 mt-4">
                                 <h4 class="card-title">Credito Actual</h4>
                                 <div class="row">
@@ -53,7 +52,6 @@
                                 <p>tabla con los cuotas actuales</p>
                             </div>
                         </div>
-                        -->
                     </div>
                 </div>
             </div>

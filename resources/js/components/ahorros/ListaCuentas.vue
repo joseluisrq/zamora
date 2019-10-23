@@ -32,10 +32,10 @@
                                             <th> N° Cuenta </th>
                                             <th> Saldo efectivo</th>
                                             <th> Fecha apertura</th>
-                                            <th> Tasa </th>
+                                            <!-- <th> Tasa </th> -->
                                             <th> DNI Socio </th>
                                             <th> Nombres Socio </th>
-                                            <th> Estado</th>
+                                            <!-- <th> Estado</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -48,17 +48,17 @@
                                             <td v-text="cuenta.numerocuenta"></td>
                                             <td v-text="cuenta.saldoefectivo"></td>
                                             <td v-text="cuenta.fechaapertura"></td>
-                                            <td v-text="cuenta.tasa"></td>
+                                            <!-- <td v-text="cuenta.tasa"></td> -->
 
                                             <td v-text="cuenta.sociodni"></td>
                                             <td v-text="cuenta.socionombre+' '+cuenta.socioapellido"></td>
                                          
-                                            <td v-if="cuenta.estado==0">
+                                            <!-- <td v-if="cuenta.estado==0">
                                                 <label class="badge badge-danger text-white ">Inactivo</label>
                                             </td>
                                             <td v-else>
                                                 <label class="badge badge-success text-white ">Activo</label>
-                                            </td>
+                                            </td> -->
                                         </tr>                                
                                     </tbody>
                                 </table>
@@ -109,7 +109,7 @@
                     'to' : 0,
                 },
                 offset : 3,
-                criterio : 'nombre',
+                criterio : 'numerocuenta',
                 buscar : '',
 
                 showlista: true,

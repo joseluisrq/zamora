@@ -95,11 +95,6 @@ class CuentaAhorroController extends Controller
         ->where('personas.dni', 'like', '%'. $filtro . '%')
         ->get();
 
-        $tasa = Empresa::select('tasa_ahorros')
-        ->orderBy('empresa.id', 'desc')
-        ->take(1)
-        ->get()[0]->tasa_ahorros;
-
         $iduser = 14;//\Auth::user()->id;
         $usuario = User::select(
             'users.id',
@@ -110,7 +105,6 @@ class CuentaAhorroController extends Controller
         ->get()[0];
 
         return [
-        	'tasa' => $tasa,
         	'socios' => $socios,
         	'usuario' => $usuario
         ];
@@ -119,6 +113,12 @@ class CuentaAhorroController extends Controller
 	public function store(Request $request)
 	{
 		if (!$request->ajax()) return redirect('/');
+
+        $request->validate([
+            'idsocio' => 'required',
+            'monto_inicial' => 'required',
+            // 'descripcion' => 'required'
+        ]);
  
         try{
 			DB::beginTransaction();
@@ -134,6 +134,8 @@ class CuentaAhorroController extends Controller
 			if($cantidad_cuentas > 0)
 				$numerocuenta .= '_'.($cantidad_cuentas + 1);
 
+            $descripcion = $request->tipocuenta==1?'Nueva Cuenta de Ahorros':'Nueva Cuenta a Plazo Fijo';
+
 			$cuentaahorro = new CuentaAhorro();
 			$cuentaahorro->idsocio = $request->idsocio;
 	        $cuentaahorro->idusuario = $request->idusuario;
@@ -141,7 +143,8 @@ class CuentaAhorroController extends Controller
 	        $cuentaahorro->saldoefectivo = $request->monto_inicial;
 	        $cuentaahorro->fechaapertura = Carbon::now('America/Lima');
 	        $cuentaahorro->ultimomovimiento = 0;//Al momento de la creación
-	        $cuentaahorro->descripcion = $request->descripcion;
+	        $cuentaahorro->descripcion = $descripcion;
+            $cuentaahorro->tipocuenta = $request->tipocuenta;
 	        $cuentaahorro->tasa = $request->tasa;
 	        $cuentaahorro->estado = '1';
             $cuentaahorro->save();
@@ -160,6 +163,8 @@ class CuentaAhorroController extends Controller
 	        $cuentaahorro->save();
 
 			DB::commit();
+
+            return ["idcuenta" => $cuentaahorro->id];
         } catch (Exception $e){
             DB::rollBack();
         }
@@ -221,33 +226,38 @@ class CuentaAhorroController extends Controller
 		];
 	}
 
-	public function imprimirBoucherMovimiento(Request $request)
-	{
-		$id = $request->id;
+    public function imprimirDetalleCuenta(Request $request)
+    {
+        $id = $request->id;
 
-		$movimiento = Movimiento::join('cuentaahorros', 'cuentaahorros.id', '=', 'movimientos.idahorro')
-		->join('personas', 'personas.id', '=', 'cuentaahorros.idsocio')
-		->join('users', 'users.id', '=', 'movimientos.idusuario')
-    	->select(
-    		'cuentaahorros.numerocuenta',
+        $cuenta = CuentaAhorro::join('personas as socio', 'socio.id', '=', 'cuentaahorros.idsocio')
+        ->join('users', 'users.id', '=', 'cuentaahorros.idusuario')
+        ->select(
+            'cuentaahorros.numerocuenta',
+            'cuentaahorros.saldoefectivo',
+            'cuentaahorros.fechaapertura',
+            'cuentaahorros.descripcion',
+            'cuentaahorros.tasa',
+            'cuentaahorros.tipocuenta',
 
-    		'personas.nombre',
-            'personas.apellidos',
-            'personas.dni',
+            'socio.nombre',
+            'socio.apellidos',
+            'socio.dni',
+            'socio.fechanacimiento',
+            'socio.departamento',
+            'socio.ciudad',
+            'socio.direccion',
+            'socio.telefono',
+            'socio.email',
 
-	        'movimientos.monto',
-	        'movimientos.descripcion',
-	        'movimientos.tipomovimiento',
-	        'movimientos.fecharegistro',
+            'users.usuario'
+        )
+        ->where('cuentaahorros.id', '=', $id)
+        ->orderBy('cuentaahorros.id', 'desc')
+        ->take(1)
+        ->get()[0];
 
-	        'users.usuario'
-    	)
-    	->where('movimientos.id', '=', $id)
-    	->orderBy('movimientos.id', 'desc')
-    	->take(1)
-    	->get()[0];
-
-		$pdf= \PDF::loadView('pdf.detallemovimiento',['mov'=>$movimiento]);
-		return $pdf->download('Movimiento-0'.$id.'.pdf');
-	}
+        $pdf= \PDF::loadView('pdf.detallecuentaahorros',['cuenta' => $cuenta]);
+        return $pdf->download('CuentaAhorro-0'.$id.'.pdf');
+    }
 }

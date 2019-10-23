@@ -41,10 +41,10 @@
                         <img src="./images/logo.png" width="120px" alt="">
                         <h4>Boucher de Movimiento</h4>
                     </div>
-                    <p>
+                    <p class="bg-light">
                         N° CUENTA: {{ $mov->numerocuenta }}<br><br>
                         SOCIO :  {{ $mov->nombre . ' ' . $mov->apellidos }}<br><br>
-                        OPERACIÓN:  @if ($mov->tipomovimiento === 0) RETIRO
+                        OPERACIÓN:  @if ($mov->tipomovimiento == 0) RETIRO
                                     @else APORTE
                                     @endif
                                     <br><br>
