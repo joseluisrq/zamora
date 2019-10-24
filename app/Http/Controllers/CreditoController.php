@@ -263,7 +263,7 @@ class CreditoController extends Controller
             if($estadogarante==1)$credito->idgarante = $idgarante;
             else $credito->idgarante = $request->idcliente;
 
-            $credito->idusuario = 14;// \Auth::user()->id;
+            $credito->idusuario = \Auth::user()->id;
             $credito->numeroprestamo = $request->numeroprestamo;           
             $credito->montodesembolsado = $request->montodesembolsado;
             $credito->fechadesembolso = $mytime;           
@@ -284,7 +284,7 @@ class CreditoController extends Controller
                 $cuota = new Cuota();
                 $cuota->idcredito = $credito->id;                
                 $cuota->numerodecuota = $cuot['contador'];
-                $cuota->idcajero=14;  //cambiar a usuario  
+                $cuota->idcajero=\Auth::user()->id; //cambiar a usuario  
                 $cuota->fechapago = $cuot['fechapago'];            
                 $cuota->saldopendiente =  $cuot['saldopendiente'];
                 $cuota->monto = $cuot['monto'];
@@ -329,15 +329,22 @@ class CreditoController extends Controller
           $cuota->save();
       }
           //aprobar DESAPROBAR
-          public function desaprobar(Request $request)
-          {
-              if (!$request->ajax()) return redirect('/');
-           
-      
-              $cuota = Credito::findOrFail($request->id);
-              $cuota->estadodesembolso = '3'; 
-              $cuota->estado = '0';           
-              $cuota->save();
+        public function desaprobar(Request $request)
+        {
+            if (!$request->ajax()) return redirect('/');
+        
+    
+            $credito = Credito::findOrFail($request->id);
+            $credito->estadodesembolso = '3'; 
+            $credito->estado = '0';           
+            $credito->save();
+
+
+            $idsocio=$credito->idsocio;
+            
+            $cliente = Socio::findOrFail($idsocio);
+            $cliente->estadocredito = '0';
+            $cliente->save();
           }
 
 

@@ -9,7 +9,7 @@
         @if(Auth::check()) <!--si el usuario esta autentificado-->
                     @if (Auth::user()->idrol == 1)
                     <template v-if="menu==0">
-                        <example-component></example-component>
+                        <example-component :ruta="ruta"></example-component>
                     </template>
 
                     <template v-if="menu==30">
@@ -79,7 +79,7 @@
 
                     @elseif (Auth::user()->idrol == 2)
                     <template v-if="menu==0">
-                        <example-component></example-component>
+                        <example-component :ruta="ruta"></example-component>
                     </template>
 
                     <template v-if="menu==30">
@@ -136,7 +136,7 @@
 
                     @elseif (Auth::user()->idrol == 3)
                     <template v-if="menu==0">
-                        <example-component></example-component>
+                        <example-component :ruta="ruta"></example-component>
                     </template>
                     <template v-if="menu==40">
                             <listarcredito :ruta="ruta" :rol="3"></listarcredito>

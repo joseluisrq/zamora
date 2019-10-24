@@ -1,6 +1,7 @@
 <template>
     <main>
     <!--detalle de CREDITO-->
+        <template v-if="vistas==1">
         <div class="row ">
             <div class="col-lg-12 grid-margin stretch-card ">
                 <div class="card ">
@@ -33,16 +34,15 @@
                                             </button>
                                             <template v-if="rol==1">
                                                     <template v-if="arrayCreditos[0].estadodesembolso==0">
-                                                        <button  class="btn btn-warning" @click="aprobar(c.id)"> Aprobar Credito</button>
+                                                        <button  class="btn btn-warning" @click="vistas=2"> Aprobar Credito</button>
                                                         <button  class="btn btn-danger" @click="desaprobar(c.id)"> Desaprobar Credito</button>
                                                     </template>
                                                     <template v-else-if="arrayCreditos[0].estadodesembolso==1">
                                                         <button  class="btn btn-success" @click="desembolsar(c.id)">Desembolsar</button>
-                                                    </template>
-
-                                            
+                                                    </template>                                            
                                             </template>
-                                            <template v-else>
+
+                                            <template v-else-if="rol!=1">
                                                  <button v-if="arrayCreditos[0].estadodesembolso==0" class="btn btn-success" disabled> Credito por aprobar</button>
                                                   <button v-else-if="arrayCreditos[0].estadodesembolso==1" class="btn btn-success" @click="desembolsar(c.id)">Desembolsar</button>
                                             </template>
@@ -249,7 +249,64 @@
                 </div>
             </div>
         </div>
+        </template>
         <!--detalle de CREDITO-->
+
+        <!--aprobar credito-->
+        <template v-if="vistas==2">
+            <div class="row ">
+                <div class="col-lg-12 grid-margin stretch-card ">
+                    <div class="card ">
+                        <div class="card-body ">
+                             <div class="row bg bg-dark ">
+                                 <div class="col-md-12 mt-2 text-white ">
+                                     <h4>Requisitos para aprobar Crédito</h4>
+                                   
+                                </div>
+                             </div>
+                             <div class="row  ">
+                                <div class="col-md-12">
+                                      <span>Marque los opciones que cumpla el crédito</span>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f1" type="checkbox"> Solicitud de Préstamo                                       
+                                    </div>
+                                     <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f2" type="checkbox"> Pagaré                                      
+                                    </div>
+                                     <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f3" type="checkbox"> Contrato                                       
+                                    </div>
+                                     <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f4" type="checkbox"> Copia de DNI del Socio Titular, conyuge y garante                                      
+                                    </div>
+                                     <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f5" type="checkbox"> Copia de las boletas de los 2 últimos meses                                       
+                                    </div>
+                                     <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f6" type="checkbox"> Central de Riesgo                                      
+                                    </div>
+                                      <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f7" type="checkbox"> Se aceptan otros ingresos, o ingresos conyugales                                      
+                                    </div>
+                                      <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  v-model="f8" type="checkbox"> Copia del recibo del servicio de luz o agua                                      
+                                    </div>
+
+
+                                       <button  class="btn btn-warning" @click="aprobar(arrayCreditos[0].id)"> Aprobar Credito</button>
+                                   
+
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                          
+
+        </template>
+        <!--fin aprobar credito-->
     </main>
 </template>
 
@@ -264,6 +321,8 @@ export default {
             arrayCuotas:[],
 
             hoy:'',
+            vistas:1,
+            fi:'', f2:'', f3:'', f4:'', f5:'', f6:'', f7:'', f8:'',
         }
     },
     computed:

@@ -528,6 +528,8 @@
                         var tnominal=(Math.pow(1+me.tasa_creditos/100,0.0833333333333333)-1)*12*100;
                         var mensual=tnominal/12;            
                         me.tasa_mensual=this.deci(mensual,2)
+
+                        //me.tasa=me.tasa_mensual;
                     
                     })
                     .catch(err => {
@@ -597,7 +599,7 @@
                         'numerocuotas' : this.numerocuotas,
                         'interes':this.totalinteres,
                        
-                        'tasa' : this.tasa,
+                        'tasa' : this.tasa_mensual,
                         'periodo' : this.periodo,
                         'idcliente' : this.idcliente,
 

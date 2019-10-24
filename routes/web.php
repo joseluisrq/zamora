@@ -20,6 +20,8 @@ Route::group(['middleware' => ['guest']], function () {
 
 Route::group(['middleware' => ['auth']], function () {   
     
+    //reportes
+    Route::get('/reportes', 'ReportesController');//listar creditos
     //cerrar sesion
     Route::post('/cerrarsesion','Auth\LoginController@cerrarSesion')->name('cerrarsesion'); 
      

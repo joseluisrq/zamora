@@ -1854,9 +1854,231 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['ruta'],
+  data: function data() {
+    return {
+      varDesembolsos: null,
+      charDesembolso: null,
+      desembolsos: [],
+      varTotalDesembolsos: [],
+      varMesDesembolsos: [],
+      ano: '1993',
+      enproceso: 0,
+      rechazados: 0,
+      terminados: 0
+    };
+  },
+  methods: {
+    getDesembolsos: function getDesembolsos() {
+      var me = this;
+      var url = me.ruta + '/reportes';
+      axios.get(url).then(function (response) {
+        var respuesta = response.data; //cantidad de creditos
+
+        me.enproceso = respuesta.enproceso;
+        me.rechazados = respuesta.rechazados;
+        me.terminados = respuesta.terminados; //para el grafico de desembolsos por mes
+
+        me.desembolsos = respuesta.desembolsos;
+        me.ano = respuesta.ano; //cargamos los datos al chart
+
+        me.loadDesembolsos();
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    loadDesembolsos: function loadDesembolsos() {
+      var me = this;
+      me.desembolsos.map(function (x) {
+        if (x.mes == 1) me.varMesDesembolsos.push('Enero');else if (x.mes == 2) me.varMesDesembolsos.push('Febrero');else if (x.mes == 3) me.varMesDesembolsos.push('Marzo');else if (x.mes == 4) me.varMesDesembolsos.push('Abril');else if (x.mes == 5) me.varMesDesembolsos.push('Mayo');else if (x.mes == 6) me.varMesDesembolsos.push('Junio');else if (x.mes == 7) me.varMesDesembolsos.push('Julio');else if (x.mes == 8) me.varMesDesembolsos.push('Agosto');else if (x.mes == 9) me.varMesDesembolsos.push('Setiembre');else if (x.mes == 10) me.varMesDesembolsos.push('Octubre');else if (x.mes == 11) me.varMesDesembolsos.push('Noviembre');else if (x.mes == 12) me.varMesDesembolsos.push('Diciembre'); //me.varMesDesembolsos.push(x.mes);
+
+        me.varTotalDesembolsos.push(x.total);
+      });
+      me.varDesembolsos = document.getElementById('desembolsos').getContext('2d');
+      me.charDesembolso = new Chart(me.varDesembolsos, {
+        type: 'bar',
+        data: {
+          labels: me.varMesDesembolsos,
+          datasets: [{
+            label: 'Desembolsos',
+            data: me.varTotalDesembolsos,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        }
+      });
+    }
+  },
   mounted: function mounted() {
-    console.log('Component mounted.');
+    this.getDesembolsos();
   }
 });
 
@@ -3844,6 +4066,63 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['id', 'rol'],
   data: function data() {
@@ -3852,7 +4131,16 @@ __webpack_require__.r(__webpack_exports__);
       arrayCreditos: [],
       estadodes: 0,
       arrayCuotas: [],
-      hoy: ''
+      hoy: '',
+      vistas: 1,
+      fi: '',
+      f2: '',
+      f3: '',
+      f4: '',
+      f5: '',
+      f6: '',
+      f7: '',
+      f8: ''
     };
   },
   computed: {},
@@ -4680,7 +4968,7 @@ __webpack_require__.r(__webpack_exports__);
         var base = 1 + parseFloat(me.tasa_creditos);
         var tnominal = (Math.pow(1 + me.tasa_creditos / 100, 0.0833333333333333) - 1) * 12 * 100;
         var mensual = tnominal / 12;
-        me.tasa_mensual = _this.deci(mensual, 2);
+        me.tasa_mensual = _this.deci(mensual, 2); //me.tasa=me.tasa_mensual;
       })["catch"](function (err) {
         // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
         console.log(err);
@@ -4745,7 +5033,7 @@ __webpack_require__.r(__webpack_exports__);
             'fechadesembolso': _this2.hoy,
             'numerocuotas': _this2.numerocuotas,
             'interes': _this2.totalinteres,
-            'tasa': _this2.tasa,
+            'tasa': _this2.tasa_mensual,
             'periodo': _this2.periodo,
             'idcliente': _this2.idcliente,
             'garanteestado': _this2.garanteestado,
@@ -42816,30 +43104,423 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("main", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "row  mt-4" }, [
+      _vm._m(1),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-2 grid-margin stretch-card " }, [
+        _c("div", { staticClass: "card " }, [
+          _c("div", { staticClass: "card-body pb-0 " }, [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "d-flex align-items-center justify-content-between "
+              },
+              [
+                _c("h2", { staticClass: "text-danger font-weight-bold " }, [
+                  _vm._v(_vm._s(_vm.enproceso))
+                ]),
+                _vm._v(" "),
+                _c("i", { staticClass: "mdi mdi-refresh mdi-18px text-dark " })
+              ]
+            ),
+            _vm._v(" "),
+            _c("p", { staticClass: "text-dark font-weight-bold" }, [
+              _vm._v("Creditos en Proceso")
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-2 grid-margin stretch-card " }, [
+        _c("div", { staticClass: "card " }, [
+          _c("div", { staticClass: "card-body pb-0 " }, [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "d-flex align-items-center justify-content-between "
+              },
+              [
+                _c("h2", { staticClass: "text-info font-weight-bold " }, [
+                  _vm._v(_vm._s(_vm.terminados))
+                ]),
+                _vm._v(" "),
+                _c("i", {
+                  staticClass:
+                    "mdi mdi-file-document-outline mdi-18px text-dark "
+                })
+              ]
+            ),
+            _vm._v(" "),
+            _c("p", { staticClass: "text-dark font-weight-bold" }, [
+              _vm._v("Creditos Terminados")
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-2 grid-margin stretch-card " }, [
+        _c("div", { staticClass: "card " }, [
+          _c("div", { staticClass: "card-body pb-0 " }, [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "d-flex align-items-center justify-content-between "
+              },
+              [
+                _c("h2", { staticClass: "text-warning font-weight-bold " }, [
+                  _vm._v(_vm._s(_vm.rechazados))
+                ]),
+                _vm._v(" "),
+                _c("i", {
+                  staticClass: "mdi mdi-folder-outline mdi-18px text-dark "
+                })
+              ]
+            ),
+            _vm._v(" "),
+            _c("p", { staticClass: "text-dark font-weight-bold" }, [
+              _vm._v("Creditos Rechazados")
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _vm._m(2),
+      _vm._v(" "),
+      _vm._m(3)
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row " }, [
+      _c(
+        "div",
+        { staticClass: "col-sm-6 grid-margin grid-margin-md-0 stretch-card " },
+        [
+          _c("div", { staticClass: "card " }, [
+            _c("div", { staticClass: "card-body " }, [
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "d-flex align-items-center justify-content-between "
+                },
+                [
+                  _c("h4", { staticClass: "card-title " }, [
+                    _vm._v("Desembolsos de Créditos por Mes")
+                  ]),
+                  _vm._v(" "),
+                  _c("h4", { staticClass: "text-success font-weight-bold " }, [
+                    _vm._v("Año"),
+                    _c("span", { staticClass: "text-dark ml-3 " }, [
+                      _vm._v(_vm._s(_vm.ano))
+                    ])
+                  ])
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", {
+                staticClass: "support-tracker-legend ",
+                attrs: { id: "support-tracker-legend " }
+              }),
+              _vm._v(" "),
+              _c("canvas", { attrs: { id: "desembolsos" } })
+            ])
+          ])
+        ]
+      ),
+      _vm._v(" "),
+      _vm._m(4)
+    ])
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row justify-content-center" }, [
-        _c("div", { staticClass: "col-md-8" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-header" }, [
-              _vm._v("Example Component")
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "card " }, [
+        _c("div", { staticClass: "card-body " }, [
+          _c("div", { staticClass: "row " }, [
+            _c("div", { staticClass: "col-lg-4 " }, [
+              _c("h4", { staticClass: "card-title " }, [
+                _vm._v("Sales Difference")
+              ]),
+              _vm._v(" "),
+              _c("canvas", { attrs: { id: "salesDifference " } }),
+              _vm._v(" "),
+              _c("p", { staticClass: "mt-3 mb-4 mb-lg-0 " }, [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\n                        "
+                )
+              ])
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _vm._v(
-                "\n                    I'm an example component.\n                "
-              )
+            _c("div", { staticClass: "col-lg-5 " }, [
+              _c("h4", { staticClass: "card-title " }, [
+                _vm._v("Best Sellers")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "row " }, [
+                _c("div", { staticClass: "col-sm-4 " }, [
+                  _c("ul", { staticClass: "graphl-legend-rectangle " }, [
+                    _c("li", [
+                      _c("span", { staticClass: "bg-danger " }),
+                      _vm._v("Automotive")
+                    ]),
+                    _vm._v(" "),
+                    _c("li", [
+                      _c("span", { staticClass: "bg-warning " }),
+                      _vm._v("Books")
+                    ]),
+                    _vm._v(" "),
+                    _c("li", [
+                      _c("span", { staticClass: "bg-info " }),
+                      _vm._v("Software")
+                    ]),
+                    _vm._v(" "),
+                    _c("li", [
+                      _c("span", { staticClass: "bg-success " }),
+                      _vm._v("Video games")
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm-8 grid-margin " }, [
+                  _c("canvas", { attrs: { id: "bestSellers " } })
+                ])
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "mt-3 mb-4 mb-lg-0 " }, [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\n                        "
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-3 " }, [
+              _c("h4", { staticClass: "card-title " }, [
+                _vm._v("Social Media Statistics")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "row " }, [
+                _c("div", { staticClass: "col-sm-12 " }, [
+                  _c(
+                    "div",
+                    { staticClass: "progress progress-lg grouped mb-2 " },
+                    [
+                      _c("div", {
+                        staticClass: "progress-bar bg-danger ",
+                        staticStyle: { width: "40%" },
+                        attrs: {
+                          role: "progressbar ",
+                          "aria-valuenow": "25 ",
+                          "aria-valuemin": "0 ",
+                          "aria-valuemax": "100 "
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("div", {
+                        staticClass: "progress-bar bg-info ",
+                        staticStyle: { width: "10%" },
+                        attrs: {
+                          role: "progressbar ",
+                          "aria-valuenow": "50 ",
+                          "aria-valuemin": "0 ",
+                          "aria-valuemax": "100 "
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("div", {
+                        staticClass: "progress-bar bg-warning ",
+                        staticStyle: { width: "20%" },
+                        attrs: {
+                          role: "progressbar ",
+                          "aria-valuenow": "50 ",
+                          "aria-valuemin": "0 ",
+                          "aria-valuemax": "100 "
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("div", {
+                        staticClass: "progress-bar bg-success ",
+                        staticStyle: { width: "30%" },
+                        attrs: {
+                          role: "progressbar ",
+                          "aria-valuenow": "50 ",
+                          "aria-valuemin": "0 ",
+                          "aria-valuemax": "100 "
+                        }
+                      })
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm-12 " }, [
+                  _c("ul", { staticClass: "graphl-legend-rectangle " }, [
+                    _c("li", [
+                      _c("span", { staticClass: "bg-danger " }),
+                      _vm._v("Instagram (15%)")
+                    ]),
+                    _vm._v(" "),
+                    _c("li", [
+                      _c("span", { staticClass: "bg-warning " }),
+                      _vm._v("Facebook (20%)")
+                    ]),
+                    _vm._v(" "),
+                    _c("li", [
+                      _c("span", { staticClass: "bg-info " }),
+                      _vm._v("Website (25%)")
+                    ]),
+                    _vm._v(" "),
+                    _c("li", [
+                      _c("span", { staticClass: "bg-success " }),
+                      _vm._v("Youtube (40%)")
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "mb-0 mt-2 " }, [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\n                        "
+                )
+              ])
             ])
           ])
         ])
       ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-lg-2 grid-margin stretch-card " }, [
+      _c("div", { staticClass: "card " }, [
+        _c("div", { staticClass: "card-body pb-0 " }, [
+          _c(
+            "div",
+            {
+              staticClass: "d-flex align-items-center justify-content-between "
+            },
+            [
+              _c("h2", { staticClass: "text-success font-weight-bold " }, [
+                _vm._v("18390")
+              ]),
+              _vm._v(" "),
+              _c("i", {
+                staticClass: "mdi mdi-account-outline mdi-18px text-dark "
+              })
+            ]
+          ),
+          _vm._v(" "),
+          _c("p", { staticClass: "text-dark font-weight-bold" }, [
+            _vm._v("Total de Créditos")
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-lg-2 grid-margin stretch-card " }, [
+      _c("div", { staticClass: "card " }, [
+        _c("div", { staticClass: "card-body pb-0 " }, [
+          _c(
+            "div",
+            {
+              staticClass: "d-flex align-items-center justify-content-between "
+            },
+            [
+              _c("h2", { staticClass: "text-dark font-weight-bold " }, [
+                _vm._v("7826")
+              ]),
+              _vm._v(" "),
+              _c("i", { staticClass: "mdi mdi-cash text-dark mdi-18px " })
+            ]
+          ),
+          _vm._v(" "),
+          _c("p", { staticClass: "text-dark font-weight-bold" }, [
+            _vm._v("Créditos en Proceso")
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-lg-2 grid-margin stretch-card " }, [
+      _c("div", { staticClass: "card " }, [
+        _c("div", { staticClass: "card-body pb-0 " }, [
+          _c(
+            "div",
+            {
+              staticClass: "d-flex align-items-center justify-content-between "
+            },
+            [
+              _c("h2", { staticClass: "text-secondary font-weight-bold " }, [
+                _vm._v("586")
+              ]),
+              _vm._v(" "),
+              _c("i", {
+                staticClass: "mdi mdi-cart-outline mdi-18px text-dark "
+              })
+            ]
+          ),
+          _vm._v(" "),
+          _c("p", { staticClass: "text-dark font-weight-bold" }, [
+            _vm._v("Creditos Con cuotas Atrasadas")
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "col-sm-6 grid-margin grid-margin-md-0 stretch-card " },
+      [
+        _c("div", { staticClass: "card " }, [
+          _c("div", { staticClass: "card-body " }, [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "d-lg-flex align-items-center justify-content-between mb-4 "
+              },
+              [
+                _c("h4", { staticClass: "card-title " }, [
+                  _vm._v("Product Orders")
+                ]),
+                _vm._v(" "),
+                _c("p", { staticClass: "text-dark " }, [
+                  _vm._v("+5.2% vs last 7 days")
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "product-order-wrap padding-reduced " }, [
+              _c("div", {
+                staticClass: "gauge productorder-gage ",
+                attrs: { id: "productorder-gage " }
+              })
+            ])
+          ])
+        ])
+      ]
+    )
   }
 ]
 render._withStripped = true
@@ -45992,555 +46673,1157 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("main", [
-    _c("div", { staticClass: "row " }, [
-      _c("div", { staticClass: "col-lg-12 grid-margin stretch-card " }, [
-        _c("div", { staticClass: "card " }, [
-          _c("div", { staticClass: "card-body " }, [
-            _c("div", { staticClass: "row bg bg-dark " }, [
-              _c("div", { staticClass: "col-md-12 mt-2 text-white " }, [
-                _c(
-                  "h4",
-                  [
-                    _vm._v(
-                      "Detalle de Crédtio  \n                            "
-                    ),
-                    _vm.estadodes == 3
-                      ? [
-                          _c("span", { staticClass: "bg bg-danger" }, [
-                            _vm._v("  CREDIDO INACTIVO")
-                          ])
-                        ]
-                      : _vm._e()
-                  ],
-                  2
-                )
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "row mt-4 " }, [
-              _c("div", { staticClass: "col-lg-12 " }, [
-                _c(
-                  "div",
-                  { staticClass: "template-demo " },
-                  _vm._l(_vm.arrayCreditos, function(c) {
-                    return _c(
-                      "div",
-                      { key: c.id, staticClass: "row" },
-                      [
-                        _vm._m(0, true),
-                        _vm._v(" "),
+  return _c(
+    "main",
+    [
+      _vm.vistas == 1
+        ? [
+            _c("div", { staticClass: "row " }, [
+              _c(
+                "div",
+                { staticClass: "col-lg-12 grid-margin stretch-card " },
+                [
+                  _c("div", { staticClass: "card " }, [
+                    _c("div", { staticClass: "card-body " }, [
+                      _c("div", { staticClass: "row bg bg-dark " }, [
                         _c(
                           "div",
-                          { staticClass: "col-md-5 " },
+                          { staticClass: "col-md-12 mt-2 text-white " },
                           [
                             _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-primary btn-icon-text",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.pdfCronograma()
-                                  }
-                                }
-                              },
+                              "h4",
                               [
-                                _c("i", {
-                                  staticClass:
-                                    "mdi mdi-file-pdf btn-icon-prepend"
-                                }),
                                 _vm._v(
-                                  "                                                    \n                                            Descargar Cronograma\n                                        "
-                                )
-                              ]
-                            ),
-                            _vm._v(" "),
-                            _vm.rol == 1
-                              ? [
-                                  _vm.arrayCreditos[0].estadodesembolso == 0
-                                    ? [
-                                        _c(
-                                          "button",
-                                          {
-                                            staticClass: "btn btn-warning",
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.aprobar(c.id)
-                                              }
-                                            }
-                                          },
-                                          [_vm._v(" Aprobar Credito")]
-                                        ),
-                                        _vm._v(" "),
-                                        _c(
-                                          "button",
-                                          {
-                                            staticClass: "btn btn-danger",
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.desaprobar(c.id)
-                                              }
-                                            }
-                                          },
-                                          [_vm._v(" Desaprobar Credito")]
-                                        )
-                                      ]
-                                    : _vm.arrayCreditos[0].estadodesembolso == 1
-                                    ? [
-                                        _c(
-                                          "button",
-                                          {
-                                            staticClass: "btn btn-success",
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.desembolsar(c.id)
-                                              }
-                                            }
-                                          },
-                                          [_vm._v("Desembolsar")]
-                                        )
-                                      ]
-                                    : _vm._e()
-                                ]
-                              : [
-                                  _vm.arrayCreditos[0].estadodesembolso == 0
-                                    ? _c(
-                                        "button",
-                                        {
-                                          staticClass: "btn btn-success",
-                                          attrs: { disabled: "" }
-                                        },
-                                        [_vm._v(" Credito por aprobar")]
-                                      )
-                                    : _vm.arrayCreditos[0].estadodesembolso == 1
-                                    ? _c(
-                                        "button",
-                                        {
-                                          staticClass: "btn btn-success",
-                                          on: {
-                                            click: function($event) {
-                                              return _vm.desembolsar(c.id)
-                                            }
-                                          }
-                                        },
-                                        [_vm._v("Desembolsar")]
-                                      )
-                                    : _vm._e()
-                                ]
-                          ],
-                          2
-                        ),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3" }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Codigo de Credito:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: { textContent: _vm._s(c.numeroprestamo) }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Monto Financiado:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: {
-                              textContent: _vm._s("S/ " + c.montodesembolsado)
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Número de Cuotas")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: {
-                              textContent: _vm._s(c.numerocuotas + "Cuotas")
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("TEA(Tasa de interes anual)")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", [_vm._v(_vm._s(c.tasa) + " % ")])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Interes Total")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", [_vm._v(" S/ " + _vm._s(c.interes))])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Monto total a Pagar")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", [
-                            _vm._v(
-                              " S/ " +
-                                _vm._s(
-                                  parseFloat(c.montodesembolsado) +
-                                    parseFloat(c.interes)
-                                )
-                            )
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Periodo")
-                          ]),
-                          _vm._v(" "),
-                          c.periodo == 1
-                            ? _c("p", [_vm._v("Anual")])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          c.periodo == 2
-                            ? _c("p", [_vm._v("Semestral")])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          c.periodo == 4
-                            ? _c("p", [_vm._v("Trimestral")])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          c.periodo == 12
-                            ? _c("p", [_vm._v("Mensual")])
-                            : _vm._e()
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3" }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Analista del Crédito")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: {
-                              textContent: _vm._s(
-                                c.usernombre + " " + c.userapellidos
-                              )
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _vm._m(1, true),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3" }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("DNI:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: { textContent: _vm._s(c.sociodni) }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Nombres y apellidos:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: {
-                              textContent: _vm._s(
-                                c.socionombre + " " + c.socioapellidos
-                              )
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Fecha nacimiento:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: {
-                              textContent: _vm._s(c.sociofechanacimiento)
-                            }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Dirección:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: { textContent: _vm._s(c.sociodireccion) }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3 " }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Teléfono:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: { textContent: _vm._s(c.sociotelefono) }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-3" }, [
-                          _c("h5", { staticClass: "font-weight-bold " }, [
-                            _vm._v("Email:")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", {
-                            domProps: { textContent: _vm._s(c.socioemail) }
-                          })
-                        ]),
-                        _vm._v(" "),
-                        _vm._m(2, true),
-                        _vm._v(" "),
-                        c.idgarante != c.idsocio
-                          ? [
-                              _c("div", { staticClass: "col-md-3" }, [
-                                _c("h5", { staticClass: "font-weight-bold " }, [
-                                  _vm._v("DNI:")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", {
-                                  domProps: {
-                                    textContent: _vm._s(c.garantedni)
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "col-md-3 " }, [
-                                _c("h5", { staticClass: "font-weight-bold " }, [
-                                  _vm._v("Nombres y apellidos:")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", {
-                                  domProps: {
-                                    textContent: _vm._s(
-                                      c.garantenombre + " " + c.garanteapellidos
-                                    )
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "col-md-3 " }, [
-                                _c("h5", { staticClass: "font-weight-bold " }, [
-                                  _vm._v("Fecha nacimiento:")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", {
-                                  domProps: {
-                                    textContent: _vm._s(
-                                      c.garantefechanacimiento
-                                    )
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "col-md-3 " }, [
-                                _c("h5", { staticClass: "font-weight-bold " }, [
-                                  _vm._v("Dirección:")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", {
-                                  domProps: {
-                                    textContent: _vm._s(c.garantedireccion)
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "col-md-3 " }, [
-                                _c("h5", { staticClass: "font-weight-bold " }, [
-                                  _vm._v("Teléfono:")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", {
-                                  domProps: {
-                                    textContent: _vm._s(c.garantetelefono)
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "col-md-3" }, [
-                                _c("h5", { staticClass: "font-weight-bold " }, [
-                                  _vm._v("Email:")
-                                ]),
-                                _vm._v(" "),
-                                _c("p", {
-                                  domProps: {
-                                    textContent: _vm._s(c.garanteemail)
-                                  }
-                                })
-                              ])
-                            ]
-                          : [_vm._m(3, true)]
-                      ],
-                      2
-                    )
-                  }),
-                  0
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-lg-12 mt-4 " }, [
-                _vm._m(4),
-                _vm._v(" "),
-                _c("hr"),
-                _vm._v(" "),
-                _c("div", { staticClass: "table-responsive" }, [
-                  _c("table", { staticClass: "table  table-bordered" }, [
-                    _vm._m(5),
-                    _vm._v(" "),
-                    _c(
-                      "tbody",
-                      _vm._l(_vm.arrayCuotas, function(cu) {
-                        return _c(
-                          "tr",
-                          { key: cu.id },
-                          [
-                            _c("td", {
-                              staticClass: "py-1",
-                              domProps: {
-                                textContent: _vm._s(cu.numerodecuota)
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c(
-                              "td",
-                              [
-                                cu.estado == 0 ? [_vm._m(6, true)] : _vm._e(),
-                                _vm._v(" "),
-                                cu.estado == 1
+                                  "Detalle de Crédtio  \n                            "
+                                ),
+                                _vm.estadodes == 3
                                   ? [
+                                      _c(
+                                        "span",
+                                        { staticClass: "bg bg-danger" },
+                                        [_vm._v("  CREDIDO INACTIVO")]
+                                      )
+                                    ]
+                                  : _vm._e()
+                              ],
+                              2
+                            )
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row mt-4 " }, [
+                        _c("div", { staticClass: "col-lg-12 " }, [
+                          _c(
+                            "div",
+                            { staticClass: "template-demo " },
+                            _vm._l(_vm.arrayCreditos, function(c) {
+                              return _c(
+                                "div",
+                                { key: c.id, staticClass: "row" },
+                                [
+                                  _vm._m(0, true),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "col-md-5 " },
+                                    [
                                       _c(
                                         "button",
                                         {
                                           staticClass:
-                                            "btn btn-success btn-rounded btn-icon ",
+                                            "btn btn-primary btn-icon-text",
                                           attrs: { type: "button" },
                                           on: {
                                             click: function($event) {
-                                              return _vm.generarboucher(cu.id)
+                                              return _vm.pdfCronograma()
                                             }
                                           }
                                         },
                                         [
                                           _c("i", {
                                             staticClass:
-                                              "mdi mdi-file-import mdi-24px"
-                                          })
+                                              "mdi mdi-file-pdf btn-icon-prepend"
+                                          }),
+                                          _vm._v(
+                                            "                                                    \n                                            Descargar Cronograma\n                                        "
+                                          )
                                         ]
-                                      )
-                                    ]
-                                  : _vm._e()
-                              ],
-                              2
-                            ),
-                            _vm._v(" "),
-                            cu.estado == 0
-                              ? [
-                                  _c("td", {
-                                    domProps: {
-                                      textContent: _vm._s(cu.fechapago)
-                                    }
-                                  })
-                                ]
-                              : _vm._e(),
-                            _vm._v(" "),
-                            cu.estado == 1
-                              ? [
-                                  _c("td", [
-                                    _vm._v(
-                                      "Fecha de Vencimiento :" +
-                                        _vm._s(cu.fechapago) +
-                                        " "
-                                    ),
-                                    _c("br"),
-                                    _vm._v(
-                                      "\n                                                 Fecha de Pago :  "
-                                    ),
+                                      ),
+                                      _vm._v(" "),
+                                      _vm.rol == 1
+                                        ? [
+                                            _vm.arrayCreditos[0]
+                                              .estadodesembolso == 0
+                                              ? [
+                                                  _c(
+                                                    "button",
+                                                    {
+                                                      staticClass:
+                                                        "btn btn-warning",
+                                                      on: {
+                                                        click: function(
+                                                          $event
+                                                        ) {
+                                                          _vm.vistas = 2
+                                                        }
+                                                      }
+                                                    },
+                                                    [_vm._v(" Aprobar Credito")]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _c(
+                                                    "button",
+                                                    {
+                                                      staticClass:
+                                                        "btn btn-danger",
+                                                      on: {
+                                                        click: function(
+                                                          $event
+                                                        ) {
+                                                          return _vm.desaprobar(
+                                                            c.id
+                                                          )
+                                                        }
+                                                      }
+                                                    },
+                                                    [
+                                                      _vm._v(
+                                                        " Desaprobar Credito"
+                                                      )
+                                                    ]
+                                                  )
+                                                ]
+                                              : _vm.arrayCreditos[0]
+                                                  .estadodesembolso == 1
+                                              ? [
+                                                  _c(
+                                                    "button",
+                                                    {
+                                                      staticClass:
+                                                        "btn btn-success",
+                                                      on: {
+                                                        click: function(
+                                                          $event
+                                                        ) {
+                                                          return _vm.desembolsar(
+                                                            c.id
+                                                          )
+                                                        }
+                                                      }
+                                                    },
+                                                    [_vm._v("Desembolsar")]
+                                                  )
+                                                ]
+                                              : _vm._e()
+                                          ]
+                                        : _vm.rol != 1
+                                        ? [
+                                            _vm.arrayCreditos[0]
+                                              .estadodesembolso == 0
+                                              ? _c(
+                                                  "button",
+                                                  {
+                                                    staticClass:
+                                                      "btn btn-success",
+                                                    attrs: { disabled: "" }
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      " Credito por aprobar"
+                                                    )
+                                                  ]
+                                                )
+                                              : _vm.arrayCreditos[0]
+                                                  .estadodesembolso == 1
+                                              ? _c(
+                                                  "button",
+                                                  {
+                                                    staticClass:
+                                                      "btn btn-success",
+                                                    on: {
+                                                      click: function($event) {
+                                                        return _vm.desembolsar(
+                                                          c.id
+                                                        )
+                                                      }
+                                                    }
+                                                  },
+                                                  [_vm._v("Desembolsar")]
+                                                )
+                                              : _vm._e()
+                                          ]
+                                        : _vm._e()
+                                    ],
+                                    2
+                                  ),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3" }, [
                                     _c(
-                                      "label",
-                                      { staticClass: "badge badge-danger" },
-                                      [_vm._v(_vm._s(cu.fechacancelo))]
-                                    )
-                                  ])
-                                ]
-                              : _vm._e(),
-                            _vm._v(" "),
-                            _c("td", {
-                              domProps: { textContent: _vm._s(cu.monto) }
-                            }),
-                            _vm._v(" "),
-                            _c("td", {
-                              domProps: { textContent: _vm._s(cu.interes) }
-                            }),
-                            _vm._v(" "),
-                            _c("td", {
-                              domProps: { textContent: _vm._s(cu.amortizacion) }
-                            }),
-                            _vm._v(" "),
-                            _c("td", {
-                              domProps: {
-                                textContent: _vm._s(cu.saldopendiente)
-                              }
-                            }),
-                            _vm._v(" "),
-                            cu.estado == 1
-                              ? _c("td", [
-                                  _vm._v(
-                                    _vm._s(cu.nombre) +
-                                      " " +
-                                      _vm._s(cu.apellidos)
-                                  )
-                                ])
-                              : _c("td", [_vm._v(" - ")]),
-                            _vm._v(" "),
-                            cu.estado == 0
-                              ? [
-                                  _c("td", {}, [
-                                    _c(
-                                      "label",
-                                      { staticClass: "badge badge-danger" },
-                                      [_vm._v("Pendiente")]
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Codigo de Credito:")]
                                     ),
                                     _vm._v(" "),
-                                    cu.fechapago < _vm.hoy
-                                      ? _c(
-                                          "label",
-                                          { staticClass: "badge badge-danger" },
-                                          [_vm._v("Cuota Atrasada")]
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(c.numeroprestamo)
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Monto Financiado:")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(
+                                          "S/ " + c.montodesembolsado
                                         )
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Número de Cuotas")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(
+                                          c.numerocuotas + "Cuotas"
+                                        )
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("TEA(Tasa de interes anual)")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", [_vm._v(_vm._s(c.tasa) + " % ")])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Interes Total")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", [
+                                      _vm._v(" S/ " + _vm._s(c.interes))
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Monto total a Pagar")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", [
+                                      _vm._v(
+                                        " S/ " +
+                                          _vm._s(
+                                            parseFloat(c.montodesembolsado) +
+                                              parseFloat(c.interes)
+                                          )
+                                      )
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Periodo")]
+                                    ),
+                                    _vm._v(" "),
+                                    c.periodo == 1
+                                      ? _c("p", [_vm._v("Anual")])
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    c.periodo == 2
+                                      ? _c("p", [_vm._v("Semestral")])
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    c.periodo == 4
+                                      ? _c("p", [_vm._v("Trimestral")])
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    c.periodo == 12
+                                      ? _c("p", [_vm._v("Mensual")])
                                       : _vm._e()
-                                  ])
-                                ]
-                              : cu.estado == 1
-                              ? [_vm._m(7, true)]
-                              : [_vm._m(8, true)]
-                          ],
-                          2
-                        )
-                      }),
-                      0
-                    )
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3" }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Analista del Crédito")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(
+                                          c.usernombre + " " + c.userapellidos
+                                        )
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _vm._m(1, true),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3" }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("DNI:")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(c.sociodni)
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Nombres y apellidos:")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(
+                                          c.socionombre + " " + c.socioapellidos
+                                        )
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Fecha nacimiento:")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(
+                                          c.sociofechanacimiento
+                                        )
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Dirección:")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(c.sociodireccion)
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3 " }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Teléfono:")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(c.sociotelefono)
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "col-md-3" }, [
+                                    _c(
+                                      "h5",
+                                      { staticClass: "font-weight-bold " },
+                                      [_vm._v("Email:")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("p", {
+                                      domProps: {
+                                        textContent: _vm._s(c.socioemail)
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _vm._m(2, true),
+                                  _vm._v(" "),
+                                  c.idgarante != c.idsocio
+                                    ? [
+                                        _c("div", { staticClass: "col-md-3" }, [
+                                          _c(
+                                            "h5",
+                                            {
+                                              staticClass: "font-weight-bold "
+                                            },
+                                            [_vm._v("DNI:")]
+                                          ),
+                                          _vm._v(" "),
+                                          _c("p", {
+                                            domProps: {
+                                              textContent: _vm._s(c.garantedni)
+                                            }
+                                          })
+                                        ]),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "col-md-3 " },
+                                          [
+                                            _c(
+                                              "h5",
+                                              {
+                                                staticClass: "font-weight-bold "
+                                              },
+                                              [_vm._v("Nombres y apellidos:")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("p", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  c.garantenombre +
+                                                    " " +
+                                                    c.garanteapellidos
+                                                )
+                                              }
+                                            })
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "col-md-3 " },
+                                          [
+                                            _c(
+                                              "h5",
+                                              {
+                                                staticClass: "font-weight-bold "
+                                              },
+                                              [_vm._v("Fecha nacimiento:")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("p", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  c.garantefechanacimiento
+                                                )
+                                              }
+                                            })
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "col-md-3 " },
+                                          [
+                                            _c(
+                                              "h5",
+                                              {
+                                                staticClass: "font-weight-bold "
+                                              },
+                                              [_vm._v("Dirección:")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("p", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  c.garantedireccion
+                                                )
+                                              }
+                                            })
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "col-md-3 " },
+                                          [
+                                            _c(
+                                              "h5",
+                                              {
+                                                staticClass: "font-weight-bold "
+                                              },
+                                              [_vm._v("Teléfono:")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("p", {
+                                              domProps: {
+                                                textContent: _vm._s(
+                                                  c.garantetelefono
+                                                )
+                                              }
+                                            })
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("div", { staticClass: "col-md-3" }, [
+                                          _c(
+                                            "h5",
+                                            {
+                                              staticClass: "font-weight-bold "
+                                            },
+                                            [_vm._v("Email:")]
+                                          ),
+                                          _vm._v(" "),
+                                          _c("p", {
+                                            domProps: {
+                                              textContent: _vm._s(
+                                                c.garanteemail
+                                              )
+                                            }
+                                          })
+                                        ])
+                                      ]
+                                    : [_vm._m(3, true)]
+                                ],
+                                2
+                              )
+                            }),
+                            0
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-lg-12 mt-4 " }, [
+                          _vm._m(4),
+                          _vm._v(" "),
+                          _c("hr"),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "table-responsive" }, [
+                            _c(
+                              "table",
+                              { staticClass: "table  table-bordered" },
+                              [
+                                _vm._m(5),
+                                _vm._v(" "),
+                                _c(
+                                  "tbody",
+                                  _vm._l(_vm.arrayCuotas, function(cu) {
+                                    return _c(
+                                      "tr",
+                                      { key: cu.id },
+                                      [
+                                        _c("td", {
+                                          staticClass: "py-1",
+                                          domProps: {
+                                            textContent: _vm._s(
+                                              cu.numerodecuota
+                                            )
+                                          }
+                                        }),
+                                        _vm._v(" "),
+                                        _c(
+                                          "td",
+                                          [
+                                            cu.estado == 0
+                                              ? [_vm._m(6, true)]
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            cu.estado == 1
+                                              ? [
+                                                  _c(
+                                                    "button",
+                                                    {
+                                                      staticClass:
+                                                        "btn btn-success btn-rounded btn-icon ",
+                                                      attrs: { type: "button" },
+                                                      on: {
+                                                        click: function(
+                                                          $event
+                                                        ) {
+                                                          return _vm.generarboucher(
+                                                            cu.id
+                                                          )
+                                                        }
+                                                      }
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "mdi mdi-file-import mdi-24px"
+                                                      })
+                                                    ]
+                                                  )
+                                                ]
+                                              : _vm._e()
+                                          ],
+                                          2
+                                        ),
+                                        _vm._v(" "),
+                                        cu.estado == 0
+                                          ? [
+                                              _c("td", {
+                                                domProps: {
+                                                  textContent: _vm._s(
+                                                    cu.fechapago
+                                                  )
+                                                }
+                                              })
+                                            ]
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        cu.estado == 1
+                                          ? [
+                                              _c("td", [
+                                                _vm._v(
+                                                  "Fecha de Vencimiento :" +
+                                                    _vm._s(cu.fechapago) +
+                                                    " "
+                                                ),
+                                                _c("br"),
+                                                _vm._v(
+                                                  "\n                                                 Fecha de Pago :  "
+                                                ),
+                                                _c(
+                                                  "label",
+                                                  {
+                                                    staticClass:
+                                                      "badge badge-danger"
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      _vm._s(cu.fechacancelo)
+                                                    )
+                                                  ]
+                                                )
+                                              ])
+                                            ]
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        _c("td", {
+                                          domProps: {
+                                            textContent: _vm._s(cu.monto)
+                                          }
+                                        }),
+                                        _vm._v(" "),
+                                        _c("td", {
+                                          domProps: {
+                                            textContent: _vm._s(cu.interes)
+                                          }
+                                        }),
+                                        _vm._v(" "),
+                                        _c("td", {
+                                          domProps: {
+                                            textContent: _vm._s(cu.amortizacion)
+                                          }
+                                        }),
+                                        _vm._v(" "),
+                                        _c("td", {
+                                          domProps: {
+                                            textContent: _vm._s(
+                                              cu.saldopendiente
+                                            )
+                                          }
+                                        }),
+                                        _vm._v(" "),
+                                        cu.estado == 1
+                                          ? _c("td", [
+                                              _vm._v(
+                                                _vm._s(cu.nombre) +
+                                                  " " +
+                                                  _vm._s(cu.apellidos)
+                                              )
+                                            ])
+                                          : _c("td", [_vm._v(" - ")]),
+                                        _vm._v(" "),
+                                        cu.estado == 0
+                                          ? [
+                                              _c("td", {}, [
+                                                _c(
+                                                  "label",
+                                                  {
+                                                    staticClass:
+                                                      "badge badge-danger"
+                                                  },
+                                                  [_vm._v("Pendiente")]
+                                                ),
+                                                _vm._v(" "),
+                                                cu.fechapago < _vm.hoy
+                                                  ? _c(
+                                                      "label",
+                                                      {
+                                                        staticClass:
+                                                          "badge badge-danger"
+                                                      },
+                                                      [_vm._v("Cuota Atrasada")]
+                                                    )
+                                                  : _vm._e()
+                                              ])
+                                            ]
+                                          : cu.estado == 1
+                                          ? [_vm._m(7, true)]
+                                          : [_vm._m(8, true)]
+                                      ],
+                                      2
+                                    )
+                                  }),
+                                  0
+                                )
+                              ]
+                            )
+                          ])
+                        ])
+                      ])
+                    ])
                   ])
-                ])
-              ])
+                ]
+              )
             ])
-          ])
-        ])
-      ])
-    ])
-  ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.vistas == 2
+        ? [
+            _c("div", { staticClass: "row " }, [
+              _c(
+                "div",
+                { staticClass: "col-lg-12 grid-margin stretch-card " },
+                [
+                  _c("div", { staticClass: "card " }, [
+                    _c("div", { staticClass: "card-body " }, [
+                      _vm._m(9),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row  " }, [
+                        _c("div", { staticClass: "col-md-12" }, [
+                          _c("span", [
+                            _vm._v("Marque los opciones que cumpla el crédito")
+                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f1,
+                                    expression: "f1"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f1)
+                                    ? _vm._i(_vm.f1, null) > -1
+                                    : _vm.f1
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f1,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f1 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f1 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f1 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Solicitud de Préstamo                                       \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f2,
+                                    expression: "f2"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f2)
+                                    ? _vm._i(_vm.f2, null) > -1
+                                    : _vm.f2
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f2,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f2 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f2 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f2 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Pagaré                                      \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f3,
+                                    expression: "f3"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f3)
+                                    ? _vm._i(_vm.f3, null) > -1
+                                    : _vm.f3
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f3,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f3 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f3 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f3 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Contrato                                       \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f4,
+                                    expression: "f4"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f4)
+                                    ? _vm._i(_vm.f4, null) > -1
+                                    : _vm.f4
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f4,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f4 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f4 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f4 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Copia de DNI del Socio Titular, conyuge y garante                                      \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f5,
+                                    expression: "f5"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f5)
+                                    ? _vm._i(_vm.f5, null) > -1
+                                    : _vm.f5
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f5,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f5 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f5 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f5 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Copia de las boletas de los 2 últimos meses                                       \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f6,
+                                    expression: "f6"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f6)
+                                    ? _vm._i(_vm.f6, null) > -1
+                                    : _vm.f6
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f6,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f6 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f6 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f6 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Central de Riesgo                                      \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f7,
+                                    expression: "f7"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f7)
+                                    ? _vm._i(_vm.f7, null) > -1
+                                    : _vm.f7
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f7,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f7 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f7 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f7 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Se aceptan otros ingresos, o ingresos conyugales                                      \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "form-check form-check-inline" },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.f8,
+                                    expression: "f8"
+                                  }
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.f8)
+                                    ? _vm._i(_vm.f8, null) > -1
+                                    : _vm.f8
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$a = _vm.f8,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 && (_vm.f8 = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.f8 = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.f8 = $$c
+                                    }
+                                  }
+                                }
+                              }),
+                              _vm._v(
+                                " Copia del recibo del servicio de luz o agua                                      \n                                "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-warning",
+                              on: {
+                                click: function($event) {
+                                  return _vm.aprobar(_vm.arrayCreditos[0].id)
+                                }
+                              }
+                            },
+                            [_vm._v(" Aprobar Credito")]
+                          )
+                        ])
+                      ])
+                    ])
+                  ])
+                ]
+              )
+            ])
+          ]
+        : _vm._e()
+    ],
+    2
+  )
 }
 var staticRenderFns = [
   function() {
@@ -46652,6 +47935,16 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("td", [
       _c("label", { staticClass: "badge badge-warning" }, [_vm._v("Error-")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row bg bg-dark " }, [
+      _c("div", { staticClass: "col-md-12 mt-2 text-white " }, [
+        _c("h4", [_vm._v("Requisitos para aprobar Crédito")])
+      ])
     ])
   }
 ]
@@ -65405,8 +66698,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
