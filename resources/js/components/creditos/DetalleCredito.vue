@@ -35,7 +35,7 @@
                                             <template v-if="rol==1">
                                                     <template v-if="arrayCreditos[0].estadodesembolso==0">
                                                         <button  class="btn btn-warning" @click="vistas=2"> Aprobar Credito</button>
-                                                        <button  class="btn btn-danger" @click="desaprobar(c.id)"> Desaprobar Credito</button>
+                                                       
                                                     </template>
                                                     <template v-else-if="arrayCreditos[0].estadodesembolso==1">
                                                         <button  class="btn btn-success" @click="desembolsar(c.id)">Desembolsar</button>
@@ -268,32 +268,33 @@
                                 <div class="col-md-12">
                                       <span>Marque los opciones que cumpla el crédito</span>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f1" type="checkbox"> Solicitud de Préstamo                                       
+                                        <input class="form-check-input"  value="f1" v-model="requisistos" type="checkbox"> Solicitud de Préstamo                                       
                                     </div>
                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f2" type="checkbox"> Pagaré                                      
+                                        <input class="form-check-input"  value="f2" v-model="requisistos" type="checkbox"> Pagaré                                      
                                     </div>
                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f3" type="checkbox"> Contrato                                       
+                                        <input class="form-check-input"  value="f3"  v-model="requisistos" type="checkbox"> Contrato                                       
                                     </div>
                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f4" type="checkbox"> Copia de DNI del Socio Titular, conyuge y garante                                      
+                                        <input class="form-check-input"   value="f4" v-model="requisistos" type="checkbox"> Copia de DNI del Socio Titular, conyuge y garante                                      
                                     </div>
                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f5" type="checkbox"> Copia de las boletas de los 2 últimos meses                                       
+                                        <input class="form-check-input"   value="f5" v-model="requisistos" type="checkbox"> Copia de las boletas de los 2 últimos meses                                       
                                     </div>
                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f6" type="checkbox"> Central de Riesgo                                      
+                                        <input class="form-check-input"  value="f6"  v-model="requisistos" type="checkbox"> Central de Riesgo                                      
+                                    </div> 
+                                      <div class="form-check form-check-inline">
+                                        <input class="form-check-input"  value="f7"  v-model="requisistos" type="checkbox"> Se aceptan otros ingresos, o ingresos conyugales                                      
                                     </div>
                                       <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f7" type="checkbox"> Se aceptan otros ingresos, o ingresos conyugales                                      
-                                    </div>
-                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input"  v-model="f8" type="checkbox"> Copia del recibo del servicio de luz o agua                                      
+                                        <input class="form-check-input"  value="f8"  v-model="requisistos" type="checkbox"> Copia del recibo del servicio de luz o agua                                      
                                     </div>
 
 
-                                       <button  class="btn btn-warning" @click="aprobar(arrayCreditos[0].id)"> Aprobar Credito</button>
+                                       <button  class="btn btn-warning" @click="aprobar(arrayCreditos[0].id);"> Aprobar Credito</button>
+                                        <button  class="btn btn-danger" @click="desaprobar(arrayCreditos[0].id);"> Desaprobar Credito</button>
                                    
 
                                    
@@ -305,6 +306,56 @@
             </div>
                           
 
+        </template>
+        <template v-if="vistas==3">
+                 <div class="row ">
+                <div class="col-lg-12 grid-margin stretch-card ">
+                    <div class="card ">
+                        <div class="card-body ">
+                             <div class="row bg bg-dark ">
+                                 <div class="col-md-12 mt-2 text-white ">
+                                     <h4>Requisitos para aprobar Crédito</h4>
+                                   
+                                </div>
+                             </div>
+                             <div class="row  ">
+                                <div class="col-md-12">
+                                     <template v-if="estadoaprobado==0">
+                                        <div class="card">
+                                            <div class="card-body">
+                                            <h4 class="card-title">El Credito ha sido desaprobado</h4>
+                                            <div class="media">
+                                                <i class="mdi mdi-earth icon-md text-info d-flex align-self-start mr-3"></i>
+                                                <div class="media-body">
+                                                <p class="card-text">El crédito no ha cumplido con los requisitos para ser aprobado, y queda inactivo</p>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                     </template>
+                                     <template v-if="estadoaprobado==1">
+                                         <div class="card">
+                                            <div class="card-body">
+                                            <h4 class="card-title">El Credito ha sido Aprobado</h4>
+                                            <div class="media">
+                                                <i class="mdi mdi-earth icon-md text-info d-flex align-self-start mr-3"></i>
+                                                <div class="media-body">
+                                                <p class="card-text">El crédito ha sido aprobado, puede descargar el el cronograma de pagos</p>
+                                                 <button type="button" @click="pdfCronograma()" class="btn btn-primary btn-icon-text">
+                                                <i class="mdi mdi-file-pdf btn-icon-prepend"></i>                                                    
+                                                Descargar Cronograma
+                                                </button>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </template>                                 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </template>
         <!--fin aprobar credito-->
     </main>
@@ -322,7 +373,12 @@ export default {
 
             hoy:'',
             vistas:1,
-            fi:'', f2:'', f3:'', f4:'', f5:'', f6:'', f7:'', f8:'',
+            f1:'', f2:'', f3:'', f4:'', f5:'', f6:'', f7:'', f8:'',
+
+            errorRequisistos:0,
+            errorMostrarMsjRequisistos :[],
+            requisistos:[],
+            estadoaprobado:'',
         }
     },
     computed:
@@ -381,35 +437,51 @@ export default {
                     }
                  })
             },
-                     aprobar(id){
+        aprobar(id){
+             if (this.validarRequisistos()==true){ 
+            let me = this;
+            Swal.fire({
+            title: '',
+            text: "¿Está seguro que desea APROBAR EL CREDITO?",
+            type: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Si'
+            }).then((result) => {
+            if (result.value) {
+                axios.put(this.ruta+'/credito/aprobar',{
+            'id': id,
+                }).then(function (response) {
+                    me.vistas=3;
+                    me.estadoaprobado=1;
+                Swal.fire(
+                '', 'El credito ha sido APROBADO ',
+                'success'
+                )  
+                    this.detalleCredito();
                 
-                  let me = this;
-                    Swal.fire({
-                    title: '',
-                    text: "¿Está seguro que desea APROBAR EL CREDITO?",
-                    type: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                     cancelButtonText: 'Cancelar',
-                    confirmButtonText: 'Si'
-                    }).then((result) => {
-                    if (result.value) {
-                       axios.put(this.ruta+'/credito/aprobar',{
-                    'id': id,
-                        }).then(function (response) {
+                        
+                }).catch(function (error) {
+                        console.log(error);
+                    });
+            }
+            })
+             } 
+             else{
+                 Swal.fire({
+                    type: 'error',
+                    title: 'Error',
+                    text: 'El credito no se puede aprobar',
+                    footer: '<a href>Todos los requisitos son obligatorios</a>'
+                    })
+             }},
+            validarRequisistos(){
+                if(this.requisistos.length==8){
+                    return true;
+                }
 
-                        Swal.fire(
-                        '', 'El credito ha sido APROBADO ',
-                        'success'
-                        )  
-                          this.detalleCredito();
-                               
-                      }).catch(function (error) {
-                                console.log(error);
-                            });
-                    }
-                 })
             },
 
               desaprobar(id){
@@ -429,12 +501,14 @@ export default {
                        axios.put(this.ruta+'/credito/desaprobar',{
                     'id': id,
                         }).then(function (response) {
-
+                              me.vistas=3;
+                             me.estadoaprobado=0;
                         Swal.fire(
                         '', 'El credito ha sido DESAPROBADO ',
                         'success'
                         )  
                           this.detalleCredito();
+                         
                                
                       }).catch(function (error) {
                                 console.log(error);

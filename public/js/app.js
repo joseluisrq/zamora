@@ -4123,6 +4123,57 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['id', 'rol'],
   data: function data() {
@@ -4133,14 +4184,18 @@ __webpack_require__.r(__webpack_exports__);
       arrayCuotas: [],
       hoy: '',
       vistas: 1,
-      fi: '',
+      f1: '',
       f2: '',
       f3: '',
       f4: '',
       f5: '',
       f6: '',
       f7: '',
-      f8: ''
+      f8: '',
+      errorRequisistos: 0,
+      errorMostrarMsjRequisistos: [],
+      requisistos: [],
+      estadoaprobado: ''
     };
   },
   computed: {},
@@ -4192,28 +4247,44 @@ __webpack_require__.r(__webpack_exports__);
     aprobar: function aprobar(id) {
       var _this2 = this;
 
-      var me = this;
-      Swal.fire({
-        title: '',
-        text: "¿Está seguro que desea APROBAR EL CREDITO?",
-        type: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        cancelButtonText: 'Cancelar',
-        confirmButtonText: 'Si'
-      }).then(function (result) {
-        if (result.value) {
-          axios.put(_this2.ruta + '/credito/aprobar', {
-            'id': id
-          }).then(function (response) {
-            Swal.fire('', 'El credito ha sido APROBADO ', 'success');
-            this.detalleCredito();
-          })["catch"](function (error) {
-            console.log(error);
-          });
-        }
-      });
+      if (this.validarRequisistos() == true) {
+        var me = this;
+        Swal.fire({
+          title: '',
+          text: "¿Está seguro que desea APROBAR EL CREDITO?",
+          type: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          cancelButtonText: 'Cancelar',
+          confirmButtonText: 'Si'
+        }).then(function (result) {
+          if (result.value) {
+            axios.put(_this2.ruta + '/credito/aprobar', {
+              'id': id
+            }).then(function (response) {
+              me.vistas = 3;
+              me.estadoaprobado = 1;
+              Swal.fire('', 'El credito ha sido APROBADO ', 'success');
+              this.detalleCredito();
+            })["catch"](function (error) {
+              console.log(error);
+            });
+          }
+        });
+      } else {
+        Swal.fire({
+          type: 'error',
+          title: 'Error',
+          text: 'El credito no se puede aprobar',
+          footer: '<a href>Todos los requisitos son obligatorios</a>'
+        });
+      }
+    },
+    validarRequisistos: function validarRequisistos() {
+      if (this.requisistos.length == 8) {
+        return true;
+      }
     },
     desaprobar: function desaprobar(id) {
       var _this3 = this;
@@ -4233,6 +4304,8 @@ __webpack_require__.r(__webpack_exports__);
           axios.put(_this3.ruta + '/credito/desaprobar', {
             'id': id
           }).then(function (response) {
+            me.vistas = 3;
+            me.estadoaprobado = 0;
             Swal.fire('', 'El credito ha sido DESAPROBADO ', 'success');
             this.detalleCredito();
           })["catch"](function (error) {
@@ -5583,6 +5656,51 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['idcliente'],
   data: function data() {
@@ -5612,7 +5730,8 @@ __webpack_require__.r(__webpack_exports__);
       fechapago: '',
       diasdemora: '',
       morahastahoy: 0.0,
-      estadomora: "0"
+      estadomora: "0",
+      pagodeposito: false
     };
   },
   computed: {},
@@ -46770,28 +46889,6 @@ var render = function() {
                                                       }
                                                     },
                                                     [_vm._v(" Aprobar Credito")]
-                                                  ),
-                                                  _vm._v(" "),
-                                                  _c(
-                                                    "button",
-                                                    {
-                                                      staticClass:
-                                                        "btn btn-danger",
-                                                      on: {
-                                                        click: function(
-                                                          $event
-                                                        ) {
-                                                          return _vm.desaprobar(
-                                                            c.id
-                                                          )
-                                                        }
-                                                      }
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        " Desaprobar Credito"
-                                                      )
-                                                    ]
                                                   )
                                                 ]
                                               : _vm.arrayCreditos[0]
@@ -47425,35 +47522,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f1,
-                                    expression: "f1"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f1", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f1)
-                                    ? _vm._i(_vm.f1, null) > -1
-                                    : _vm.f1
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f1") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f1,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f1",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f1 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f1 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f1 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47473,35 +47571,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f2,
-                                    expression: "f2"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f2", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f2)
-                                    ? _vm._i(_vm.f2, null) > -1
-                                    : _vm.f2
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f2") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f2,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f2",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f2 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f2 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f2 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47521,35 +47620,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f3,
-                                    expression: "f3"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f3", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f3)
-                                    ? _vm._i(_vm.f3, null) > -1
-                                    : _vm.f3
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f3") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f3,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f3",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f3 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f3 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f3 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47569,35 +47669,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f4,
-                                    expression: "f4"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f4", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f4)
-                                    ? _vm._i(_vm.f4, null) > -1
-                                    : _vm.f4
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f4") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f4,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f4",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f4 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f4 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f4 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47617,35 +47718,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f5,
-                                    expression: "f5"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f5", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f5)
-                                    ? _vm._i(_vm.f5, null) > -1
-                                    : _vm.f5
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f5") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f5,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f5",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f5 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f5 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f5 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47665,35 +47767,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f6,
-                                    expression: "f6"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f6", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f6)
-                                    ? _vm._i(_vm.f6, null) > -1
-                                    : _vm.f6
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f6") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f6,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f6",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f6 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f6 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f6 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47713,35 +47816,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f7,
-                                    expression: "f7"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f7", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f7)
-                                    ? _vm._i(_vm.f7, null) > -1
-                                    : _vm.f7
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f7") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f7,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f7",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f7 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f7 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f7 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47761,35 +47865,36 @@ var render = function() {
                                   {
                                     name: "model",
                                     rawName: "v-model",
-                                    value: _vm.f8,
-                                    expression: "f8"
+                                    value: _vm.requisistos,
+                                    expression: "requisistos"
                                   }
                                 ],
                                 staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
+                                attrs: { value: "f8", type: "checkbox" },
                                 domProps: {
-                                  checked: Array.isArray(_vm.f8)
-                                    ? _vm._i(_vm.f8, null) > -1
-                                    : _vm.f8
+                                  checked: Array.isArray(_vm.requisistos)
+                                    ? _vm._i(_vm.requisistos, "f8") > -1
+                                    : _vm.requisistos
                                 },
                                 on: {
                                   change: function($event) {
-                                    var $$a = _vm.f8,
+                                    var $$a = _vm.requisistos,
                                       $$el = $event.target,
                                       $$c = $$el.checked ? true : false
                                     if (Array.isArray($$a)) {
-                                      var $$v = null,
+                                      var $$v = "f8",
                                         $$i = _vm._i($$a, $$v)
                                       if ($$el.checked) {
-                                        $$i < 0 && (_vm.f8 = $$a.concat([$$v]))
+                                        $$i < 0 &&
+                                          (_vm.requisistos = $$a.concat([$$v]))
                                       } else {
                                         $$i > -1 &&
-                                          (_vm.f8 = $$a
+                                          (_vm.requisistos = $$a
                                             .slice(0, $$i)
                                             .concat($$a.slice($$i + 1)))
                                       }
                                     } else {
-                                      _vm.f8 = $$c
+                                      _vm.requisistos = $$c
                                     }
                                   }
                                 }
@@ -47811,8 +47916,108 @@ var render = function() {
                               }
                             },
                             [_vm._v(" Aprobar Credito")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-danger",
+                              on: {
+                                click: function($event) {
+                                  return _vm.desaprobar(_vm.arrayCreditos[0].id)
+                                }
+                              }
+                            },
+                            [_vm._v(" Desaprobar Credito")]
                           )
                         ])
+                      ])
+                    ])
+                  ])
+                ]
+              )
+            ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.vistas == 3
+        ? [
+            _c("div", { staticClass: "row " }, [
+              _c(
+                "div",
+                { staticClass: "col-lg-12 grid-margin stretch-card " },
+                [
+                  _c("div", { staticClass: "card " }, [
+                    _c("div", { staticClass: "card-body " }, [
+                      _vm._m(10),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row  " }, [
+                        _c(
+                          "div",
+                          { staticClass: "col-md-12" },
+                          [
+                            _vm.estadoaprobado == 0 ? [_vm._m(11)] : _vm._e(),
+                            _vm._v(" "),
+                            _vm.estadoaprobado == 1
+                              ? [
+                                  _c("div", { staticClass: "card" }, [
+                                    _c("div", { staticClass: "card-body" }, [
+                                      _c("h4", { staticClass: "card-title" }, [
+                                        _vm._v("El Credito ha sido Aprobado")
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("div", { staticClass: "media" }, [
+                                        _c("i", {
+                                          staticClass:
+                                            "mdi mdi-earth icon-md text-info d-flex align-self-start mr-3"
+                                        }),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "media-body" },
+                                          [
+                                            _c(
+                                              "p",
+                                              { staticClass: "card-text" },
+                                              [
+                                                _vm._v(
+                                                  "El crédito ha sido aprobado, puede descargar el el cronograma de pagos"
+                                                )
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "button",
+                                              {
+                                                staticClass:
+                                                  "btn btn-primary btn-icon-text",
+                                                attrs: { type: "button" },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.pdfCronograma()
+                                                  }
+                                                }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "mdi mdi-file-pdf btn-icon-prepend"
+                                                }),
+                                                _vm._v(
+                                                  "                                                    \n                                            Descargar Cronograma\n                                            "
+                                                )
+                                              ]
+                                            )
+                                          ]
+                                        )
+                                      ])
+                                    ])
+                                  ])
+                                ]
+                              : _vm._e()
+                          ],
+                          2
+                        )
                       ])
                     ])
                   ])
@@ -47944,6 +48149,43 @@ var staticRenderFns = [
     return _c("div", { staticClass: "row bg bg-dark " }, [
       _c("div", { staticClass: "col-md-12 mt-2 text-white " }, [
         _c("h4", [_vm._v("Requisitos para aprobar Crédito")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row bg bg-dark " }, [
+      _c("div", { staticClass: "col-md-12 mt-2 text-white " }, [
+        _c("h4", [_vm._v("Requisitos para aprobar Crédito")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card" }, [
+      _c("div", { staticClass: "card-body" }, [
+        _c("h4", { staticClass: "card-title" }, [
+          _vm._v("El Credito ha sido desaprobado")
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "media" }, [
+          _c("i", {
+            staticClass:
+              "mdi mdi-earth icon-md text-info d-flex align-self-start mr-3"
+          }),
+          _vm._v(" "),
+          _c("div", { staticClass: "media-body" }, [
+            _c("p", { staticClass: "card-text" }, [
+              _vm._v(
+                "El crédito no ha cumplido con los requisitos para ser aprobado, y queda inactivo"
+              )
+            ])
+          ])
+        ])
       ])
     ])
   }
@@ -50219,7 +50461,9 @@ var render = function() {
                       _c("hr"),
                       _vm._v(" "),
                       _c("div", { staticClass: "row" }, [
-                        _c("div", { staticClass: "col-md-9" }, [
+                        _vm._m(3, true),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-6" }, [
                           _vm.botoncuota
                             ? _c(
                                 "button",
@@ -50235,12 +50479,93 @@ var render = function() {
                                     }
                                   }
                                 },
-                                [_vm._v("Pagar Cuota")]
+                                [_vm._v("Pagar en Efectivo")]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.botoncuota
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-success col-md-4",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.pagodeposito = true
+                                    }
+                                  }
+                                },
+                                [_vm._v("Pago en Deposito a Cuenta")]
                               )
                             : _vm._e()
                         ])
                       ])
-                    ])
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "col-md-12" },
+                      [
+                        _vm.pagodeposito == true
+                          ? [
+                              _c("div", { staticClass: "row" }, [
+                                _c("div", { staticClass: "col-md-12" }, [
+                                  _c("div", { staticClass: "card" }, [
+                                    _c("div", { staticClass: "card-body" }, [
+                                      _c("h4", { staticClass: "card-title" }, [
+                                        _vm._v("Detalle de Pago por Deposito")
+                                      ]),
+                                      _vm._v(" "),
+                                      _c(
+                                        "p",
+                                        { staticClass: "card-description" },
+                                        [
+                                          _vm._v(
+                                            "\n                                               Inserte la informacion del deposito \n                                            "
+                                          )
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "form",
+                                        { staticClass: "forms-sample" },
+                                        [
+                                          _vm._m(4, true),
+                                          _vm._v(" "),
+                                          _vm._m(5, true),
+                                          _vm._v(" "),
+                                          _vm._m(6, true),
+                                          _vm._v(" "),
+                                          _vm.botoncuota
+                                            ? _c(
+                                                "button",
+                                                {
+                                                  staticClass:
+                                                    "btn btn-success col-md-4",
+                                                  attrs: { type: "button" },
+                                                  on: {
+                                                    click: function($event) {
+                                                      return _vm.pagarDeposito(
+                                                        c.idcuota,
+                                                        c.idpersona
+                                                      )
+                                                    }
+                                                  }
+                                                },
+                                                [_vm._v("Pago en Cuota")]
+                                              )
+                                            : _vm._e()
+                                        ]
+                                      )
+                                    ])
+                                  ])
+                                ])
+                              ])
+                            ]
+                          : _vm._e()
+                      ],
+                      2
+                    )
                   ])
                 }),
                 0
@@ -50355,6 +50680,92 @@ var staticRenderFns = [
       ]),
       _vm._v(" "),
       _c("hr")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12" }, [
+      _c("h4", [_vm._v("Forma de Pago")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group row" }, [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-3 col-form-label",
+          attrs: { for: "exampleInputUsername2" }
+        },
+        [_vm._v("Número de Transacción ")]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-3" }, [
+        _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            id: "exampleInputUsername2",
+            placeholder: "Username"
+          }
+        })
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group row" }, [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-5 col-form-label",
+          attrs: { for: "exampleInputEmail2" }
+        },
+        [_vm._v("Fecha de Pago")]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-3" }, [
+        _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "email",
+            id: "exampleInputEmail2",
+            placeholder: "Email"
+          }
+        })
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group row" }, [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-3 col-form-label",
+          attrs: { for: "exampleInputMobile" }
+        },
+        [_vm._v("Monto")]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-3" }, [
+        _c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            id: "exampleInputMobile",
+            placeholder: "Mobile number"
+          }
+        })
+      ])
     ])
   }
 ]
