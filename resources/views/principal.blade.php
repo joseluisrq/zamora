@@ -9,7 +9,7 @@
      <link rel="stylesheet" href="vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="vendors/base/vendor.bundle.base.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="js/Chart.min.js">
+   
     <link rel="shortcut icon" href="images/logo.png" />
   </head>
   <body>
@@ -107,7 +107,7 @@
  
     <script src="vendors/base/vendor.bundle.base.js"></script>
 
-    <script src="http://momentjs.com/downloads/moment.min.js"></script>
+    <script src="js/moment.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/all.js"></script>
 
@@ -118,7 +118,7 @@
 	<script src="vendors/chartjs-plugin-datalabels/chartjs-plugin-datalabels.js"></script>
 	<script src="vendors/justgage/raphael-2.1.4.min.js"></script>
     <script src="vendors/justgage/justgage.js"></script>
-    <script src="http://momentjs.com/downloads/moment.min.js"></script>
+    <script src="js/moment.min.js"></script>
     <script>
     $('#myDropdown').on('show.bs.dropdown', function () {
   // do something…

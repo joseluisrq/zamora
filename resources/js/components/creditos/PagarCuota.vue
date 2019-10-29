@@ -170,7 +170,7 @@
                                                             <input type="number" class="form-control" id="exampleInputMobile" v-model="montodeposito"  placeholder="Monto a Depositar">
                                                         </div>
                                                     </div>
-                                                      <button type="button" v-if="botoncuota" @click="pagarDeposito(c.idcuota,c.idpersona)" class="btn btn-success col-md-4" >Pago de Cuota</button> 
+                                                      <button type="button" v-if="botoncuota" @click="pagarDeposito()" class="btn btn-success col-md-4" >Pago de Cuota</button> 
                                                         <button type="button"  @click="pagodeposito=false;transacciondeposito='';fechapagodeposito='';montodeposito='';" class="btn btn-danger col-md-4" >Cancelar</button>  
                                                   
                                                 </form>
@@ -299,7 +299,7 @@ export default {
                     this.dataC = res.data.cuotas;
                     this.fechapago=this.dataC[0].fechapago
                     this.montodeposito=this.dataC[0].monto;
-                     this.montoestandar=this.dataC[0].monto;
+                    // this.montoestandar=this.dataC[0].monto;
                    // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
                    // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
                      })
@@ -310,7 +310,40 @@ export default {
             pagarDeposito(){
                 let me= this;
                 if(me.transacciondeposito!=''&& me.fechapagodeposito!='' && me.montodeposito!=0 ){
-                    if(me.montoestandar>=me.montodeposito){
+                    if(me.montoestandar<=me.montodeposito){
+                          axios.put(this.ruta+'/cuota/pagarCuotaDeposito',{
+                            'id': me.dataC[0].idcuota,
+                            'descripcion': this.descpagocuota,
+                            'mora': this.morahastahoy,
+                            'idsocio':me.dataC[0].idpersona,
+                            'montodeposito':me.montodeposito,
+                            'transacciondeposito':me.transacciondeposito,
+                            'fechapagodeposito':me.fechapagodeposito,
+                            'estadomora':this.estadomora
+                        
+                        })
+                            .then(res => {
+                                 this.mostrarpagar=false;
+                                this.identificadorcuota=me.dataC[0].idcuota
+                            Swal.fire({
+                                position: 'top-end',
+                                type: 'success',
+                                title: 'El pago se realizó exitosameente',
+                                showConfirmButton: false,
+                                timer: 2000
+                                })
+                               
+                        
+                            })
+                            .catch(err => {
+                                Swal.fire({
+                                position: 'top-end',
+                                type: 'error',
+                                title: 'Error, No se realizó el pago',
+                                showConfirmButton: false,
+                                timer: 1500
+                                })
+                            });
 
                     }
                     else{
@@ -390,8 +423,8 @@ export default {
                    parseFloat(CP*(Math.pow(parseFloat(1)+parseFloat(TM),DM)-1))
                    ;
                    me.morahastahoy=(M-C).toFixed(2);
-                   me.montodeposito=me.morahastahoy+me.montodeposito;
-                    me.montoestandar= me.morahastahoy+me.montoestandar;
+                   me.montodeposito=parseFloat(me.morahastahoy)+parseFloat(me.montodeposito);
+                   me.montoestandar= me.montodeposito;
                    console.log(me.morahastahoy)
                }
                else{
@@ -409,6 +442,7 @@ export default {
                     me.tasa_compensatoria_anual =  res.data.config.tasa_compensatoria_anual;
                     me.tasa_moratoria_anual = res.data.config.tasa_moratoria_anual;
                     me.hoy = res.data.hoy;
+                    me.fechapagodeposito=me.hoy;
                     me.interespormora();
                 })
                 .catch(err => {

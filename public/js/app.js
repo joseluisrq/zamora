@@ -5749,18 +5749,49 @@ __webpack_require__.r(__webpack_exports__);
       axios.get(this.ruta + '/cuota/detallepagar?id=' + this.idcliente).then(function (res) {
         _this.dataC = res.data.cuotas;
         _this.fechapago = _this.dataC[0].fechapago;
-        _this.montodeposito = _this.dataC[0].monto;
-        _this.montoestandar = _this.dataC[0].monto; // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
+        _this.montodeposito = _this.dataC[0].monto; // this.montoestandar=this.dataC[0].monto;
+        // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
         // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
       })["catch"](function (err) {
         console.log(err);
       });
     },
     pagarDeposito: function pagarDeposito() {
+      var _this2 = this;
+
       var me = this;
 
       if (me.transacciondeposito != '' && me.fechapagodeposito != '' && me.montodeposito != 0) {
-        if (me.montoestandar >= me.montodeposito) {} else {
+        if (me.montoestandar <= me.montodeposito) {
+          axios.put(this.ruta + '/cuota/pagarCuotaDeposito', {
+            'id': me.dataC[0].idcuota,
+            'descripcion': this.descpagocuota,
+            'mora': this.morahastahoy,
+            'idsocio': me.dataC[0].idpersona,
+            'montodeposito': me.montodeposito,
+            'transacciondeposito': me.transacciondeposito,
+            'fechapagodeposito': me.fechapagodeposito,
+            'estadomora': this.estadomora
+          }).then(function (res) {
+            _this2.mostrarpagar = false;
+            _this2.identificadorcuota = me.dataC[0].idcuota;
+            Swal.fire({
+              position: 'top-end',
+              type: 'success',
+              title: 'El pago se realizó exitosameente',
+              showConfirmButton: false,
+              timer: 2000
+            });
+          })["catch"](function (err) {
+            Swal.fire({
+              position: 'top-end',
+              type: 'error',
+              title: 'Error, No se realizó el pago',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          });
+        } else {
           Swal.fire({
             type: 'error',
             title: 'Error',
@@ -5778,7 +5809,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     //pagar cuota
     pagarCuota: function pagarCuota(idcuota, idpersona) {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.put(this.ruta + '/cuota/pagarCuota', {
         'id': idcuota,
@@ -5794,8 +5825,8 @@ __webpack_require__.r(__webpack_exports__);
           showConfirmButton: false,
           timer: 2000
         });
-        _this2.mostrarpagar = false;
-        _this2.identificadorcuota = idcuota;
+        _this3.mostrarpagar = false;
+        _this3.identificadorcuota = idcuota;
       })["catch"](function (err) {
         Swal.fire({
           position: 'top-end',
@@ -5823,8 +5854,8 @@ __webpack_require__.r(__webpack_exports__);
         var TM = this.tasa_moratoria_anual / 100;
         M = parseFloat(C) + parseFloat(CP * (Math.pow(parseFloat(1) + parseFloat(TC), DM) - 1)) + parseFloat(CP * (Math.pow(parseFloat(1) + parseFloat(TM), DM) - 1));
         me.morahastahoy = (M - C).toFixed(2);
-        me.montodeposito = me.morahastahoy + me.montodeposito;
-        me.montoestandar = me.morahastahoy + me.montoestandar;
+        me.montodeposito = parseFloat(me.morahastahoy) + parseFloat(me.montodeposito);
+        me.montoestandar = me.montodeposito;
         console.log(me.morahastahoy);
       } else {
         me.morahastahoy = 0;
@@ -5838,6 +5869,7 @@ __webpack_require__.r(__webpack_exports__);
         me.tasa_compensatoria_anual = res.data.config.tasa_compensatoria_anual;
         me.tasa_moratoria_anual = res.data.config.tasa_moratoria_anual;
         me.hoy = res.data.hoy;
+        me.fechapagodeposito = me.hoy;
         me.interespormora();
       })["catch"](function (err) {
         //  me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
@@ -50751,10 +50783,7 @@ var render = function() {
                                                   attrs: { type: "button" },
                                                   on: {
                                                     click: function($event) {
-                                                      return _vm.pagarDeposito(
-                                                        c.idcuota,
-                                                        c.idpersona
-                                                      )
+                                                      return _vm.pagarDeposito()
                                                     }
                                                   }
                                                 },
@@ -67255,8 +67284,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

@@ -247,8 +247,11 @@ class CuotaController extends Controller
             $cuota->mora =$request->mora;
             $cuota->fechacancelo = Carbon::now('America/Lima');
             $cuota->estado ='1';
+            $cuota->tipopago=1;
+            $cuota->transaccion='0';
+            $cuota->pagodeposito = 0;
             $cuota->estado_mora = '1';
-            $cuota->idcajero =14; //cambiar por usuario
+            $cuota->idcajero = \Auth::user()->id;; //cambiar por usuario
            $cuota->save();
 
            $idcredito = $cuota->idcredito;
@@ -269,7 +272,57 @@ class CuotaController extends Controller
 
                 $idsocio = $request->idsocio;
                 $cliente = Socio::findOrFail($idsocio);
-                $cliente->estadocredito = "0";//Crédito finalizado
+                $cliente->estadocredito = "2";//Crédito finalizado
+                $cliente->save();
+            }
+
+      
+            DB::commit();
+ 
+        } catch (Exception $e){
+            DB::rollBack();
+        }
+      
+    }
+    public function pagarCuotaDeposito(Request $request)
+    {        
+       if (!$request->ajax()) return redirect('/');
+         
+        try{
+            DB::beginTransaction();
+            $cuota = Cuota::findOrFail($request->id);
+            $cuota->descripcion ="Pago"; 
+                 
+            $cuota->mora =$request->mora;
+            $cuota->fechacancelo = Carbon::now('America/Lima');
+            $cuota->fechadeposito = $request->fechapagodeposito;
+            $cuota->transaccion = $request->transacciondeposito;
+            $cuota->pagodeposito = $request->montodeposito;
+            $cuota->estado ='1';
+            $cuota->estado_mora = '1';
+            $cuota->tipopago=2;
+            $cuota->idcajero = \Auth::user()->id; //cambiar por usuario
+           $cuota->save();
+
+           $idcredito = $cuota->idcredito;
+            //Verificar que todas las cuotas del crédito se hayan pagado
+            $cuotas = Cuota::join(
+                'creditos', 'cuotas.idcredito', '=', 'creditos.id')
+            ->select(
+                'cuotas.id'
+            )
+            ->where('cuotas.estado', '=', '0')
+            ->where('creditos.id', '=', $idcredito)
+            ->get();
+
+            if(sizeof($cuotas) == 0){//En este caso ya se pagaron todas las cuotas
+                $credito = Credito::findOrFail($idcredito);
+                $credito->estado = "2";//Crédito finalizado
+                $credito->save();
+
+                $idsocio = $request->idsocio;
+                $cliente = Socio::findOrFail($idsocio);
+                $cliente->estadocredito = "2";//Crédito finalizado
                 $cliente->save();
             }
 
@@ -308,6 +361,12 @@ class CuotaController extends Controller
             'cuotas.estado_mora',
             'cuotas.descripcion',
             'cuotas.estado',
+
+            'cuotas.transaccion',
+            'cuotas.pagodeposito',
+            'cuotas.fechadeposito',
+            'cuotas.tipopago',
+
 
             'socio.nombre as socionombre',
             'socio.dni as sociodni',

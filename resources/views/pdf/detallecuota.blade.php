@@ -40,10 +40,20 @@
                    
                    
               <div class="container" style="background-color:white">
-                      <p>Cooperativa ZAMORA</p>
+                      <p>Cooperativa ZAMORA / NRO OPERACIÓN: {{$c->id}} -  {{$c->numerodecuota}}
                 
-              <p>NRO OPERACIÓN: {{$c->id}} -  {{$c->numerodecuota}}
-              <br> {{$c->fechacancelo}}
+           
+              <br>  <?php
+               if($c->tipopago=="2"){
+                 echo "Tipo Pago: A Depóstio <br>";
+                 echo "Fecha de Deposito: ".$c->fechadeposito."<br>";
+                 echo "Monto de Deposito: ".$c->pagodeposito."<br>";               
+                }
+               elseif($c->tipopago=="1"){
+               echo "Tipo Pago:  En efectivo <br> "; 
+               };
+              ?>
+                Fecha de Pago: {{$c->fechacancelo}}
                <br>DNI SOCIO  : {{$c->sociodni}}
               <br>{{$c->socionombre}} {{$c->socioapellidos}} 
               <br>Obs: {{$c->descripcion}}
@@ -68,12 +78,9 @@
                 <p>SALDO PENDIENTE N: S/  {{$c->saldopendiente}} 
            
                 <p>
-                   GRACIAS POR SU PREFERENCIA <br>
-                   CAJERO: {{$c->cajeronombre}}  {{$c->cajeroapellidos}} &nbsp;&nbsp;
+                
+                   CAJERO: {{$c->cajeronombre}}  {{$c->cajeroapellidos}} <br>
 
-                    
-                </p>
-                <p>
                   DOC.IDE ..........................FIRMA...............................
                                        
                 </p>

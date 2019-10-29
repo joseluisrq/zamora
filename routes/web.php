@@ -61,6 +61,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/cuota/cuotassinpagar', 'CuotaController@cuotassinpagar');
         Route::get('/cuota/detallepagar', 'CuotaController@detalleCuota');
         Route::put('/cuota/pagarCuota', 'CuotaController@pagarCuota');
+        Route::put('/cuota/pagarCuotaDeposito', 'CuotaController@pagarCuotaDeposito');
         Route::get('/cuota/selectsocio', 'CuotaController@selectSocio');
         Route::get('/cuota/detallecuotapdf/{id}', 'CuotaController@pdfDetalleCuota')->name('detallecuota_pdf');
         //listar cuotas a pagaR
@@ -148,7 +149,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/cuota/pagarCuota', 'CuotaController@pagarCuota');
         Route::get('/cuota/selectsocio', 'CuotaController@selectSocio');
         Route::get('/cuota/detallecuotapdf/{id}', 'CuotaController@pdfDetalleCuota')->name('detallecuota_pdf');
-        
+        Route::put('/cuota/pagarCuotaDeposito', 'CuotaController@pagarCuotaDeposito');
         Route::get('/aporte/listar', 'AporteController@index');
         Route::get('/aporte/selectsocio', 'AporteController@selectSocio');
         Route::get('/aporte/pdfDetalleAporte', 'AporteController@pdfDetalleAporte')->name('detalleaporte_pdf');
