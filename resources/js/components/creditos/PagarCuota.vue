@@ -155,22 +155,23 @@
                                                     <div class="form-group row">
                                                         <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Número de Transacción </label>
                                                         <div class="col-sm-3">
-                                                            <input type="text" class="form-control" id="exampleInputUsername2" placeholder="Username">
+                                                            <input type="text" class="form-control" id="exampleInputUsername2"  v-model="transacciondeposito" placeholder="Número de Transacción">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row">
-                                                        <label for="exampleInputEmail2" class="col-sm-5 col-form-label">Fecha de Pago</label>
+                                                        <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Fecha de Pago</label>
                                                         <div class="col-sm-3">
-                                                            <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email">
+                                                            <input type="date" class="form-control" id="exampleInputEmail2" v-model="fechapagodeposito" placeholder="Fecha de Pago">
                                                         </div>
                                                     </div>
                                                     <div class="form-group row">
                                                         <label for="exampleInputMobile" class="col-sm-3 col-form-label">Monto</label>
                                                         <div class="col-sm-3">
-                                                            <input type="text" class="form-control" id="exampleInputMobile" placeholder="Mobile number">
+                                                            <input type="number" class="form-control" id="exampleInputMobile" v-model="montodeposito"  placeholder="Monto a Depositar">
                                                         </div>
                                                     </div>
-                                                      <button type="button" v-if="botoncuota" @click="pagarDeposito(c.idcuota,c.idpersona)" class="btn btn-success col-md-4" >Pago en Cuota</button>  
+                                                      <button type="button" v-if="botoncuota" @click="pagarDeposito(c.idcuota,c.idpersona)" class="btn btn-success col-md-4" >Pago de Cuota</button> 
+                                                        <button type="button"  @click="pagodeposito=false;transacciondeposito='';fechapagodeposito='';montodeposito='';" class="btn btn-danger col-md-4" >Cancelar</button>  
                                                   
                                                 </form>
                                                 </div>
@@ -271,6 +272,12 @@ export default {
                  morahastahoy:0.0,
                  estadomora:"0",
                  pagodeposito:false,
+                
+                montoestandar:0,
+                transacciondeposito:'',
+                montodeposito:0,
+                fechapagodeposito:''
+                 
 
             }
             
@@ -291,13 +298,38 @@ export default {
                     .then(res => {
                     this.dataC = res.data.cuotas;
                     this.fechapago=this.dataC[0].fechapago
-                  //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
+                    this.montodeposito=this.dataC[0].monto;
+                     this.montoestandar=this.dataC[0].monto;
                    // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
                    // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
                      })
                     .catch(err => {
                         console.log(err);
                     });
+            },
+            pagarDeposito(){
+                let me= this;
+                if(me.transacciondeposito!=''&& me.fechapagodeposito!='' && me.montodeposito!=0 ){
+                    if(me.montoestandar>=me.montodeposito){
+
+                    }
+                    else{
+                        Swal.fire({
+                        type: 'error',
+                        title: 'Error',
+                        text: 'El  deposito tiene que ser igual o mayor a la deuda',
+                     
+                        })
+                    }
+                    
+                }else{
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Error',
+                        text: 'Datos Incorrectos',
+                        footer: '<a href>Asegurese de ingresar los datos correctos</a>'
+                        })
+                }
             },
 
             //pagar cuota
@@ -358,6 +390,8 @@ export default {
                    parseFloat(CP*(Math.pow(parseFloat(1)+parseFloat(TM),DM)-1))
                    ;
                    me.morahastahoy=(M-C).toFixed(2);
+                   me.montodeposito=me.morahastahoy+me.montodeposito;
+                    me.montoestandar= me.morahastahoy+me.montoestandar;
                    console.log(me.morahastahoy)
                }
                else{

@@ -5701,6 +5701,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['idcliente'],
   data: function data() {
@@ -5731,7 +5732,11 @@ __webpack_require__.r(__webpack_exports__);
       diasdemora: '',
       morahastahoy: 0.0,
       estadomora: "0",
-      pagodeposito: false
+      pagodeposito: false,
+      montoestandar: 0,
+      transacciondeposito: '',
+      montodeposito: 0,
+      fechapagodeposito: ''
     };
   },
   computed: {},
@@ -5743,12 +5748,33 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       axios.get(this.ruta + '/cuota/detallepagar?id=' + this.idcliente).then(function (res) {
         _this.dataC = res.data.cuotas;
-        _this.fechapago = _this.dataC[0].fechapago; //  me.interes=me.dataC[0].monto*(me.dataC[0].tasa/100);
-        // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
+        _this.fechapago = _this.dataC[0].fechapago;
+        _this.montodeposito = _this.dataC[0].monto;
+        _this.montoestandar = _this.dataC[0].monto; // me.montoanterior=me.dataC[0].montodesembolsado/me.dataC[0].numerocuotas
         // me.totalpagar=(((parseFloat(me.dataC[0].monto)+parseFloat(me.interes))*me.dataC [0].tipocambio)).toFixed(2);
       })["catch"](function (err) {
         console.log(err);
       });
+    },
+    pagarDeposito: function pagarDeposito() {
+      var me = this;
+
+      if (me.transacciondeposito != '' && me.fechapagodeposito != '' && me.montodeposito != 0) {
+        if (me.montoestandar >= me.montodeposito) {} else {
+          Swal.fire({
+            type: 'error',
+            title: 'Error',
+            text: 'El  deposito tiene que ser igual o mayor a la deuda'
+          });
+        }
+      } else {
+        Swal.fire({
+          type: 'error',
+          title: 'Error',
+          text: 'Datos Incorrectos',
+          footer: '<a href>Asegurese de ingresar los datos correctos</a>'
+        });
+      }
     },
     //pagar cuota
     pagarCuota: function pagarCuota(idcuota, idpersona) {
@@ -5797,6 +5823,8 @@ __webpack_require__.r(__webpack_exports__);
         var TM = this.tasa_moratoria_anual / 100;
         M = parseFloat(C) + parseFloat(CP * (Math.pow(parseFloat(1) + parseFloat(TC), DM) - 1)) + parseFloat(CP * (Math.pow(parseFloat(1) + parseFloat(TM), DM) - 1));
         me.morahastahoy = (M - C).toFixed(2);
+        me.montodeposito = me.morahastahoy + me.montodeposito;
+        me.montoestandar = me.morahastahoy + me.montoestandar;
         console.log(me.morahastahoy);
       } else {
         me.morahastahoy = 0;
@@ -50530,11 +50558,189 @@ var render = function() {
                                         "form",
                                         { staticClass: "forms-sample" },
                                         [
-                                          _vm._m(4, true),
+                                          _c(
+                                            "div",
+                                            { staticClass: "form-group row" },
+                                            [
+                                              _c(
+                                                "label",
+                                                {
+                                                  staticClass:
+                                                    "col-sm-3 col-form-label",
+                                                  attrs: {
+                                                    for: "exampleInputUsername2"
+                                                  }
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    "Número de Transacción "
+                                                  )
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "div",
+                                                { staticClass: "col-sm-3" },
+                                                [
+                                                  _c("input", {
+                                                    directives: [
+                                                      {
+                                                        name: "model",
+                                                        rawName: "v-model",
+                                                        value:
+                                                          _vm.transacciondeposito,
+                                                        expression:
+                                                          "transacciondeposito"
+                                                      }
+                                                    ],
+                                                    staticClass: "form-control",
+                                                    attrs: {
+                                                      type: "text",
+                                                      id:
+                                                        "exampleInputUsername2",
+                                                      placeholder:
+                                                        "Número de Transacción"
+                                                    },
+                                                    domProps: {
+                                                      value:
+                                                        _vm.transacciondeposito
+                                                    },
+                                                    on: {
+                                                      input: function($event) {
+                                                        if (
+                                                          $event.target
+                                                            .composing
+                                                        ) {
+                                                          return
+                                                        }
+                                                        _vm.transacciondeposito =
+                                                          $event.target.value
+                                                      }
+                                                    }
+                                                  })
+                                                ]
+                                              )
+                                            ]
+                                          ),
                                           _vm._v(" "),
-                                          _vm._m(5, true),
+                                          _c(
+                                            "div",
+                                            { staticClass: "form-group row" },
+                                            [
+                                              _c(
+                                                "label",
+                                                {
+                                                  staticClass:
+                                                    "col-sm-3 col-form-label",
+                                                  attrs: {
+                                                    for: "exampleInputEmail2"
+                                                  }
+                                                },
+                                                [_vm._v("Fecha de Pago")]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "div",
+                                                { staticClass: "col-sm-3" },
+                                                [
+                                                  _c("input", {
+                                                    directives: [
+                                                      {
+                                                        name: "model",
+                                                        rawName: "v-model",
+                                                        value:
+                                                          _vm.fechapagodeposito,
+                                                        expression:
+                                                          "fechapagodeposito"
+                                                      }
+                                                    ],
+                                                    staticClass: "form-control",
+                                                    attrs: {
+                                                      type: "date",
+                                                      id: "exampleInputEmail2",
+                                                      placeholder:
+                                                        "Fecha de Pago"
+                                                    },
+                                                    domProps: {
+                                                      value:
+                                                        _vm.fechapagodeposito
+                                                    },
+                                                    on: {
+                                                      input: function($event) {
+                                                        if (
+                                                          $event.target
+                                                            .composing
+                                                        ) {
+                                                          return
+                                                        }
+                                                        _vm.fechapagodeposito =
+                                                          $event.target.value
+                                                      }
+                                                    }
+                                                  })
+                                                ]
+                                              )
+                                            ]
+                                          ),
                                           _vm._v(" "),
-                                          _vm._m(6, true),
+                                          _c(
+                                            "div",
+                                            { staticClass: "form-group row" },
+                                            [
+                                              _c(
+                                                "label",
+                                                {
+                                                  staticClass:
+                                                    "col-sm-3 col-form-label",
+                                                  attrs: {
+                                                    for: "exampleInputMobile"
+                                                  }
+                                                },
+                                                [_vm._v("Monto")]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "div",
+                                                { staticClass: "col-sm-3" },
+                                                [
+                                                  _c("input", {
+                                                    directives: [
+                                                      {
+                                                        name: "model",
+                                                        rawName: "v-model",
+                                                        value:
+                                                          _vm.montodeposito,
+                                                        expression:
+                                                          "montodeposito"
+                                                      }
+                                                    ],
+                                                    staticClass: "form-control",
+                                                    attrs: {
+                                                      type: "number",
+                                                      id: "exampleInputMobile",
+                                                      placeholder:
+                                                        "Monto a Depositar"
+                                                    },
+                                                    domProps: {
+                                                      value: _vm.montodeposito
+                                                    },
+                                                    on: {
+                                                      input: function($event) {
+                                                        if (
+                                                          $event.target
+                                                            .composing
+                                                        ) {
+                                                          return
+                                                        }
+                                                        _vm.montodeposito =
+                                                          $event.target.value
+                                                      }
+                                                    }
+                                                  })
+                                                ]
+                                              )
+                                            ]
+                                          ),
                                           _vm._v(" "),
                                           _vm.botoncuota
                                             ? _c(
@@ -50552,9 +50758,27 @@ var render = function() {
                                                     }
                                                   }
                                                 },
-                                                [_vm._v("Pago en Cuota")]
+                                                [_vm._v("Pago de Cuota")]
                                               )
-                                            : _vm._e()
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-danger col-md-4",
+                                              attrs: { type: "button" },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.pagodeposito = false
+                                                  _vm.transacciondeposito = ""
+                                                  _vm.fechapagodeposito = ""
+                                                  _vm.montodeposito = ""
+                                                }
+                                              }
+                                            },
+                                            [_vm._v("Cancelar")]
+                                          )
                                         ]
                                       )
                                     ])
@@ -50688,84 +50912,6 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-md-12" }, [
       _c("h4", [_vm._v("Forma de Pago")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-3 col-form-label",
-          attrs: { for: "exampleInputUsername2" }
-        },
-        [_vm._v("Número de Transacción ")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-3" }, [
-        _c("input", {
-          staticClass: "form-control",
-          attrs: {
-            type: "text",
-            id: "exampleInputUsername2",
-            placeholder: "Username"
-          }
-        })
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-5 col-form-label",
-          attrs: { for: "exampleInputEmail2" }
-        },
-        [_vm._v("Fecha de Pago")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-3" }, [
-        _c("input", {
-          staticClass: "form-control",
-          attrs: {
-            type: "email",
-            id: "exampleInputEmail2",
-            placeholder: "Email"
-          }
-        })
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-3 col-form-label",
-          attrs: { for: "exampleInputMobile" }
-        },
-        [_vm._v("Monto")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-3" }, [
-        _c("input", {
-          staticClass: "form-control",
-          attrs: {
-            type: "text",
-            id: "exampleInputMobile",
-            placeholder: "Mobile number"
-          }
-        })
-      ])
     ])
   }
 ]
@@ -67109,8 +67255,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
