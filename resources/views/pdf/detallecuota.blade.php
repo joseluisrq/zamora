@@ -94,49 +94,56 @@
                   <div class="coupon">
                    
                    
-                    <div class="container" style="background-color:white">
-                            <p>Cooperativa ZAMORA</p>
-                      
-                    <p>NRO OPERACIÓN: {{$c->id}} -  {{$c->numerodecuota}}
-                    <br> {{$c->fechacancelo}}
-                     <br>DNI SOCIO  : {{$c->sociodni}}
-                    <br>{{$c->socionombre}} {{$c->socioapellidos}} 
-                    <br>Obs: {{$c->descripcion}}
-                    <br>N° CRED: {{$c->numeroprestamo}}
-                 <br>
-                     <br>MONTO A PAGAR N: S/ {{$c->monto}}
-                    <br>INTERES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:
-                     S/ {{ $c->interes }}
-                     <?php
-                     if($c->estado_mora=="1"){ ;?>
-                    <br>MORA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: S/ {{$c->mora}}
-                    <?php 
-                       }
-                    ;?>
-                    <br>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: S/
-                    {{
-                      $c->monto+$c->mora
+                   <div class="container" style="background-color:white">
+                           <p>Cooperativa ZAMORA / NRO OPERACIÓN: {{$c->id}} -  {{$c->numerodecuota}}
+                     
+                
+                   <br>  <?php
+                    if($c->tipopago=="2"){
+                      echo "Tipo Pago: A Depóstio <br>";
+                      echo "Fecha de Deposito: ".$c->fechadeposito."<br>";
+                      echo "Monto de Deposito: ".$c->pagodeposito."<br>";               
+                     }
+                    elseif($c->tipopago=="1"){
+                    echo "Tipo Pago:  En efectivo <br> "; 
+                    };
+                   ?>
+                     Fecha de Pago: {{$c->fechacancelo}}
+                    <br>DNI SOCIO  : {{$c->sociodni}}
+                   <br>{{$c->socionombre}} {{$c->socioapellidos}} 
+                   <br>Obs: {{$c->descripcion}}
+                   <br>N° CRED: {{$c->numeroprestamo}}
+                     <br>
+                   <br>MONTO A PAGAR N: S/ {{$c->monto}}
+                   <br>INTERES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:
+                    S/ {{ $c->interes }}
+                    <?php
+                    if($c->estado_mora=="1"){ ;?>
+                   <br>MORA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: S/ {{$c->mora}}
+                   <?php 
+                      }
+                   ;?>
+                   <br>TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: S/
+                   {{
+                     $c->monto+$c->mora
+                
+                   }} 
+     
+                     </p>
+                     <p>SALDO PENDIENTE N: S/  {{$c->saldopendiente}} 
+                
+                     <p>
+                     
+                        CAJERO: {{$c->cajeronombre}}  {{$c->cajeroapellidos}} <br>
+     
+                       DOC.IDE ..........................FIRMA...............................
+                                            
+                     </p>
+                   
+                   
+                   </div>
                  
-                    }} 
-      
-                      </p>
-                      <p>SALDO PENDIENTE N: S/  {{$c->saldopendiente}} 
-                 
-                      <p>
-                         GRACIAS POR SU PREFERENCIA <br>
-                         CAJERO: {{$c->cajeronombre}}  {{$c->cajeroapellidos}} &nbsp;&nbsp;
-      
-                          
-                      </p>
-                      <p>
-                        DOC.IDE ..........................FIRMA...............................
-                                             
-                      </p>
-                    
-                    
-                    </div>
-                  
-                  </div>
+                 </div>
             @endforeach
     </body>
 </html>

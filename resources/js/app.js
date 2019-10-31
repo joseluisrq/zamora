@@ -56,6 +56,9 @@ Vue.component('configuraciones', require('./components/configuracion/Configuraci
 // NOTIFIACCIONES
 Vue.component('notificacion', require('./components/Notificacion.vue').default);
 
+//CAJA
+Vue.component('caja', require('./components/Caja.vue').default);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -65,7 +68,7 @@ Vue.component('notificacion', require('./components/Notificacion.vue').default);
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 100,
+        menu: 15,
         ruta: 'http://localhost/zamora/public',
 
     },

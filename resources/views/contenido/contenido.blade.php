@@ -50,9 +50,7 @@
                     </template>
                     {{-- FIN SOCIOS --}}
                     
-                    <template v-if="menu==15">
-                            <h1>Caja</h1>
-                    </template>
+                
 
                     <template v-if="menu==16">
                             <h1>Reportes</h1>
@@ -75,6 +73,11 @@
                         <configuraciones :ruta='ruta'/>
                     </template>
                     {{-- FIN CONFIGURACIÓN --}}
+                    
+                    <!--Caja-->
+                    <template v-if="menu==15">
+                        <caja :ruta='ruta'/>
+                    </template>
 
 
                     @elseif (Auth::user()->idrol == 2)
