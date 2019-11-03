@@ -7,7 +7,8 @@
                     <div class="card-body ">
                         <div class="row bg bg-dark ">
                             <div class="col-md-12 mt-2 text-white ">
-                                <h4>Detalle de Cuenta de Ahorros</h4>
+                                <h4 v-if="infocuenta.tipocuenta==1">Detalle de Cuenta de Ahorros</h4>
+                                <h4 v-if="infocuenta.tipocuenta==2">Detalle de Cuenta a Plazo Fijo</h4>
                             </div>
                         </div>
                         <div class="row mt-4 ">
@@ -17,7 +18,10 @@
                                     <div class="row">
                                         <div class="col-md-8">
                                             <h4 class="text-dark font-weight-bold">
-                                                <i class="mdi mdi-package-variant-closed mdi-36px"></i>Informacón de la Cueta de Ahorros </h4>
+                                                <i class="mdi mdi-package-variant-closed mdi-36px"></i>
+                                                <span v-if="infocuenta.tipocuenta==1">Información de la Cuenta de Ahorros</span>
+                                                <span v-if="infocuenta.tipocuenta==2">Información de la Cuenta a Plazo Fijo</span>
+                                            </h4>
                                             <hr>
                                         </div>
                                          <div class="col-md-4 mt-2 text-white ">
@@ -45,45 +49,12 @@
                                             <h5 class="font-weight-bold ">Creado por:</h5>
                                              <p v-text="infocuenta.usuario"></p>
                                         </div>
-
-                                        <!--INFORMACIÓN DEL SOCIO-->
-                                          <div class="col-md-12 ">
-                                            <h4 class="text-dark font-weight-bold">
-                                                <i class="mdi mdi-account-location mdi-36px"></i>Informacón del Socio </h4>
-                                            <hr>
-                                        </div>
-
-                                        <div class="col-md-3">
-                                            <h5 class="font-weight-bold ">DNI:</h5>
-                                            <p v-text="infosocio.dni"></p>
-                                        </div>
-                                        <div class="col-md-3 ">
-                                            <h5 class="font-weight-bold ">Nombres y apellidos:</h5>
-                                            <p v-text="infosocio.nombre+' '+infosocio.apellidos"></p>
-                                        </div>
-                                        <div class="col-md-3 ">
-                                            <h5 class="font-weight-bold ">Fecha nacimiento:</h5>
-                                             <p v-text="infosocio.fechanacimiento"></p>
-                                        </div>
-                                        <div class="col-md-3 ">
-                                            <h5 class="font-weight-bold ">Dirección:</h5>
-                                              <p v-text="infosocio.direccion"></p>
-                                        </div>
-                                        <div class="col-md-3 ">
-                                            <h5 class="font-weight-bold ">Teléfono:</h5>
-                                            <p v-text="infosocio.telefono"></p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <h5 class="font-weight-bold ">Email:</h5>
-                                            <p v-text="infosocio.email"></p>
-                                        </div>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="col-lg-12 mt-4 ">
                                 <h4 class="text-dark font-weight-bold">
-                                    <i class="mdi mdi-credit-card-multiple mdi-36px"></i>Historial de movimientos</h4>
+                                    <i class="mdi mdi-account-location mdi-36px"></i>Historial de movimientos</h4>
                                 <hr>
                                 <div class="table-responsive">
                                     <table class="table  table-bordered">

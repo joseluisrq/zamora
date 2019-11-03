@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Credito;
+use App\CuentaAhorro;
 use App\Persona;
 use App\Socio;
 use App\User;
@@ -177,6 +178,26 @@ class PersonaController extends Controller
         ];
     }
 
+    public function infosocio(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $infosocio = Persona::select(
+            'personas.dni',
+            'personas.nombre',
+            'personas.apellidos',
+            'personas.fechanacimiento',
+            'personas.direccion',
+            'personas.telefono',
+            'personas.email'
+        )
+        ->where('personas.id', '=', $request->id)
+        ->take(1)
+        ->get()[0];
+
+        return ["infosocio" => $infosocio];
+    }
+
 	public function store(Request $request)
     {
 		if (!$request->ajax()) return redirect('/');
@@ -192,7 +213,23 @@ class PersonaController extends Controller
             'telefono' => 'required'
         ];
 
-        if(isset($request->correo)) $validar += array('correo' => 'email');
+        $traducciones = [
+            'dni.required' => 'ingrese un número de DNI de socio',
+            'dni.size' => 'el DNI debe ser de 8 dígitos',
+            'nombres.required' => 'ingrese los nombres del socio',
+            'apellidos.required' => 'ingrese los apellidos del socio',
+            'fechanacimiento.required' => 'ingrese la fecha de nacimiento del socio',
+            'fechanacimiento.date' => 'ingrese una fecha válida',
+            'departamento.required' => 'ingrese el nombre del departamento del socio',
+            'ciudad.required' => 'ingrese la ciudadd del socio',
+            'direccion.required' => 'ingrese la dirección del socio',
+            'telefono.required' => 'ingrese el número de teléfono del socio'
+        ];
+
+        if(isset($request->correo)){
+            $validar += array('correo' => 'email');
+            $traducciones += array('correo.email' => 'ingrese un correo válido');
+        };
 
         $tipo = $request->tipo;
 
@@ -204,9 +241,20 @@ class PersonaController extends Controller
                 'repetirpassword' => 'required|same:password',
                 'rol' => 'required'
             );
+
+            $traducciones += array(
+                'correo.required' => 'ingrese el correo del usuario',
+                'correo.email' => 'ingrese un correo válido',
+                'usuario.required' => 'ingrese un nombre de usuario',
+                'usuario.unique' => 'ese nombre de usuario ya existe',
+                'password.required' => 'ingrese su nueva contraseña',
+                'repetirpassword.required' => 'repita la contraseña',
+                'repetirpassword.same' => 'las contraseñas no coinciden',
+                'rol.required' => 'seleccione un rol de usuario'
+            );
         }
 
-        $request->validate($validar);
+        $request->validate($validar, $traducciones);
 
         $id = Persona::select('id')->where('personas.dni', '=', $request->dni)->get();
 
@@ -240,6 +288,7 @@ class PersonaController extends Controller
                         $socio->estadoahorro = '0';
                         $socio->estadocredito = '0';
                         $socio->tipo = 'socio';
+                        $socio->interes_aportaciones = 0;
                         $socio->estado = 1;
                         $socio->save();
 
@@ -259,7 +308,7 @@ class PersonaController extends Controller
         try{
             DB::beginTransaction();
             $persona = new Persona();
-            $persona->dni = $request->dni;//OCURRIRÁ ERROR CUANDO EL DNI SEA REPETIDO
+            $persona->dni = $request->dni;
             $persona->nombre = $request->nombres;
             $persona->apellidos = $request->apellidos;
             $persona->fechanacimiento = $request->fechanacimiento;
@@ -278,12 +327,13 @@ class PersonaController extends Controller
                 $socio->estadoahorro = '0';
                 $socio->estadocredito = '0';
                 $socio->tipo = 'socio';
+                $socio->interes_aportaciones = 0;
                 $socio->estado = 1;
                 $socio->save();
             }
             else if($tipo == 1)// SI TIPO==1, REGISTRAMOS UN USUARIO, ES NECESARIO VERIFICAR EN EL CASO DE QUE SE QUIERA AGREGAR MÁS OPCIONES EN EL FUTURO
             {
-                $user = new User();//REISTRAR A LA PERSONA COMO USUARIO
+                $user = new User();//REGISTRAR A LA PERSONA COMO USUARIO
                 $user->id = $persona->id;
                 $user->usuario = $request->usuario;
                 $user->password = bcrypt($request->password);//PASSWORD ENCRIPTADO
@@ -402,18 +452,27 @@ class PersonaController extends Controller
             ])->get();
 
             if(sizeof($creditos) > 0)
-                return ["hascreditos" => true, "creditos" => $creditos];
+                return ["hascreditos" => true];
 
-            //CAMBIAR DATOS PARA EVITAR CONFLICTOS
-            $persona = Persona::findOrFail($request->id);//REGISTRAR A LA PERSONA COMO SOCIO
-            $persona->dni = substr($persona->dni, 0, 8);
-            $persona->dni .= '-d-' . $request->id;
-            $persona->save();
+            //VERIFICAR LAS CUENTAS ACTIVAS
+            $cuentas = CuentaAhorro::where([
+                ['idsocio', '=', $request->id],
+                ['estado', '=', '1']
+            ])->get();
+
+            if(sizeof($cuentas) > 0)
+                return ["hascreditos" => false, "hascuentas" => true];
 
             $tipo = $request->tipo;
 
             if($tipo == 0)
             {
+                //CAMBIAR DATOS PARA EVITAR CONFLICTOS AL REGISTRAR NUEVOS SOCIOS
+                $persona = Persona::findOrFail($request->id);
+                $persona->dni = substr($persona->dni, 0, 8);
+                $persona->dni .= '-d-' . $request->id;
+                $persona->save();
+
                 $socio = Socio::findOrFail($request->id);//DESACTIVAR SOCIO
                 $socio->estado = 0;
                 $socio->save();
@@ -428,7 +487,7 @@ class PersonaController extends Controller
  
             DB::commit();
 
-            return ["hascreditos" => false, "creditos" => $creditos];
+            return ["hascreditos" => false, "hascuentas" => false];
 
         } catch (Exception $e){
             DB::rollBack(); //DESHACER TODO SI HUBIERA ALGÚN ERROR

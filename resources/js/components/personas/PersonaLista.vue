@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <button v-if="!showlista" class="btn btn-success mr-2" @click="ocultarDetalle">volver</button>
+        <button v-if="!showlista" class="btn btn-success mr-2" @click="mostrarComponenete(true, false, false, false)">volver</button>
         <div v-show="showlista" class="row">
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
@@ -65,6 +65,12 @@
                                             <button v-if="persona.condicion==1 || tipo==0" type="button" class="btn btn-danger btn-rounded btn-icon" @click="eliminarpersona(persona.id)">
                                                     <i class="mdi mdi-delete-forever"></i>
                                             </button>
+                                            <button v-else type="button" class="btn btn-outline-danger btn-rounded btn-icon" disabled>
+                                                    <i class="mdi mdi-delete-forever"></i>
+                                            </button>
+                                            <button v-show="tipo==0" type="button" class="btn btn-info btn-rounded btn-icon" @click="mostrarCuentasDeSocio(persona.id)">
+                                                    <i class="mdi mdi-currency-usd"></i>
+                                            </button>
                                         </td>
                                         <td v-show="tipo==1" v-text="persona.rol"></td>
                                         <td v-text="persona.dni"></td>
@@ -109,6 +115,9 @@
         <registrarpersona v-show="showactualizar" :key="5" :ruta='ruta' :tipo="tipo" :registrar="0" :busactualizar="busactualizar" />
 
         <detallepersona v-show="showdetalle && tipo==0" :ruta="ruta" :tipo="tipo" :bus="bus"/><!-- EL BUS PERMITE PASAR INFO ENTRE COMPONENTES, ESTE COMPONENTE SÓLO SE MUESTRA PARA LOS SOCIOS, NO PARA LOS USUARIOS -->
+
+        <cuentassocio v-if="showcuentas" v-bind:id="idsocio" :ruta="ruta" />
+
     </div>
 </template>
 
@@ -119,6 +128,8 @@
             return {
                 bus: new Vue(),
                 busactualizar: new Vue(),
+
+                idsocio: '',
 
                 arraypersonas: [],
                 pagination : {
@@ -135,7 +146,8 @@
 
                 showlista: true,
                 showdetalle: false,
-                showactualizar: false
+                showactualizar: false,
+                showcuentas: false
             };
         },
         computed:{
@@ -163,8 +175,7 @@
                     pagesArray.push(from);
                     from++;
                 }
-                return pagesArray;             
-
+                return pagesArray;
             }
         },
         methods: {
@@ -222,6 +233,8 @@
 
                             if(res.data.hascreditos)
                                 me.mostrarAlerta('center', 'error', '¡¡¡ No se puede eliminar al socio debido a que tiene créditos activos !!!', false, 2000);
+                            else if(res.data.hascuentas)
+                                me.mostrarAlerta('center', 'error', '¡¡¡ No se puede eliminar al socio debido a que tiene cuentas activas !!!', false, 2000);
                             else
                                 me.mostrarAlerta('center', 'success', '¡¡¡ Eliminación correcta !!!', false, 2000);
                         })
@@ -258,6 +271,18 @@
                 this.bus.$emit('cargarDetalle', id);
                 this.showdetalle = true;
                 this.showlista = false;
+            },
+            mostrarComponenete(lista, detalle, actualizar, cuentas){
+                let me = this;
+                me.showlista = lista;
+                me.showdetalle = detalle;
+                me.showactualizar = actualizar;
+                me.showcuentas = cuentas;
+            },
+            mostrarCuentasDeSocio(id){
+                let me = this;
+                me.idsocio = id;
+                me.mostrarComponenete(false, false, false, true);
             }
         },
         mounted() {

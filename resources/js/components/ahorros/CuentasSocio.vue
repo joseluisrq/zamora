@@ -5,16 +5,62 @@
                 <div class="col-lg-12 grid-margin stretch-card ">
                     <div class="card ">
                         <div class="card-body ">
-                            <h4 class="card-title ">Lista de Cuentas de Ahorro</h4>
-                            <p class="card-description ">
-                                Información de cuentas
-                            </p>
                             <div class="row">
+                                <!--INFORMACIÓN DEL SOCIO-->
+                                <div class="col-md-12 ">
+                                    <h4 class="text-dark font-weight-bold">
+                                        <i class="mdi mdi-account-location mdi-36px"></i>INFORMACIÓN DEL SOCIO</h4>
+                                    <hr>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <h5 class="font-weight-bold ">DNI:</h5>
+                                    <p v-text="infosocio.dni"></p>
+                                </div>
+                                <div class="col-md-3 ">
+                                    <h5 class="font-weight-bold ">Nombres y apellidos:</h5>
+                                    <p v-text="infosocio.nombre+' '+infosocio.apellidos"></p>
+                                </div>
+                                <div class="col-md-3 ">
+                                    <h5 class="font-weight-bold ">Fecha nacimiento:</h5>
+                                     <p v-text="infosocio.fechanacimiento"></p>
+                                </div>
+                                <div class="col-md-3 ">
+                                    <h5 class="font-weight-bold ">Dirección:</h5>
+                                      <p v-text="infosocio.direccion"></p>
+                                </div>
+                                <div class="col-md-3 ">
+                                    <h5 class="font-weight-bold ">Teléfono:</h5>
+                                    <p v-text="infosocio.telefono"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5 class="font-weight-bold ">Email:</h5>
+                                    <p v-text="infosocio.email"></p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-12 ">
+                                    <h4 class="text-dark font-weight-bold">
+                                        <i class="mdi mdi-cash-usd mdi-36px"></i>INTERESES GANADOS POR LAS CUENTAS</h4>
+                                    <hr>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5 class="font-weight-bold ">En total</h5>
+                                    <p v-text="'S/. ' + interes_total"></p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-12 ">
+                                    <h4 class="text-dark font-weight-bold">
+                                        <i class="mdi mdi-package-variant-closed mdi-36px"></i>CUENTAS DE AHORRO DEL SOCIO</h4>
+                                    <hr>
+                                </div>
                                 <div class="col-md-6 col-sm-6">
                                     <div class="input-group">
                                         <select class="form-control col-md-12" v-model="criterio">
                                             <option value="numerocuenta">Número de cuenta</option>
-                                            <option value="dni">DNI Socio</option>
                                             <option value="fechaapertura">Fecha de Apertura</option>
                                         </select>
                                         <input type="text" v-model="buscar" @keyup.enter="listarCuentas(1,buscar,criterio)" 
@@ -32,10 +78,10 @@
                                             <th>Tipo Cuenta</th>
                                             <th>N° Cuenta </th>
                                             <th>Saldo efectivo</th>
+                                            <th>Tasa</th>
+                                            <th>Interés ganados</th>
                                             <th>Fecha apertura</th>
-                                            <th>DNI Socio</th>
-                                            <th>Nombres Socio</th>
-                                            <!-- <th> Estado</th> -->
+                                            <th> Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -51,18 +97,16 @@
                                             </td>
                                             <td v-text="cuenta.numerocuenta"></td>
                                             <td v-text="cuenta.saldoefectivo"></td>
+                                            <td v-text="cuenta.tasa"></td>
+                                            <td v-text="cuenta.interes_ganado"></td>
                                             <td v-text="cuenta.fechaapertura"></td>
-                                            <!-- <td v-text="cuenta.tasa"></td> -->
-
-                                            <td v-text="cuenta.sociodni"></td>
-                                            <td v-text="cuenta.socionombre+' '+cuenta.socioapellido"></td>
                                          
-                                            <!-- <td v-if="cuenta.estado==0">
-                                                <label class="badge badge-danger text-white ">Inactivo</label>
+                                            <td v-if="cuenta.estado==0">
+                                                <label class="badge badge-danger text-white ">Cancelada</label>
                                             </td>
                                             <td v-else>
-                                                <label class="badge badge-success text-white ">Activo</label>
-                                            </td> -->
+                                                <label class="badge badge-success text-white ">Activa</label>
+                                            </td>
                                         </tr>                                
                                     </tbody>
                                 </table>
@@ -80,6 +124,7 @@
                                     </ul>
                                 </nav>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -90,7 +135,7 @@
             <button type="button" class="btn btn-warning" @click="listarCuentas(1,buscar,criterio)">
                <i class="mdi mdi-arrow-left-bold"></i> Historial de cuentas de Ahorro
             </button>  
-             <detallecuenta :ruta="ruta" v-bind:id="idcuentaahorro"/>
+             <detallecuentasocio :ruta="ruta" v-bind:id="idcuentaahorro"/>
          </template>
 
      </main>
@@ -98,10 +143,22 @@
 
 <script>
     export default {        
-        props:['ruta'],
+        props:['ruta', 'id'],
         data: function(){
             return {
                 idcuentaahorro: 0,
+
+                infosocio: {
+                    dni: '',
+                    nombre: '',
+                    apellidos: '',
+                    fechanacimiento: '',
+                    direccion: '',
+                    telefono: '',
+                    email: ''
+                },
+
+                interes_total: 0,
 
                 arraycuentas: [],
 
@@ -160,12 +217,32 @@
              //CARGAR LA TABLA DE CUENTAS
             listarCuentas (page,buscar,criterio){
                 let me = this;
-                var url= me.ruta+'/ahorro/listar?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio + '&tipo=' + me.tipo;
+                var url= me.ruta+'/ahorro/cuentassocio?id='+me.id+'&criterio='+criterio+'&buscar='+buscar;
                 axios.get(url).then(res => {
                     var respuesta = res.data;
                     me.arraycuentas = respuesta.cuentas.data;
                     me.pagination = respuesta.pagination;
                     me.mostrarTemplates(true, false);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            obtenerIntereses(idcuenta){
+                let me = this;
+                var url= me.ruta+'/ahorro/intereses?id='+me.id;
+                axios.get(url).then(res => {
+                    me.interes_total = (res.data.interes_total == null) ? 0: res.data.interes_total;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            obtenerInfoSocio(){
+                let me = this;
+                var url= me.ruta+'/infosocio?id='+me.id;
+                axios.get(url).then(res => {
+                    me.infosocio = res.data.infosocio;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -184,6 +261,8 @@
         },
         mounted() {
             this.listarCuentas(1,'','');
+            this.obtenerInfoSocio();
+            this.obtenerIntereses();
         }
     };
 </script>

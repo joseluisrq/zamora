@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\CuentaAhorro;
+use App\DepositoFijo;
 use App\Empresa;
 use App\Movimiento;
 use App\Persona;
@@ -30,11 +31,13 @@ class CuentaAhorroController extends Controller
                 'cuentaahorros.saldoefectivo',
                 'cuentaahorros.fechaapertura',
                 'cuentaahorros.tasa',
+                'cuentaahorros.interes_ganado',
 
                 'personas.dni as sociodni',
                 'personas.nombre as socionombre',
                 'personas.apellidos as socioapellido',
 
+                'cuentaahorros.tipocuenta',
                 'cuentaahorros.estado'
             )
             ->where('cuentaahorros.estado', '=', 1)
@@ -54,12 +57,13 @@ class CuentaAhorroController extends Controller
                 'cuentaahorros.saldoefectivo',
                 'cuentaahorros.fechaapertura',
                 'cuentaahorros.tasa',
+                'cuentaahorros.interes_ganado',
 
                 'personas.dni as sociodni',
                 'personas.nombre as socionombre',
                 'personas.apellidos as socioapellido',
 
-                'cuentaahorros.estado'
+                'cuentaahorros.tipocuenta'
             )
             ->where('cuentaahorros.estado', '=', 1)
             ->where($tabla.'.'.$criterio, 'like', '%'. $buscar . '%')
@@ -79,6 +83,67 @@ class CuentaAhorroController extends Controller
         ];
 	}
 
+    public function cuentasSocio(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $idsocio = $request->id;
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+
+        if($buscar == ''){
+            $cuentas = CuentaAhorro::join('personas', 'personas.id', '=', 'cuentaahorros.idsocio')
+             ->select(
+                'cuentaahorros.id',
+                'cuentaahorros.numerocuenta',
+                'cuentaahorros.saldoefectivo',
+                'cuentaahorros.fechaapertura',
+                'cuentaahorros.tasa',
+                'cuentaahorros.interes_ganado',
+
+                'cuentaahorros.tipocuenta',
+                'cuentaahorros.estado'
+            )
+            ->where([
+                ['cuentaahorros.idsocio', '=', $idsocio]
+            ])
+            ->orderBy('cuentaahorros.id', 'desc')->paginate(15);
+        }
+        else
+        {
+            $cuentas = CuentaAhorro::join('personas', 'personas.id', '=', 'cuentaahorros.idsocio')
+             ->select(
+                'cuentaahorros.id',
+                'cuentaahorros.numerocuenta',
+                'cuentaahorros.saldoefectivo',
+                'cuentaahorros.fechaapertura',
+                'cuentaahorros.tasa',
+                'cuentaahorros.interes_ganado',
+
+                'cuentaahorros.tipocuenta',
+                'cuentaahorros.estado'
+            )
+            ->where([
+                ['cuentaahorros.estado', '=', 1],
+                ['cuentaahorros.idsocio', '=', $idsocio],
+                ['cuentaahorros.'.$criterio, 'like', '%'.$buscar.'%']
+            ])
+            ->orderBy('cuentaahorros.id', 'desc')->paginate(15);
+        }
+
+        return [
+            'pagination' => [
+                'total'        => $cuentas->total(),
+                'current_page' => $cuentas->currentPage(),
+                'per_page'     => $cuentas->perPage(),
+                'last_page'    => $cuentas->lastPage(),
+                'from'         => $cuentas->firstItem(),
+                'to'           => $cuentas->lastItem(),
+            ],
+            'cuentas' => $cuentas
+        ];
+    }
+
 	public function selectSocio(Request $request)
     {
     	if (!$request->ajax()) return redirect('/');
@@ -95,7 +160,7 @@ class CuentaAhorroController extends Controller
         ->where('personas.dni', 'like', '%'. $filtro . '%')
         ->get();
 
-        $iduser = 14;//\Auth::user()->id;
+        $iduser = \Auth::user()->id;
         $usuario = User::select(
             'users.id',
             'users.usuario'
@@ -114,10 +179,17 @@ class CuentaAhorroController extends Controller
 	{
 		if (!$request->ajax()) return redirect('/');
 
+        $monto_min = $request->monto_min;
+
         $request->validate([
             'idsocio' => 'required',
-            'monto_inicial' => 'required',
+            'monto_inicial' => 'required|numeric|min:'.$monto_min,
             // 'descripcion' => 'required'
+        ],
+        [
+            'idsocio.required' => 'seleccione un DNI de socio',
+            'monto_inicial.required' => 'ingrese un monto',
+            'monto_inicial.min' => 'el monto mínimo de apertura es de S/.'.$monto_min
         ]);
  
         try{
@@ -138,7 +210,7 @@ class CuentaAhorroController extends Controller
 
 			$cuentaahorro = new CuentaAhorro();
 			$cuentaahorro->idsocio = $request->idsocio;
-	        $cuentaahorro->idusuario = $request->idusuario;
+	        $cuentaahorro->idusuario = \Auth::user()->id;
 	        $cuentaahorro->numerocuenta = $numerocuenta;
 	        $cuentaahorro->saldoefectivo = $request->monto_inicial;
 	        $cuentaahorro->fechaapertura = Carbon::now('America/Lima');
@@ -146,6 +218,7 @@ class CuentaAhorroController extends Controller
 	        $cuentaahorro->descripcion = $descripcion;
             $cuentaahorro->tipocuenta = $request->tipocuenta;
 	        $cuentaahorro->tasa = $request->tasa;
+            $cuentaahorro->interes_ganado = 0;
 	        $cuentaahorro->estado = '1';
             $cuentaahorro->save();
 
@@ -154,17 +227,35 @@ class CuentaAhorroController extends Controller
 	        $movimiento->idahorro = $cuentaahorro->id;
 	        $movimiento->fecharegistro = Carbon::now('America/Lima');
 	        $movimiento->monto = $cuentaahorro->saldoefectivo;//Porque se trata del aporte inicial
-	        $movimiento->descripcion = 'CREACIÓN DE CUENTA DE AHORROS';
+	        $movimiento->descripcion = 'CREACIÓN DE CUENTA';
 	        $movimiento->tipomovimiento = '1';//Se trata del aporte inicial
+            $movimiento->interes_ganado = 0;
+            $movimiento->interes_ganado_total = 0;
 	        $movimiento->estado = '1';
 	        $movimiento->save();
 
 	        $cuentaahorro->ultimomovimiento = $movimiento->id;
 	        $cuentaahorro->save();
 
+            $deposito = '';
+
+            if(isset($request->tiempo_fijo))
+            {
+                $deposito = new DepositoFijo();
+                $deposito->idcuenta = $cuentaahorro->id;
+                $deposito->fecha_inicio = Carbon::now('America/Lima');
+                $deposito->fecha_fin = Carbon::now('America/Lima')->addDays($request->tiempo_fijo);
+                $deposito->tasa = $request->tasa;
+                $deposito->monto = $request->monto_inicial;
+                $deposito->monto_cobrado = 0;
+                $deposito->interes_cobrado = 0;
+                $deposito->descripcion = 'CREACIÓN DE CUENTA';
+                $deposito->save();
+            }
+
 			DB::commit();
 
-            return ["idcuenta" => $cuentaahorro->id];
+            return ["idcuenta" => $cuentaahorro->id, "deposito" => $deposito];
         } catch (Exception $e){
             DB::rollBack();
         }
@@ -183,6 +274,7 @@ class CuentaAhorroController extends Controller
             'cuentaahorros.saldoefectivo',
             'cuentaahorros.fechaapertura',
             'cuentaahorros.tasa',
+            'cuentaahorros.tipocuenta',
 
             'users.usuario'
         )
@@ -205,13 +297,13 @@ class CuentaAhorroController extends Controller
         ->get()[0];
 
         $movimientos = Movimiento::join('cuentaahorros', 'cuentaahorros.id', '=', 'movimientos.idahorro')
-        ->join('users', 'users.id', '=', 'cuentaahorros.idusuario')
+        ->join('users', 'users.id', '=', 'movimientos.idusuario')
         ->select(
         	'movimientos.id',
             'movimientos.fecharegistro',
             'movimientos.monto',
             'movimientos.tipomovimiento',
-            'movimientos.estado',
+            'movimientos.interes_ganado',
 
             'users.usuario'
         )
@@ -226,6 +318,19 @@ class CuentaAhorroController extends Controller
 		];
 	}
 
+    public function obtenerInteresesGanados(Request $request)
+    {
+        $idsocio = $request->id;
+
+        $intereses = CuentaAhorro::select(DB::raw('sum(interes_ganado) as interes_total'))
+        ->where('idsocio', '=', $idsocio)
+        ->get()[0]->interes_total;
+
+        return [
+            "interes_total" => $intereses
+        ];
+    }
+
     public function imprimirDetalleCuenta(Request $request)
     {
         $id = $request->id;
@@ -233,6 +338,7 @@ class CuentaAhorroController extends Controller
         $cuenta = CuentaAhorro::join('personas as socio', 'socio.id', '=', 'cuentaahorros.idsocio')
         ->join('users', 'users.id', '=', 'cuentaahorros.idusuario')
         ->select(
+            'cuentaahorros.id',
             'cuentaahorros.numerocuenta',
             'cuentaahorros.saldoefectivo',
             'cuentaahorros.fechaapertura',
@@ -257,7 +363,63 @@ class CuentaAhorroController extends Controller
         ->take(1)
         ->get()[0];
 
-        $pdf= \PDF::loadView('pdf.detallecuentaahorros',['cuenta' => $cuenta]);
-        return $pdf->download('CuentaAhorro-0'.$id.'.pdf');
+        $cuenta->fechaapertura = Carbon::parse($cuenta->fechaapertura)->format('d-m-Y H:i:s');
+        $cuenta->fechanacimiento = Carbon::parse($cuenta->fechanacimiento)->format('d-m-Y');
+
+        $datos_plazo_fijo = [];
+        $min_dias = 15;
+        $max_dias = 30;
+        if($cuenta->tipocuenta == 2){
+            $datos_plazo_fijo = DepositoFijo::select(
+                        'depositos_fijo.monto',
+                        'depositos_fijo.tasa',
+                        'depositos_fijo.fecha_inicio',
+                        'depositos_fijo.fecha_fin'
+                    )
+            ->where('depositos_fijo.idcuenta', '=', $cuenta->id)
+            ->orderBy('depositos_fijo.id', 'desc')
+            ->take(1)
+            ->get()[0];
+
+            $datos_plazo_fijo->fecha_inicio = Carbon::parse($datos_plazo_fijo->fecha_inicio);
+            $datos_plazo_fijo->fecha_fin = Carbon::parse($datos_plazo_fijo->fecha_fin);
+
+            $plazo_dias = $datos_plazo_fijo->fecha_fin->diffInDays($datos_plazo_fijo->fecha_inicio);
+
+            $datos_plazo_fijo->fecha_inicio = $datos_plazo_fijo->fecha_inicio->format('d-m-Y');
+            $datos_plazo_fijo->fecha_fin = $datos_plazo_fijo->fecha_fin->format('d-m-Y');
+
+            switch ($plazo_dias) {
+                case 30://Por defecto el mínimo es 15 y el máximo 30 días
+                    break;
+                case 90:
+                    $min_dias = 31;
+                    $max_dias = 90;
+                    break;
+                case 180:
+                    $min_dias = 91;
+                    $max_dias = 180;
+                    break;
+                case 360:
+                    $min_dias = 181;
+                    $max_dias = 360;
+                    break;
+                case 361:
+                    $min_dias = 361;
+                    $max_dias = 361;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        $pdf= \PDF::loadView('pdf.detallecuentaahorros',[
+            "cuenta" => $cuenta,
+            "datos_plazo_fijo" => $datos_plazo_fijo,
+            "min_dias" => $min_dias,
+            "max_dias" => $max_dias
+        ]);
+
+        return $pdf->download('CuentaAhorro_'.$cuenta->numerocuenta.'.pdf');
     }
 }

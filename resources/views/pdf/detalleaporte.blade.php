@@ -44,23 +44,25 @@
                     </div>
                     <p>
                         SOCIO :  {{ $apte->nombre . ' ' . $apte->apellidos }}<br><br>
-                        DIRECCIÓN SOCIO:  {{ $apte->direccion }}<br><br>
+                        DIRECCIÓN SOCIO:  {{ $apte->direccion }}
                     </p>
                   
                     <p>NRO OPERACIÓN: {{$apte->id}}
                         <br>DNI SOCIO  : {{$apte->dni}}
                         <br>MONTO DE APORTE N: S/. {{ $apte->monto }}
-                        <br>TASA: S/. {{ $apte->tasa}}
+                        <br>TASA:  {{ $apte->tasa}} %
                         <br>Observaciones: {{$apte->descripcion}}
                         <br>Fecha de registro de aporte: {{$apte->fecharegistro}}
                     </p>
                     <p>
-                        GRACIAS POR SU PREFERENCIA <br>
                         USUARIO(CAJERO): {{$apte->usuario}}
                     </p>
                     <p>
                         DOC.IDE ..........................FIRMA...............................
                   </p>
+                  <div align="center">
+                      <p><strong>GRACIAS POR SU PREFERENCIA</strong></p>
+                  </div>
                 </div>
             </div>
         @endforeach

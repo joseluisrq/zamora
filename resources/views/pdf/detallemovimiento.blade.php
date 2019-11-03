@@ -42,27 +42,55 @@
                         <h4>Boucher de Movimiento</h4>
                     </div>
                     <p class="bg-light">
-                        N° CUENTA: {{ $mov->numerocuenta }}<br><br>
-                        SOCIO :  {{ $mov->nombre . ' ' . $mov->apellidos }}<br><br>
+                        <div align='center'>
+                            <strong>
+                                @if($tipocuenta == 1)
+                                    CUENTA DE AHORROS
+                                @else
+                                    CUENTA A PLAZO FIJO
+                                @endif
+                            </strong>
+                            <hr>
+                        </div>
+                        <br>
+                        <strong>N° CUENTA:</strong> {{ $mov->numerocuenta }}<br><br>
+                        DNI SOCIO  : {{$mov->dni}}<br>
+                        SOCIO :  {{ $mov->nombre . ' ' . $mov->apellidos }}<br>
                         OPERACIÓN:  @if ($mov->tipomovimiento == 0) RETIRO
                                     @else APORTE
                                     @endif
-                                    <br><br>
                     </p>
                   
                     <p>
-                        DNI SOCIO  : {{$mov->dni}}
-                        <br>MONTO DE OPERACIÓN N: S/. {{ $mov->monto }}
-                        <br>Observaciones: {{$mov->descripcion}}
-                        <br>Fecha de registro de la operación: {{$mov->fecharegistro}}
+                        MONTO DE OPERACIÓN N: S/. {{ $mov->monto }}
+                        <br><br>
+                        <strong>INTERÉS GANADO</strong>
+                        <br>Desde el último movimiento: S/. {{ $mov->interes_ganado }}
+                        <br>En total: S/. {{ $mov->interes_ganado_total }}
+                        @if($tipocuenta == 2){{-- Si se trata de cuenta a plazo fijo --}}
+                            <br><br><strong>DEPÓSITO ACTUAL</strong>
+                            <br>Plazo fijo desde {{ $min_dias }} 
+                            @if($min_dias == 361)
+                                días a más de un año.
+                            @else
+                                hasta {{ $max_dias }} días.
+                            @endif
+                            <br>Fecha inicio: ......................... {{ $fecha_inicio }}
+                            <br>Fecha fin del plazo: .............. {{ $fecha_fin }}
+                        @endif
+                        <br>
+                        <br>Observaciones: {{ $mov->descripcion }}
+                        <br>Fecha de registro de la operación: {{ $mov->fecharegistro }}
                     </p>
                     <p>
-                        GRACIAS POR SU PREFERENCIA <br>
-                        USUARIO(CAJERO): {{$mov->usuario}}
+                        USUARIO(CAJERO): {{ $mov->usuario }}
                     </p>
                     <p>
-                        DOC.IDE ..........................FIRMA...............................
+                        DOC.IDE ..........................      FIRMA...............................
                   </p>
+                  <div align="center">
+                      <p><strong>GRACIAS POR SU PREFERENCIA</strong></p>
+                  </div>
                 </div>
             </div>
     </body>

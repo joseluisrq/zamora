@@ -2,7 +2,7 @@
     <div class="content-wrapper">
 
         <template v-if="showformregistro || showtiempo">
-            <button type="button" class="btn btn-warning" @click="showformregistro=false;showtiempo=false;showtipocuenta=true">
+            <button type="button" class="btn btn-warning" @click="elegirTipoCuenta">
                <i class="mdi mdi-arrow-left-bold"></i> Elegir Tipo de cuenta
             </button>
          </template>
@@ -17,14 +17,14 @@
                             <hr>
                             <div class="row">
                                 <div v-if="!showtiempo" class="col-md-4">
-                                    <button type="button" class="btn btn-success btn-icon-text" @click="cargarTasaCuenta(1, '')">
-                                        <i class="mdi mdi-upload btn-icon-prepend"></i>   
+                                    <button type="button" class="btn btn-success btn-icon-text" @click="cargarTasaCuenta(1, '', '')">
+                                        <i class="mdi mdi-clock-fast btn-icon-prepend"></i>   
                                         Cuenta de Ahorros
                                     </button>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="button" class="btn btn-success btn-icon-text" @click="showtiempo=true">
-                                        <i class="mdi mdi-upload btn-icon-prepend"></i>
+                                    <button type="button" class="btn btn-warning btn-icon-text" @click="showtiempo=true">
+                                        <i class="mdi mdi-clock-end btn-icon-prepend"></i>
                                         Cuenta a Plazo Fijo
                                     </button>
                                 </div>
@@ -34,29 +34,29 @@
                                     <h5 class=" text-primary text-center">Seleccionar Plazo</h5>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="button" class="btn btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 30)">
+                                    <button type="button" class="btn btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 30, 'Desde 15 hasta 30 días')">
                                         <i class="mdi mdi-upload btn-icon-prepend"></i>   
-                                        30 días
+                                        de 15 hasta 30 días
                                     </button>
                                     <hr>
-                                      <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 90)">
+                                      <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 90, 'Desde 31 hasta 90 días')">
                                         <i class="mdi mdi-upload btn-icon-prepend"></i>   
-                                        90 días
+                                        de 31 hasta 90 días
                                     </button>
                                     <hr>
-                                      <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 180)">
+                                      <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 180, 'Desde 91 hasta 180 días')">
                                         <i class="mdi mdi-upload btn-icon-prepend"></i>   
-                                        180 días
+                                        de 91 hasta 180 días
                                     </button>
                                     <hr>
-                                         <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 360)">
+                                         <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 360, 'Desde 181 a 360 días')">
                                         <i class="mdi mdi-upload btn-icon-prepend"></i>   
-                                        360 días
+                                        de 181 hasta 360 días
                                     </button>
                                     <hr>
-                                     <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 361)">
+                                     <button type="button" class="btn  btn-inverse-dark btn-icon-text col-md-12" @click="cargarTasaCuenta(2, 361, 'Desde 361 días a más de un año')">
                                         <i class="mdi mdi-upload btn-icon-prepend"></i>   
-                                        361 días
+                                        más de un año
                                     </button>
                                 </div>
                                
@@ -83,7 +83,7 @@
                             <p class="card-description text-primary">
                                 Verifique la Información antes de crear una cuenta de ahorros
                             </p>
-                            <form id="formRegistro" submit="this.preventDefault()" class="forms-sample">
+                            <form id="formRegistro" @submit="prevenirDefault" class="forms-sample">
                                 <div class="form-group">
                                     <label for="dnisocio " class="font-weight-bold">Socio (Ingrese N° de DNI )</label>
                                     <v-select
@@ -116,7 +116,7 @@
                                 </div> -->                                
                             
                                 <input type="submit" class="btn btn-primary mr-2" value="Crear Cuenta" @click="crearcuentaahorros"></input>
-                                <a class="btn btn-light" @click="limpiarformulario">Cancelar</a>
+                                <a class="btn btn-light" @click="elegirTipoCuenta">Cancelar</a>
                             </form>
                         </div>
                     </div>
@@ -126,13 +126,18 @@
                         <div class="card-body">
                             <h3 class=" text-dark font-weight-bold">
                                     <i class="mdi mdi-cash-usd mdi-36px"></i>
-                                    Datos de la nueva Cuenta de Ahorros
+                                    <span v-if="tipocuenta==1">Datos de la nueva Cuenta de Ahorros</span>
+                                    <span v-if="tipocuenta==2">Datos de la nueva Cuenta a Plazo Fijo</span>
                             </h3>
                                     <hr>
                             <p class="card-description text-primary">
                                 La cuenta que se creará tendrá la siguiente información
                             </p>
                             <div class="row">
+                                <div v-if="tipocuenta==2" class="col-md-12">
+                                    <h5 class="font-weight-bold ">Plazo del depósito</h5>
+                                    <p v-text="msg_plazo"></p>
+                                </div>
                                 <div class="col-md-12">
                                     <h5 class="font-weight-bold ">Número de cuenta</h5>
                                     <p v-text="numerocuenta"></p>
@@ -141,13 +146,17 @@
                                     <h5 class="font-weight-bold ">Socio</h5>
                                      <p v-text="nombre+' '+apellidos"></p>
                                 </div>
-                                <div class="col-md-9">
+                                <div class="col-md-4">
                                     <h5 class="font-weight-bold ">Saldo efectivo</h5>
                                      <p v-text="'S/.'+monto"></p>
                                 </div>
-                                <div class="col-md-3">
-                                    <h5 class="font-weight-bold ">Tasa</h5>
+                                <div class="col-md-4">
+                                    <h5 class="font-weight-bold ">Tasa Efectiva Anual</h5>
                                      <p v-text="tasa"></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h5 class="font-weight-bold ">Monto mínimo de apertura</h5>
+                                     <p v-text="'S/.'+monto_min"></p>
                                 </div>
                                 <div class="col-md-12">
                                     <h5 class="font-weight-bold ">Creado por:</h5>
@@ -208,11 +217,15 @@
                 nombre: '',
                 apellidos: '',
 
+                msg_plazo: '',
+
                 numerocuenta: '',
 
                 monto: '',//Al momnto de crear la cuenta, este es el saldo inicial
                 // descripcion: '',
                 tasa: '',
+                monto_min: '',
+                tiempo_deposito: 0,
 
                 socioseleccionado: false,
                 arraysocios: [],
@@ -254,7 +267,12 @@
                 me.numerocuenta = '';
                 me.monto = '';
                 // me.descripcion = '';
+
+                me.msg_plazo = '';
+
                 me.tasa = '';
+                me.monto_min = '';
+                me.tiempo_deposito = 0;
 
                 me.showtiempo = false;
 
@@ -276,24 +294,27 @@
                 me.socioseleccionado = false;
                 me.arraysocios = [];
 
-                me.tasa = '';
                 me.usuario = {
                     id: '',
                     usuario: ''
                 };
                 me.numerocuenta = '';
             },
+            prevenirDefault: function (e) {
+                e.preventDefault();//Esto evita que que el formulario recargue la página cunado se envía la info
+            },
             crearcuentaahorros(){
                 let me = this;
 
                 let cuentaahorros = {
                     'idsocio': me.idsocio,
-                    'idusuario': me.usuario.id,
                     'numerocuenta': me.numerocuenta,
                     'monto_inicial': me.monto,
                     'tipocuenta': me.tipocuenta,
                     // 'descripcion': me.descripcion,
-                    'tasa': me.tasa
+                    'tasa': me.tasa,
+                    'monto_min': me.monto_min,
+                    'tiempo_fijo' : me.tiempo_deposito
                 };
 
                 me.errores = [];
@@ -363,20 +384,35 @@
                 me.showformregistro = form;
                 me.showmsgregistro = msg;
             },
+            elegirTipoCuenta(){
+                let me = this;
+
+                me.limpiarformulario();
+                me.errores = [];
+                
+                me.showformregistro = false;
+                me.showtiempo = false;
+                me.showtipocuenta = true;
+            },
             descargarDetalleCuenta(){
                 let me = this;
                 me.mostrarComponente(false, false, true);
                 window.open(me.ruta + '/ahorro/cuenta/imprimirdetalle?id=' + me.idcuentaahorro,'_blank');
             },
-            cargarTasaCuenta(tipo, tiempo){
+            cargarTasaCuenta(tipo, tiempo, msg_plazo){
                 let me = this;
 
-                let url = this.ruta + '/empresa/tasaCuenta?tipo=' + tipo + '&tiempo=' + tiempo;
+                let url = me.ruta + '/empresa/tasaCuenta?tipo=' + tipo + '&tiempo=' + tiempo;
 
                 axios.get(url).then(res => {
                     me.limpiarformulario();
                     me.tasa = res.data.tasa;
+                    me.monto_min = res.data.monto_min;
+
+                    me.tiempo_deposito = tiempo;
                     me.tipocuenta = tipo;
+                    me.msg_plazo = msg_plazo;
+                    
                     me.mostrarComponente(true, false, false);
                 })
                 .catch(function (error) {

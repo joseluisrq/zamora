@@ -104,6 +104,13 @@ class AporteController extends Controller
             'dni' => 'required|size:8',
             'monto' => 'required',
             'descripcion' => 'required'
+        ],
+        [
+            'idsocio.required' => 'Problema con el ID de socio',
+            'dni.required' => 'Seleccione un DNI de socio',
+            'dni.size' => 'El DNI debe tener 8 números',
+            'monto.required' => 'Ingrese un monto',
+            'descripcion.required' => 'Ingrese una descripción'  
         ]);
  
         try{
@@ -116,7 +123,7 @@ class AporteController extends Controller
 
 			$aporte = new Aporte();
             $aporte->idsocio = $request->idsocio;
-            $aporte->idusuario = $request->idsocio;// \Auth::user()->id;
+            $aporte->idusuario = \Auth::user()->id;
            
             $aporte->monto = $request->monto;
             $aporte->fecharegistro = Carbon::now('America/Lima');

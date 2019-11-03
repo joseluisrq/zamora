@@ -2048,21 +2048,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
   data: function data() {
     return {
       fecha: '',
       hora: '',
-      montoincial: 1200,
+      montoinicial: 500,
       moneda: 'Soles',
       movimientos: 0,
-      totaldinero: 0
+      montoapertura: 0,
+      totaldinero: 0,
+      datosCaja: 0,
+      cajasAperturadas: [],
+      user: '',
+      idcajaactual: 0,
+      cajaabierta: false,
+      arrayMovimientos: [],
+      arrayCaja: [],
+      arrayTabla: [],
+      estadoMovimiento: '',
+      totalTabla: 0,
+      sumaaportes: 0,
+      sumapagos: 0,
+      sumamovimiento: 0,
+      sumadesembolso: 0
     };
   },
   methods: {
@@ -2076,10 +2086,98 @@ __webpack_require__.r(__webpack_exports__);
         weekdaysMin: 'Do_Lu_Ma_Mi_Ju_Vi_Sa'.split('_')
       });
       me.fecha = moment().format('LLL');
+    },
+    seleccionarCaja: function seleccionarCaja() {
+      var me = this;
+      me.datosactuales();
+      var url = me.ruta + '/caja/seleccionarCaja';
+      axios.get(url).then(function (response) {
+        var respuesta = response.data;
+        me.datosCaja = respuesta.caja; //me.montoapertura= me.datosCaja[0].montoinicial; 
+
+        me.user = respuesta.user;
+
+        if (me.user == me.datosCaja[0].idusuario) {
+          me.cajaabierta = true;
+          me.idcajaactual = me.datosCaja[0].id;
+          me.MovimientosCaja();
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    CajasAperturadas: function CajasAperturadas() {
+      var me = this;
+      me.datosactuales();
+      var url = me.ruta + '/caja/CajasAperturadas';
+      axios.get(url).then(function (response) {
+        var respuesta = response.data;
+        me.cajasAperturadas = respuesta.cajas;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    abrirCaja: function abrirCaja() {
+      var _this = this;
+
+      var me = this;
+      Swal.fire({
+        title: '¿Está seguro que desea ABRIR UNA NUEVA CAJA?',
+        text: "",
+        type: 'success',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Si'
+      }).then(function (result) {
+        if (result.value) {
+          axios.post(_this.ruta + '/caja/abrirCaja', {
+            'montoinicial': me.montoinicial
+          }).then(function (response) {
+            me.cajaabierta = true;
+            Swal.fire('CAJA ABIERTA', 'Ya puede registrar operaciones', 'success');
+          })["catch"](function (error) {
+            console.log(error);
+          });
+        }
+      });
+    },
+    MovimientosCaja: function MovimientosCaja() {
+      var me = this;
+
+      if (me.idcajaactual != 0) {
+        var url = me.ruta + '/caja/MovimientosCaja?id=' + me.idcajaactual;
+        axios.get(url).then(function (res) {
+          var respuesta = res.data;
+          me.arrayMovimientos = respuesta.detallecaja;
+          me.arrayCaja = respuesta.datoscaja;
+          me.montoapertura = me.arrayCaja[0].montoinicial;
+          me.arrayMovimientos.map(function (x) {
+            me.totaldinero = parseFloat(x.monto) + parseFloat(me.totaldinero);
+            if (x.tipo == 1) me.sumaaportes = parseFloat(x.monto) + parseFloat(me.sumaaportes);else if (x.tipo == 2) me.sumamovimiento = parseFloat(x.monto) + parseFloat(me.sumamovimiento);else if (x.tipo == 3) me.sumapagos = parseFloat(x.monto) + parseFloat(me.sumapagos);else if (x.tipo == 4) me.sumadesembolso = parseFloat(x.monto) + parseFloat(me.sumadesembolso);
+          });
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      }
+    },
+    mostrarMovimientos: function mostrarMovimientos(id) {
+      var me = this;
+      me.arrayTabla.length = 0;
+      me.totalTabla = 0;
+      if (id == 1) me.estadoMovimiento = 'Aportes de Socios';else if (id == 2) me.estadoMovimiento = 'Cuenta de Ahorros';else if (id == 3) me.estadoMovimiento = 'Pago de Cuotas';else if (id == 4) me.estadoMovimiento = 'Desembolsos de Créditos';
+      me.arrayMovimientos.map(function (x) {
+        if (x.tipo == id) {
+          me.arrayTabla.push(x);
+          me.totalTabla = parseFloat(x.monto) + parseFloat(me.totalTabla);
+        }
+      });
     }
   },
   mounted: function mounted() {
-    this.datosactuales();
+    this.seleccionarCaja();
+    this.CajasAperturadas();
   }
 });
 
@@ -2622,6 +2720,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
@@ -2635,11 +2742,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       dni: '',
       nombre: '',
       apellidos: '',
+      msg_plazo: '',
       numerocuenta: '',
       monto: '',
       //Al momnto de crear la cuenta, este es el saldo inicial
       // descripcion: '',
       tasa: '',
+      monto_min: '',
+      tiempo_deposito: 0,
       socioseleccionado: false,
       arraysocios: []
     }, _defineProperty(_ref, "numerocuenta", ''), _defineProperty(_ref, "usuario", {
@@ -2668,7 +2778,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       me.numerocuenta = '';
       me.monto = ''; // me.descripcion = '';
 
+      me.msg_plazo = '';
       me.tasa = '';
+      me.monto_min = '';
+      me.tiempo_deposito = 0;
       me.showtiempo = false;
       me.limpiarselect();
     },
@@ -2687,23 +2800,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       me.apellidos = '';
       me.socioseleccionado = false;
       me.arraysocios = [];
-      me.tasa = '';
       me.usuario = {
         id: '',
         usuario: ''
       };
       me.numerocuenta = '';
     },
+    prevenirDefault: function prevenirDefault(e) {
+      e.preventDefault(); //Esto evita que que el formulario recargue la página cunado se envía la info
+    },
     crearcuentaahorros: function crearcuentaahorros() {
       var me = this;
       var cuentaahorros = {
         'idsocio': me.idsocio,
-        'idusuario': me.usuario.id,
         'numerocuenta': me.numerocuenta,
         'monto_inicial': me.monto,
         'tipocuenta': me.tipocuenta,
         // 'descripcion': me.descripcion,
-        'tasa': me.tasa
+        'tasa': me.tasa,
+        'monto_min': me.monto_min,
+        'tiempo_fijo': me.tiempo_deposito
       };
       me.errores = [];
       axios.post(me.ruta + '/cuentaahorros/crear', cuentaahorros).then(function (res) {
@@ -2771,18 +2887,29 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       me.showformregistro = form;
       me.showmsgregistro = msg;
     },
+    elegirTipoCuenta: function elegirTipoCuenta() {
+      var me = this;
+      me.limpiarformulario();
+      me.errores = [];
+      me.showformregistro = false;
+      me.showtiempo = false;
+      me.showtipocuenta = true;
+    },
     descargarDetalleCuenta: function descargarDetalleCuenta() {
       var me = this;
       me.mostrarComponente(false, false, true);
       window.open(me.ruta + '/ahorro/cuenta/imprimirdetalle?id=' + me.idcuentaahorro, '_blank');
     },
-    cargarTasaCuenta: function cargarTasaCuenta(tipo, tiempo) {
+    cargarTasaCuenta: function cargarTasaCuenta(tipo, tiempo, msg_plazo) {
       var me = this;
-      var url = this.ruta + '/empresa/tasaCuenta?tipo=' + tipo + '&tiempo=' + tiempo;
+      var url = me.ruta + '/empresa/tasaCuenta?tipo=' + tipo + '&tiempo=' + tiempo;
       axios.get(url).then(function (res) {
         me.limpiarformulario();
         me.tasa = res.data.tasa;
+        me.monto_min = res.data.monto_min;
+        me.tiempo_deposito = tiempo;
         me.tipocuenta = tipo;
+        me.msg_plazo = msg_plazo;
         me.mostrarComponente(true, false, false);
       })["catch"](function (error) {
         console.log(error);
@@ -2790,6 +2917,280 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {}
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/CuentasSocio.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ahorros/CuentasSocio.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['ruta', 'id'],
+  data: function data() {
+    return {
+      idcuentaahorro: 0,
+      infosocio: {
+        dni: '',
+        nombre: '',
+        apellidos: '',
+        fechanacimiento: '',
+        direccion: '',
+        telefono: '',
+        email: ''
+      },
+      interes_total: 0,
+      arraycuentas: [],
+      pagination: {
+        'total': 0,
+        'current_page': 0,
+        'per_page': 0,
+        'last_page': 0,
+        'from': 0,
+        'to': 0
+      },
+      offset: 3,
+      criterio: 'numerocuenta',
+      buscar: '',
+      showlista: true,
+      showdetalle: false
+    };
+  },
+  computed: {
+    isActived: function isActived() {
+      return this.pagination.current_page;
+    },
+    //Calcula los elementos de la paginación
+    pagesNumber: function pagesNumber() {
+      if (!this.pagination.to) {
+        return [];
+      }
+
+      var from = this.pagination.current_page - this.offset;
+
+      if (from < 1) {
+        from = 1;
+      }
+
+      var to = from + this.offset * 2;
+
+      if (to >= this.pagination.last_page) {
+        to = this.pagination.last_page;
+      }
+
+      var pagesArray = [];
+
+      while (from <= to) {
+        pagesArray.push(from);
+        from++;
+      }
+
+      return pagesArray;
+    }
+  },
+  methods: {
+    cambiarPagina: function cambiarPagina(page, buscar, criterio) {
+      var me = this; //Actualiza la página actual
+
+      me.pagination.current_page = page; //Envia la petición para visualizar la data de esa página
+
+      me.listarCuentas(page, buscar, criterio);
+    },
+    //CARGAR LA TABLA DE CUENTAS
+    listarCuentas: function listarCuentas(page, buscar, criterio) {
+      var me = this;
+      var url = me.ruta + '/ahorro/cuentassocio?id=' + me.id + '&criterio=' + criterio + '&buscar=' + buscar;
+      axios.get(url).then(function (res) {
+        var respuesta = res.data;
+        me.arraycuentas = respuesta.cuentas.data;
+        me.pagination = respuesta.pagination;
+        me.mostrarTemplates(true, false);
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    obtenerIntereses: function obtenerIntereses(idcuenta) {
+      var me = this;
+      var url = me.ruta + '/ahorro/intereses?id=' + me.id;
+      axios.get(url).then(function (res) {
+        me.interes_total = res.data.interes_total == null ? 0 : res.data.interes_total;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    obtenerInfoSocio: function obtenerInfoSocio() {
+      var me = this;
+      var url = me.ruta + '/infosocio?id=' + me.id;
+      axios.get(url).then(function (res) {
+        me.infosocio = res.data.infosocio;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    mostrarDetalleCuentaAhorros: function mostrarDetalleCuentaAhorros(id) {
+      var me = this;
+      me.idcuentaahorro = id;
+      me.mostrarTemplates(false, true);
+    },
+    mostrarTemplates: function mostrarTemplates(lista, detalle) {
+      var me = this;
+      me.showlista = lista;
+      me.showdetalle = detalle;
+    }
+  },
+  mounted: function mounted() {
+    this.listarCuentas(1, '', '');
+    this.obtenerInfoSocio();
+    this.obtenerIntereses();
+  }
 });
 
 /***/ }),
@@ -2803,6 +3204,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2969,6 +3375,174 @@ __webpack_require__.r(__webpack_exports__);
     boucherMovimiento: function boucherMovimiento(idmovimiento) {
       var me = this;
       window.open(me.ruta + '/ahorro/movimiento/imprimirboucher?id=' + idmovimiento, '_blank');
+    },
+    descargarDetalleCuenta: function descargarDetalleCuenta() {
+      var me = this;
+      window.open(me.ruta + '/ahorro/cuenta/imprimirdetalle?id=' + me.id, '_blank');
+    }
+  },
+  mounted: function mounted() {
+    this.detalleCuentaAhorro();
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['ruta', 'id'],
+  data: function data() {
+    return {
+      infocuenta: {
+        numerocuenta: '',
+        saldoefectivo: '',
+        fechaapertura: '',
+        tasa: '',
+        usuario: ''
+      },
+      infosocio: {
+        dni: '',
+        nombre: '',
+        apellidos: '',
+        fechanacimiento: '',
+        direccion: '',
+        telefono: '',
+        email: ''
+      },
+      arraymovimientos: []
+    };
+  },
+  computed: {},
+  methods: {
+    detalleCuentaAhorro: function detalleCuentaAhorro() {
+      var me = this;
+      var url = me.ruta + '/ahorro/detalle/?id=' + me.id;
+      axios.get(url).then(function (res) {
+        me.infocuenta = res.data.infocuenta;
+        me.infosocio = res.data.infosocio;
+        me.arraymovimientos = res.data.movimientos;
+      })["catch"](function (err) {
+        console.log(error);
+      });
+    },
+    boucherMovimiento: function boucherMovimiento(idmovimiento) {
+      var me = this;
+      window.open(me.ruta + '/ahorro/movimiento/imprimirboucher?id=' + idmovimiento, '_blank');
+    },
+    descargarDetalleCuenta: function descargarDetalleCuenta() {
+      var me = this;
+      window.open(me.ruta + '/ahorro/cuenta/imprimirdetalle?id=' + me.id, '_blank');
     }
   },
   mounted: function mounted() {
@@ -2987,6 +3561,11 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
 //
 //
 //
@@ -3275,6 +3854,104 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
@@ -3288,10 +3965,17 @@ __webpack_require__.r(__webpack_exports__);
       monto: '',
       descripcion: '',
       tipo: '',
+      tipocuenta: '',
+      tasa_fijo: '',
+      monto_fijo: '',
+      fecha_inicio: '',
+      fecha_fin: '',
       cuentaseleccionada: false,
       arraycuentas: [],
-      showfromregistro: true,
-      showmsgregistro: false,
+      showElegirTipoCuenta: true,
+      showFormRegistroAhorros: false,
+      showFormRegistroPlazoFijo: false,
+      showMsgRegistro: false,
       idmovimiento: 0,
       errores: []
     };
@@ -3301,7 +3985,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {},
   methods: {
-    enviarForm: function enviarForm(e) {
+    prevenirDefault: function prevenirDefault(e) {
       e.preventDefault();
     },
     mostraralerta: function mostraralerta(posicion, tipo, titulo, btnconfirm, tiempo) {
@@ -3323,6 +4007,10 @@ __webpack_require__.r(__webpack_exports__);
       me.monto = '';
       me.descripcion = '';
       me.tipo = '';
+      me.tasa_fijo = '';
+      me.monto_fijo = '';
+      me.fecha_inicio = '';
+      me.fecha_fin = '';
       me.cuentaseleccionada = false;
       me.arraycuentas = [];
       me.idmovimiento = 0;
@@ -3334,7 +4022,7 @@ __webpack_require__.r(__webpack_exports__);
         me.selected = null; //Limpiar el valor de label de v-select
       });
     },
-    registrarMovimiento: function registrarMovimiento() {
+    registrarMovimientoAhorros: function registrarMovimientoAhorros() {
       var me = this;
       var movimiento = {
         'cuenta': me.idcuenta,
@@ -3343,7 +4031,7 @@ __webpack_require__.r(__webpack_exports__);
         'tipo': me.tipo
       };
       me.errores = [];
-      axios.post(me.ruta + '/movimiento/registrar', movimiento).then(function (res) {
+      axios.post(me.ruta + '/movimiento/registrarAhorros', movimiento).then(function (res) {
         if (res.data.excep) {
           me.errores = {
             monto: ['Usted sólo dispone de S/.' + res.data.monto + " para retirar"]
@@ -3351,7 +4039,31 @@ __webpack_require__.r(__webpack_exports__);
         } else {
           me.limpiarformulario();
           me.idmovimiento = res.data.id;
-          me.mostrarComponente(false, true);
+          me.mostrarComponente(false, false, false, true);
+        }
+      })["catch"](function (err) {
+        me.errores = err.response.data.errors;
+        console.log(err);
+      });
+    },
+    registrarMovimientoFijo: function registrarMovimientoFijo(renovar) {
+      var me = this;
+      var movimiento = {
+        'cuenta': me.idcuenta,
+        'renovar': renovar
+      };
+      me.errores = [];
+      axios.post(me.ruta + '/movimiento/registrarFijos', movimiento).then(function (res) {
+        if (!res.data.plazocumplido) {
+          var min_dias = res.data.minimo_dias;
+          var msg = 'No puede registrar movimientos en esta cuenta debido que aún no vence el plazo desde ' + min_dias;
+          if (min_dias == 361) msg += 'días a más de un año';else msg += ' hasta ' + res.data.plazo_establecido + ' días';
+          msg += ', establecido desde la fecha ' + res.data.fecha_inicio + '.\n\n Podrá retirar su dinero e intereses a partir de la fecha ' + res.data.fecha_fin;
+          me.mostraralerta('center', 'error', msg);
+        } else {
+          me.limpiarformulario();
+          me.idmovimiento = res.data.id;
+          me.mostrarComponente(false, false, false, true);
         }
       })["catch"](function (err) {
         me.errores = err.response.data.errors;
@@ -3361,7 +4073,7 @@ __webpack_require__.r(__webpack_exports__);
     selectCuenta: function selectCuenta(search, loading) {
       var me = this;
       loading(true);
-      var url = this.ruta + '/movimiento/selectCuenta?filtro=' + search;
+      var url = this.ruta + '/movimiento/selectCuenta?filtro=' + search + '&tipocuenta=' + me.tipocuenta;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
 
@@ -3385,6 +4097,15 @@ __webpack_require__.r(__webpack_exports__);
         me.numerocuenta = value.numerocuenta;
         me.nombre = value.nombre;
         me.apellidos = value.apellidos;
+        me.tipocuenta = value.tipocuenta; // 1:AHORROS, 2:PLAZO FIJO
+
+        if (me.tipocuenta == 2) {
+          me.tasa_fijo = value.tasa;
+          me.monto_fijo = value.monto;
+          me.fecha_inicio = value.fecha_inicio;
+          me.fecha_fin = value.fecha_fin;
+        }
+
         me.errores.cuenta = null; //Para limpiar el error después de selecciona una cuenta
 
         me.cuentaseleccionada = true;
@@ -3393,15 +4114,16 @@ __webpack_require__.r(__webpack_exports__);
         me.limpiarselect();
       }
     },
-    mostrarComponente: function mostrarComponente(showform, showmessage) {
+    mostrarComponente: function mostrarComponente(elegirTipo, showAhorros, showFijo, showMessage) {
       var me = this;
-      me.showfromregistro = showform;
-      me.showmsgregistro = showmessage;
-      console.log('Cambiado' + me.showfromregistro + ', ' + me.showmsgregistro);
+      me.showElegirTipoCuenta = elegirTipo;
+      me.showFormRegistroAhorros = showAhorros;
+      me.showFormRegistroPlazoFijo = showFijo;
+      me.showMsgRegistro = showMessage;
     },
     descargarBoucherMovimiento: function descargarBoucherMovimiento() {
       var me = this;
-      me.mostrarComponente(true, false);
+      me.mostrarComponente(true, false, false, false);
       window.open(me.ruta + '/ahorro/movimiento/imprimirboucher?id=' + me.idmovimiento, '_blank');
     }
   },
@@ -3588,12 +4310,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
   data: function data() {
     return {
       idsocio: 0,
+      idaporte: '',
       dni: '',
       nombre: '',
       apellidos: '',
@@ -3616,7 +4346,8 @@ __webpack_require__.r(__webpack_exports__);
       buscar: '',
       showregistro: false,
       showmsgregistro: false,
-      showlista: true
+      showlista: true,
+      errores: []
     };
   },
   components: {
@@ -3671,11 +4402,15 @@ __webpack_require__.r(__webpack_exports__);
         timer: tiempo
       });
     },
+    prevenirDefault: function prevenirDefault(e) {
+      e.preventDefault();
+    },
     limpiarformulario: function limpiarformulario() {
       var me = this;
+      me.idaporte = '';
       me.monto = '';
       me.descripcion = '';
-      me.tasa = '';
+      me.errore = [];
       me.limpiarselect();
     },
     limpiardatossocio: function limpiardatossocio() {
@@ -3708,37 +4443,26 @@ __webpack_require__.r(__webpack_exports__);
     },
     registraraporte: function registraraporte() {
       var me = this;
-
-      if (!me.socioseleccionado) {
-        me.mostraralerta('top-end', 'error', '¡¡¡ Por favor seleccione un socio para registrar el aporte !!!', false, 2500);
-        return;
-      }
-
-      var form = document.getElementById("formRegistro");
-      form.classList.add('was-validated');
-
-      if (form.checkValidity()) {
-        var aporte = {
-          'idsocio': me.idsocio,
-          'dni': me.dni,
-          'monto': me.monto,
-          'descripcion': me.descripcion,
-          'tasa': me.tasa
-        };
-        axios.post(me.ruta + '/aporte/registrar', aporte).then(function (res) {
-          form.classList.remove('was-validated');
-          me.limpiarformulario();
-          me.mostrarComponente(false, true, false); //Mostrar el mensaje de confirmación de aporte registrado
-        })["catch"](function (err) {
-          me.mostraralerta('top-end', 'error', '¡¡¡ Error, el registro no se completó correctamente !!!', false, 2500);
-          console.log(err);
-        });
-      }
+      me.errores = [];
+      var aporte = {
+        'idsocio': me.idsocio,
+        'dni': me.dni,
+        'monto': me.monto,
+        'descripcion': me.descripcion
+      };
+      axios.post(me.ruta + '/aporte/registrar', aporte).then(function (res) {
+        me.limpiarformulario();
+        me.idaporte = res.data.idaporte;
+        me.mostrarComponente(false, true, false); //Mostrar el mensaje de confirmación de aporte registrado
+      })["catch"](function (err) {
+        me.errores = err.response.data.errors;
+        console.log(err);
+      });
     },
     selectSocio: function selectSocio(search, loading) {
       var me = this;
       loading(true);
-      var url = this.ruta + '/aporte/selectsocio?filtro=' + search;
+      var url = me.ruta + '/aporte/selectsocio?filtro=' + search;
       axios.get(url).then(function (response) {
         var respuesta = response.data;
 
@@ -3768,32 +4492,32 @@ __webpack_require__.r(__webpack_exports__);
         me.limpiarselect();
       }
     },
-    cargarValores: function cargarValores() {
-      var me = this;
-      axios.get(this.ruta + '/config/valores').then(function (res) {
-        //  me.array_empresa=res.data.config;
-        me.tasa = res.data.config.tasa_aportes;
-      })["catch"](function (err) {
-        // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
-        console.log(err);
-      });
-    },
     mostrarComponente: function mostrarComponente(valregistro, valmensaje, vallista) {
       var me = this;
       me.showregistro = valregistro;
       me.showmsgregistro = valmensaje;
       me.showlista = vallista;
       if (vallista) me.listaraportes(1, '', '');
+      if (valregistro) me.cargarTasaAportes();
     },
-    descargarBoucher: function descargarBoucher() {
+    cargarTasaAportes: function cargarTasaAportes() {
+      var me = this;
+      var url = me.ruta + '/empresa/tasaAportes';
+      axios.get(url).then(function (res) {
+        me.tasa = res.data.tasa;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    descargarBoucher: function descargarBoucher(idaporte) {
       var me = this;
       me.mostrarComponente(false, false, true);
-      window.open(me.ruta + '/aporte/pdfDetalleAporte/', '_blank');
+      window.open(me.ruta + '/aporte/pdfDetalleAporte?id=' + idaporte, '_blank');
     }
   },
   mounted: function mounted() {
+    this.cargarTasaAportes();
     this.listaraportes(1, '', '');
-    this.cargarValores();
   }
 });
 
@@ -6977,12 +7701,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta', 'tipo'],
   data: function data() {
     return {
       bus: new Vue(),
       busactualizar: new Vue(),
+      idsocio: '',
       arraypersonas: [],
       pagination: {
         'total': 0,
@@ -6997,7 +7731,8 @@ __webpack_require__.r(__webpack_exports__);
       buscar: '',
       showlista: true,
       showdetalle: false,
-      showactualizar: false
+      showactualizar: false,
+      showcuentas: false
     };
   },
   computed: {
@@ -7079,7 +7814,7 @@ __webpack_require__.r(__webpack_exports__);
         if (result.value) {
           axios["delete"](url).then(function (res) {
             me.listarPersona(1, '', '');
-            if (res.data.hascreditos) me.mostrarAlerta('center', 'error', '¡¡¡ No se puede eliminar al socio debido a que tiene créditos activos !!!', false, 2000);else me.mostrarAlerta('center', 'success', '¡¡¡ Eliminación correcta !!!', false, 2000);
+            if (res.data.hascreditos) me.mostrarAlerta('center', 'error', '¡¡¡ No se puede eliminar al socio debido a que tiene créditos activos !!!', false, 2000);else if (res.data.hascuentas) me.mostrarAlerta('center', 'error', '¡¡¡ No se puede eliminar al socio debido a que tiene cuentas activas !!!', false, 2000);else me.mostrarAlerta('center', 'success', '¡¡¡ Eliminación correcta !!!', false, 2000);
           })["catch"](function (error) {
             me.mostrarAlerta('top-end', 'error', '¡¡¡ Ocurrió algún error, No se logró eliminar !!!', false, 2500);
             console.log(error);
@@ -7115,6 +7850,18 @@ __webpack_require__.r(__webpack_exports__);
       this.bus.$emit('cargarDetalle', id);
       this.showdetalle = true;
       this.showlista = false;
+    },
+    mostrarComponenete: function mostrarComponenete(lista, detalle, actualizar, cuentas) {
+      var me = this;
+      me.showlista = lista;
+      me.showdetalle = detalle;
+      me.showactualizar = actualizar;
+      me.showcuentas = cuentas;
+    },
+    mostrarCuentasDeSocio: function mostrarCuentasDeSocio(id) {
+      var me = this;
+      me.idsocio = id;
+      me.mostrarComponenete(false, false, false, true);
     }
   },
   mounted: function mounted() {
@@ -7320,7 +8067,7 @@ __webpack_require__.r(__webpack_exports__);
       me.errores = [];
       this.bus.$emit('limpiarDetalle'); //Limpiar el detalle del cliente
     },
-    validarform: function validarform(e) {
+    prevenirDefault: function prevenirDefault(e) {
       e.preventDefault(); //Esto evita que que el formulario recargue la página cunado se envía la info
     },
     cargaroles: function cargaroles() {
@@ -43539,183 +44286,542 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("main", [
-    _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-sm-12 grid-margin stretch-card " }, [
-        _c("div", { staticClass: "card " }, [
-          _c("div", { staticClass: "card-body " }, [
-            _c("div", { staticClass: "row " }, [
-              _c("div", { staticClass: "col-lg-8 " }, [
-                _c("h1", { staticClass: "font-weight-bold text-dark " }, [
-                  _vm._v("Caja")
-                ]),
-                _vm._v(" "),
-                _c("p", { staticClass: "text-dark " }, [
-                  _vm._v(_vm._s(_vm.fecha))
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "d-lg-flex align-items-baseline mb-3 " },
-                  [
-                    _c(
-                      "h3",
-                      {
-                        staticClass: "text-dark font-weight-bold",
-                        attrs: { type: "number" }
-                      },
-                      [_vm._v("Monto Incial     ")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.montoincial,
-                          expression: "montoincial"
-                        }
-                      ],
-                      staticClass: "text-dark font-weight-bold ",
-                      attrs: { type: "number" },
-                      domProps: { value: _vm.montoincial },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.montoincial = $event.target.value
-                        }
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("p", { staticClass: "text-muted ml-3 " }, [
-                      _vm._v(_vm._s(_vm.moneda))
-                    ])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-lg-4 " }, [
-                _c(
-                  "h3",
-                  { staticClass: "font-weight-bold text-dark " },
-                  [
+  return _c(
+    "main",
+    [
+      [
+        _c("div", { staticClass: "col-sm-12 grid-margin stretch-card " }, [
+          _c("div", { staticClass: "card " }, [
+            _c("div", { staticClass: "card-body " }, [
+              _c(
+                "div",
+                { staticClass: "row " },
+                [
+                  _c(
+                    "h3",
+                    { staticClass: "font-weight-bold text-dark col-md-12" },
                     [
-                      _c("button", { staticClass: "btn btn-primary" }, [
-                        _vm._v("Abrir Caja")
-                      ])
-                    ],
-                    _vm._v(" "),
-                    [
-                      _c("button", { staticClass: "btn btn-danger" }, [
-                        _vm._v("Cerrar Caja")
+                      _vm._v(
+                        "Cajas Aperturadas : " +
+                          _vm._s(_vm.cajasAperturadas.length)
+                      )
+                    ]
+                  ),
+                  _c("hr"),
+                  _vm._v(" "),
+                  _vm._l(_vm.cajasAperturadas, function(caj, index) {
+                    return [
+                      _c("div", { key: caj.id, staticClass: "col-lg-4" }, [
+                        _c("i", {
+                          staticClass:
+                            "mdi mdi-account-settings mdi-24px text-primary"
+                        }),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-dark" }, [
+                          _vm._v(
+                            "Codigo Caja : " +
+                              _vm._s(index + 1) +
+                              " - " +
+                              _vm._s(caj.id)
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-dark" }, [
+                          _vm._v(
+                            "Usuario : " +
+                              _vm._s(caj.nombre) +
+                              " " +
+                              _vm._s(caj.apellidos)
+                          )
+                        ])
                       ])
                     ]
-                  ],
-                  2
-                )
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "row " }, [
-              _c("div", { staticClass: "col-sm-12 mt-4 mt-lg-0 " }, [
-                _c(
-                  "div",
-                  { staticClass: "bg-primary text-white px-4 py-4 card " },
-                  [
-                    _c("div", { staticClass: "row " }, [
-                      _c("div", { staticClass: "col-sm-3 pl-lg-5 " }, [
-                        _c("h2", [_vm._v(_vm._s(_vm.movimientos))]),
-                        _vm._v(" "),
-                        _c("p", { staticClass: "mb-0 " }, [
-                          _vm._v("Movimientos")
-                        ])
+                  })
+                ],
+                2
+              )
+            ])
+          ])
+        ])
+      ],
+      _vm._v(" "),
+      _vm.cajaabierta == false
+        ? [
+            _c("div", { staticClass: "col-sm-12 grid-margin stretch-card " }, [
+              _c("div", { staticClass: "card " }, [
+                _c("div", { staticClass: "card-body " }, [
+                  _c("div", { staticClass: "row " }, [
+                    _c("div", { staticClass: "col-lg-8 " }, [
+                      _c("h1", { staticClass: "font-weight-bold text-dark " }, [
+                        _vm._v("Abrir Caja")
+                      ]),
+                      _c("hr"),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "text-dark " }, [
+                        _vm._v("Fecha de Apertura : " + _vm._s(_vm.fecha))
+                      ]),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "text-dark " }, [
+                        _vm._v("Moneda : " + _vm._s(_vm.moneda))
                       ]),
                       _vm._v(" "),
                       _c(
                         "div",
-                        {
-                          staticClass:
-                            "col-sm-9 climate-info-border mt-lg-0 mt-2 "
-                        },
+                        { staticClass: "d-lg-flex align-items-baseline mb-3 " },
                         [
-                          _c("h2", [_vm._v("S/ " + _vm._s(_vm.totaldinero))]),
+                          _c("h3", { staticClass: "text-dark" }, [
+                            _vm._v(" Monto Incial     ")
+                          ]),
                           _vm._v(" "),
-                          _c("p", { staticClass: "mb-0 " }, [
-                            _vm._v("Total Efectivo")
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.montoinicial,
+                                expression: "montoinicial"
+                              }
+                            ],
+                            staticClass: "text-dark font-weight-bold ",
+                            attrs: { type: "number" },
+                            domProps: { value: _vm.montoinicial },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.montoinicial = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("p", { staticClass: "text-muted ml-3 " }, [
+                            _vm._v(_vm._s(_vm.moneda))
                           ])
                         ]
                       )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-lg-12 " }, [
+                      _c(
+                        "h3",
+                        { staticClass: "font-weight-bold text-dark " },
+                        [
+                          [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.abrirCaja()
+                                  }
+                                }
+                              },
+                              [_vm._v("Abrir Caja")]
+                            )
+                          ]
+                        ],
+                        2
+                      )
                     ])
-                  ]
-                )
+                  ])
+                ])
               ])
+            ])
+          ]
+        : [
+            _c("div", { staticClass: "row" }, [
+              _c(
+                "div",
+                { staticClass: "col-sm-12 grid-margin stretch-card " },
+                [
+                  _c("div", { staticClass: "card " }, [
+                    _c("div", { staticClass: "card-body " }, [
+                      _c("div", { staticClass: "row " }, [
+                        _c("div", { staticClass: "col-lg-8 " }, [
+                          _c(
+                            "h1",
+                            { staticClass: "font-weight-bold text-dark " },
+                            [_vm._v("Caja")]
+                          ),
+                          _vm._v(" "),
+                          _c("p", { staticClass: "text-dark " }, [
+                            _vm._v(_vm._s(_vm.fecha))
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-lg-4 " }, [
+                          _c(
+                            "h3",
+                            { staticClass: "font-weight-bold text-dark " },
+                            [
+                              [
+                                _c(
+                                  "button",
+                                  { staticClass: "btn btn-danger" },
+                                  [_vm._v("Cerrar Caja")]
+                                )
+                              ]
+                            ],
+                            2
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row " }, [
+                        _c("div", { staticClass: "col-sm-12 mt-4 mt-lg-0 " }, [
+                          _c(
+                            "div",
+                            {
+                              staticClass:
+                                "bg-primary text-white px-4 py-4 card "
+                            },
+                            [
+                              _c("div", { staticClass: "row " }, [
+                                _c(
+                                  "div",
+                                  { staticClass: "col-sm-3 pl-lg-5 " },
+                                  [
+                                    _c("h2", [
+                                      _vm._v(
+                                        _vm._s(_vm.arrayMovimientos.length)
+                                      )
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("p", { staticClass: "mb-0 " }, [
+                                      _vm._v("Movimientos")
+                                    ])
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass:
+                                      "col-sm-9 climate-info-border mt-lg-0 mt-2 "
+                                  },
+                                  [
+                                    _c("h2", [
+                                      _vm._v("S/ " + _vm._s(_vm.totaldinero))
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("p", { staticClass: "mb-0 " }, [
+                                      _vm._v("Total Efectivo Movimientos")
+                                    ])
+                                  ]
+                                )
+                              ])
+                            ]
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row pt-3 mt-md-1 " }, [
+                        _c("div", { staticClass: "col " }, [
+                          _c(
+                            "div",
+                            {
+                              staticClass:
+                                "d-flex purchase-detail-legend align-items-center "
+                            },
+                            [
+                              _c("div", {
+                                staticClass: "p-2 ",
+                                attrs: { id: "circleProgress1 " }
+                              }),
+                              _vm._v(" "),
+                              _c("div", [
+                                _c(
+                                  "p",
+                                  {
+                                    staticClass:
+                                      "font-weight-medium text-dark text-small "
+                                  },
+                                  [_vm._v("Monto de Apertura ")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "h3",
+                                  {
+                                    staticClass:
+                                      "font-weight-bold text-dark mb-0 "
+                                  },
+                                  [_vm._v(_vm._s(_vm.montoapertura))]
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _vm._m(0),
+                              _vm._v(" "),
+                              _c("div", [
+                                _c(
+                                  "p",
+                                  {
+                                    staticClass:
+                                      "font-weight-medium text-dark text-small "
+                                  },
+                                  [_vm._v(" Monto Total")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "h3",
+                                  {
+                                    staticClass:
+                                      "font-weight-bold text-dark mb-0 "
+                                  },
+                                  [
+                                    _vm._v(
+                                      _vm._s(
+                                        parseFloat(_vm.montoapertura) +
+                                          parseFloat(_vm.totaldinero)
+                                      )
+                                    )
+                                  ]
+                                )
+                              ])
+                            ]
+                          )
+                        ])
+                      ])
+                    ])
+                  ])
+                ]
+              )
             ]),
             _vm._v(" "),
-            _vm._m(0)
-          ])
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _vm._m(1)
-  ])
+            _c("div", { staticClass: "row" }, [
+              _c("div", { staticClass: "col-lg-6 grid-margin stretch-card " }, [
+                _c("div", { staticClass: "card " }, [
+                  _c("div", { staticClass: "card-body " }, [
+                    _c("div", { staticClass: "row " }, [
+                      _c("div", { staticClass: "col-lg-12 " }, [
+                        _c("h4", { staticClass: "card-title " }, [
+                          _vm._v("Tipos de Movimientos")
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "row " }, [
+                          _c("div", { staticClass: "col-sm-12 " }, [
+                            _c(
+                              "ul",
+                              { staticClass: "graphl-legend-rectangle " },
+                              [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-danger col-md-7 ",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.mostrarMovimientos(1)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c("span", { staticClass: "bg-danger " }),
+                                    _vm._v("Aportes Socios")
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-info col-md-7",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.mostrarMovimientos(4)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Créditos Desembolsados")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-warning col-md-7",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.mostrarMovimientos(3)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Pago de Cuotas")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-success col-md-7",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.mostrarMovimientos(2)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Cuentas de Ahorros")]
+                                )
+                              ]
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "mb-0 mt-2 " }, [
+                          _vm._v(
+                            "Selecione el tipo de movimiento para der el detalle\r\n                                "
+                          )
+                        ])
+                      ])
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-lg-6 grid-margin stretch-card" }, [
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-body" }, [
+                    _c("h4", { staticClass: "card-title" }, [
+                      _vm._v("Detalle de Movimientos")
+                    ]),
+                    _vm._v(" "),
+                    _c("p", { staticClass: "card-description" }, [
+                      _vm._v(
+                        "\r\n                      " +
+                          _vm._s(_vm.estadoMovimiento) +
+                          "\r\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "table-responsive" }, [
+                      _c("table", { staticClass: "table" }, [
+                        _vm._m(1),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          [
+                            _vm._l(_vm.arrayTabla, function(t) {
+                              return _c("tr", { key: t.idmovimiento }, [
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(t.idmovimiento)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: { textContent: _vm._s(t.monto) }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: { textContent: _vm._s(t.fecha) }
+                                }),
+                                _vm._v(" "),
+                                _vm._m(2, true)
+                              ])
+                            }),
+                            _vm._v(" "),
+                            _c("p", [
+                              _vm._v("Total : " + _vm._s(_vm.totalTabla))
+                            ])
+                          ],
+                          2
+                        )
+                      ])
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "col-lg-12 grid-margin stretch-card " },
+                [
+                  _c("div", { staticClass: "card " }, [
+                    _c("div", { staticClass: "card-body " }, [
+                      _c("div", { staticClass: "row " }, [
+                        _c("div", { staticClass: "col-lg-6 " }, [
+                          _c("h4", { staticClass: "card-title " }, [
+                            _vm._v("Montos Totales")
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "row " }, [
+                            _vm._m(3),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "col-sm-12 " }, [
+                              _c(
+                                "ul",
+                                { staticClass: "graphl-legend-rectangle " },
+                                [
+                                  _c("li", [
+                                    _c("span", { staticClass: "bg-danger " }),
+                                    _vm._v(
+                                      "Total Aportes de Socios: " +
+                                        _vm._s(_vm.sumaaportes)
+                                    )
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("li", [
+                                    _c("span", { staticClass: "bg-warning " }),
+                                    _vm._v(
+                                      "Total Movimientos en Cuentas de Ahorros : " +
+                                        _vm._s(_vm.sumamovimiento) +
+                                        " "
+                                    )
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("li", [
+                                    _c("span", { staticClass: "bg-info " }),
+                                    _vm._v(
+                                      "Total Desembolsos de Créditos : " +
+                                        _vm._s(_vm.sumadesembolso)
+                                    )
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("li", [
+                                    _c("span", { staticClass: "bg-success " }),
+                                    _vm._v(
+                                      "Total Pagos de Cuotas : " +
+                                        _vm._s(_vm.sumapagos)
+                                    )
+                                  ])
+                                ]
+                              )
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _c("p", { staticClass: "mb-0 mt-2 " }, [
+                            _vm._v(
+                              "Total " +
+                                _vm._s(_vm.totaldinero) +
+                                "\r\n                                "
+                            )
+                          ])
+                        ])
+                      ])
+                    ])
+                  ])
+                ]
+              )
+            ])
+          ]
+    ],
+    2
+  )
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row pt-3 mt-md-1 " }, [
-      _c("div", { staticClass: "col " }, [
-        _c(
-          "div",
-          { staticClass: "d-flex purchase-detail-legend align-items-center " },
-          [
-            _c("div", {
-              staticClass: "p-2 ",
-              attrs: { id: "circleProgress1 " }
-            }),
-            _vm._v(" "),
-            _c("div", [
-              _c(
-                "p",
-                { staticClass: "font-weight-medium text-dark text-small " },
-                [_vm._v("Sessions")]
-              ),
-              _vm._v(" "),
-              _c("h3", { staticClass: "font-weight-bold text-dark mb-0 " }, [
-                _vm._v("26.80%")
-              ])
-            ])
-          ]
-        )
+    return _c("div", [
+      _c("p", { staticClass: "font-weight-medium text-dark text-small " }, [
+        _vm._v("   ")
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col " }, [
-        _c(
-          "div",
-          { staticClass: "d-flex purchase-detail-legend align-items-center " },
-          [
-            _c("div", {
-              staticClass: "p-2 ",
-              attrs: { id: "circleProgress2 " }
-            }),
-            _vm._v(" "),
-            _c("div", [
-              _c(
-                "p",
-                { staticClass: "font-weight-medium text-dark text-small " },
-                [_vm._v("Users")]
-              ),
-              _vm._v(" "),
-              _c("h3", { staticClass: "font-weight-bold text-dark mb-0 " }, [
-                _vm._v("56.80%")
-              ])
-            ])
-          ]
-        )
+      _c("h3", { staticClass: "font-weight-bold text-dark mb-0 " }, [
+        _vm._v("  ")
       ])
     ])
   },
@@ -43723,358 +44829,75 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-lg-6 grid-margin stretch-card " }, [
-        _c("div", { staticClass: "card " }, [
-          _c("div", { staticClass: "card-body " }, [
-            _c("div", { staticClass: "row " }, [
-              _c("div", { staticClass: "col-lg-4 " }, [
-                _c("h4", { staticClass: "card-title " }, [
-                  _vm._v("Sales Difference")
-                ]),
-                _vm._v(" "),
-                _c("canvas", { attrs: { id: "salesDifference " } }),
-                _vm._v(" "),
-                _c("p", { staticClass: "mt-3 mb-4 mb-lg-0 " }, [
-                  _vm._v(
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\r\n                                "
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-lg-5 " }, [
-                _c("h4", { staticClass: "card-title " }, [
-                  _vm._v("Best Sellers")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row " }, [
-                  _c("div", { staticClass: "col-sm-4 " }, [
-                    _c("ul", { staticClass: "graphl-legend-rectangle " }, [
-                      _c("li", [
-                        _c("span", { staticClass: "bg-danger " }),
-                        _vm._v("Automotive")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-warning " }),
-                        _vm._v("Books")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-info " }),
-                        _vm._v("Software")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-success " }),
-                        _vm._v("Video games")
-                      ])
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-8 grid-margin " }, [
-                    _c("canvas", { attrs: { id: "bestSellers " } })
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("p", { staticClass: "mt-3 mb-4 mb-lg-0 " }, [
-                  _vm._v(
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\r\n                                "
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-lg-3 " }, [
-                _c("h4", { staticClass: "card-title " }, [
-                  _vm._v("Social Media Statistics")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row " }, [
-                  _c("div", { staticClass: "col-sm-12 " }, [
-                    _c(
-                      "div",
-                      { staticClass: "progress progress-lg grouped mb-2 " },
-                      [
-                        _c("div", {
-                          staticClass: "progress-bar bg-danger ",
-                          staticStyle: { width: "40%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "25 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("div", {
-                          staticClass: "progress-bar bg-info ",
-                          staticStyle: { width: "10%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "50 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("div", {
-                          staticClass: "progress-bar bg-warning ",
-                          staticStyle: { width: "20%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "50 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("div", {
-                          staticClass: "progress-bar bg-success ",
-                          staticStyle: { width: "30%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "50 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        })
-                      ]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-12 " }, [
-                    _c("ul", { staticClass: "graphl-legend-rectangle " }, [
-                      _c("li", [
-                        _c("span", { staticClass: "bg-danger " }),
-                        _vm._v("Instagram (15%)")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-warning " }),
-                        _vm._v("Facebook (20%)")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-info " }),
-                        _vm._v("Website (25%)")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-success " }),
-                        _vm._v("Youtube (40%)")
-                      ])
-                    ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("p", { staticClass: "mb-0 mt-2 " }, [
-                  _vm._v(
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\r\n                                "
-                  )
-                ])
-              ])
-            ])
-          ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-lg-6 grid-margin stretch-card" }, [
-        _c("div", { staticClass: "card" }, [
-          _c("div", { staticClass: "card-body" }, [
-            _c("h4", { staticClass: "card-title" }, [_vm._v("Movimientos")]),
-            _vm._v(" "),
-            _c("p", { staticClass: "card-description" }, [
-              _vm._v("\r\n                        Add class "),
-              _c("code", [_vm._v(".table")])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "table-responsive" }, [
-              _c("table", { staticClass: "table" }, [
-                _c("thead", [
-                  _c("tr", [
-                    _c("th", [_vm._v("Profile")]),
-                    _vm._v(" "),
-                    _c("th", [_vm._v("VatNo.")]),
-                    _vm._v(" "),
-                    _c("th", [_vm._v("Created")]),
-                    _vm._v(" "),
-                    _c("th", [_vm._v("Status")])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("tbody", [
-                  _c("tr", [
-                    _c("td", [_vm._v("Jacob")]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v("53275531")]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v("12 May 2017")]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _c("label", { staticClass: "badge badge-danger" }, [
-                        _vm._v("Pending")
-                      ])
-                    ])
-                  ])
-                ])
-              ])
-            ])
-          ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-lg-12 grid-margin stretch-card " }, [
-        _c("div", { staticClass: "card " }, [
-          _c("div", { staticClass: "card-body " }, [
-            _c("div", { staticClass: "row " }, [
-              _c("div", { staticClass: "col-lg-4 " }, [
-                _c("h4", { staticClass: "card-title " }, [
-                  _vm._v("Sales Difference")
-                ]),
-                _vm._v(" "),
-                _c("canvas", { attrs: { id: "salesDifference " } }),
-                _vm._v(" "),
-                _c("p", { staticClass: "mt-3 mb-4 mb-lg-0 " }, [
-                  _vm._v(
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\r\n                                "
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-lg-5 " }, [
-                _c("h4", { staticClass: "card-title " }, [
-                  _vm._v("Best Sellers")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row " }, [
-                  _c("div", { staticClass: "col-sm-4 " }, [
-                    _c("ul", { staticClass: "graphl-legend-rectangle " }, [
-                      _c("li", [
-                        _c("span", { staticClass: "bg-danger " }),
-                        _vm._v("Automotive")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-warning " }),
-                        _vm._v("Books")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-info " }),
-                        _vm._v("Software")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-success " }),
-                        _vm._v("Video games")
-                      ])
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-8 grid-margin " }, [
-                    _c("canvas", { attrs: { id: "bestSellers " } })
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("p", { staticClass: "mt-3 mb-4 mb-lg-0 " }, [
-                  _vm._v(
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\r\n                                "
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-lg-3 " }, [
-                _c("h4", { staticClass: "card-title " }, [
-                  _vm._v("Social Media Statistics")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row " }, [
-                  _c("div", { staticClass: "col-sm-12 " }, [
-                    _c(
-                      "div",
-                      { staticClass: "progress progress-lg grouped mb-2 " },
-                      [
-                        _c("div", {
-                          staticClass: "progress-bar bg-danger ",
-                          staticStyle: { width: "40%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "25 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("div", {
-                          staticClass: "progress-bar bg-info ",
-                          staticStyle: { width: "10%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "50 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("div", {
-                          staticClass: "progress-bar bg-warning ",
-                          staticStyle: { width: "20%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "50 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("div", {
-                          staticClass: "progress-bar bg-success ",
-                          staticStyle: { width: "30%" },
-                          attrs: {
-                            role: "progressbar ",
-                            "aria-valuenow": "50 ",
-                            "aria-valuemin": "0 ",
-                            "aria-valuemax": "100 "
-                          }
-                        })
-                      ]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-12 " }, [
-                    _c("ul", { staticClass: "graphl-legend-rectangle " }, [
-                      _c("li", [
-                        _c("span", { staticClass: "bg-danger " }),
-                        _vm._v("Instagram (15%)")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-warning " }),
-                        _vm._v("Facebook (20%)")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-info " }),
-                        _vm._v("Website (25%)")
-                      ]),
-                      _vm._v(" "),
-                      _c("li", [
-                        _c("span", { staticClass: "bg-success " }),
-                        _vm._v("Youtube (40%)")
-                      ])
-                    ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("p", { staticClass: "mb-0 mt-2 " }, [
-                  _vm._v(
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\r\n                                "
-                  )
-                ])
-              ])
-            ])
-          ])
-        ])
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("ID")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Monto.")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Fecha")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Voucher")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", [
+      _c("label", { staticClass: "badge badge-danger" }, [_vm._v("Descargar")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-sm-12 " }, [
+      _c("div", { staticClass: "progress progress-lg grouped mb-2 " }, [
+        _c("div", {
+          staticClass: "progress-bar bg-danger ",
+          staticStyle: { width: "40%" },
+          attrs: {
+            role: "progressbar ",
+            "aria-valuenow": "25 ",
+            "aria-valuemin": "0 ",
+            "aria-valuemax": "100 "
+          }
+        }),
+        _vm._v(" "),
+        _c("div", {
+          staticClass: "progress-bar bg-info ",
+          staticStyle: { width: "10%" },
+          attrs: {
+            role: "progressbar ",
+            "aria-valuenow": "50 ",
+            "aria-valuemin": "0 ",
+            "aria-valuemax": "100 "
+          }
+        }),
+        _vm._v(" "),
+        _c("div", {
+          staticClass: "progress-bar bg-warning ",
+          staticStyle: { width: "20%" },
+          attrs: {
+            role: "progressbar ",
+            "aria-valuenow": "50 ",
+            "aria-valuemin": "0 ",
+            "aria-valuemax": "100 "
+          }
+        }),
+        _vm._v(" "),
+        _c("div", {
+          staticClass: "progress-bar bg-success ",
+          staticStyle: { width: "30%" },
+          attrs: {
+            role: "progressbar ",
+            "aria-valuenow": "50 ",
+            "aria-valuemin": "0 ",
+            "aria-valuemax": "100 "
+          }
+        })
       ])
     ])
   }
@@ -44668,13 +45491,7 @@ var render = function() {
               {
                 staticClass: "btn btn-warning",
                 attrs: { type: "button" },
-                on: {
-                  click: function($event) {
-                    _vm.showformregistro = false
-                    _vm.showtiempo = false
-                    _vm.showtipocuenta = true
-                  }
-                }
+                on: { click: _vm.elegirTipoCuenta }
               },
               [
                 _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
@@ -44704,13 +45521,14 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.cargarTasaCuenta(1, "")
+                                    return _vm.cargarTasaCuenta(1, "", "")
                                   }
                                 }
                               },
                               [
                                 _c("i", {
-                                  staticClass: "mdi mdi-upload btn-icon-prepend"
+                                  staticClass:
+                                    "mdi mdi-clock-fast btn-icon-prepend"
                                 }),
                                 _vm._v(
                                   "   \n                                    Cuenta de Ahorros\n                                "
@@ -44724,7 +45542,7 @@ var render = function() {
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-success btn-icon-text",
+                            staticClass: "btn btn-warning btn-icon-text",
                             attrs: { type: "button" },
                             on: {
                               click: function($event) {
@@ -44734,7 +45552,7 @@ var render = function() {
                           },
                           [
                             _c("i", {
-                              staticClass: "mdi mdi-upload btn-icon-prepend"
+                              staticClass: "mdi mdi-clock-end btn-icon-prepend"
                             }),
                             _vm._v(
                               "\n                                    Cuenta a Plazo Fijo\n                                "
@@ -44757,7 +45575,11 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.cargarTasaCuenta(2, 30)
+                                    return _vm.cargarTasaCuenta(
+                                      2,
+                                      30,
+                                      "Desde 15 hasta 30 días"
+                                    )
                                   }
                                 }
                               },
@@ -44766,7 +45588,7 @@ var render = function() {
                                   staticClass: "mdi mdi-upload btn-icon-prepend"
                                 }),
                                 _vm._v(
-                                  "   \n                                    30 días\n                                "
+                                  "   \n                                    de 15 hasta 30 días\n                                "
                                 )
                               ]
                             ),
@@ -44781,7 +45603,11 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.cargarTasaCuenta(2, 90)
+                                    return _vm.cargarTasaCuenta(
+                                      2,
+                                      90,
+                                      "Desde 31 hasta 90 días"
+                                    )
                                   }
                                 }
                               },
@@ -44790,7 +45616,7 @@ var render = function() {
                                   staticClass: "mdi mdi-upload btn-icon-prepend"
                                 }),
                                 _vm._v(
-                                  "   \n                                    90 días\n                                "
+                                  "   \n                                    de 31 hasta 90 días\n                                "
                                 )
                               ]
                             ),
@@ -44805,7 +45631,11 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.cargarTasaCuenta(2, 180)
+                                    return _vm.cargarTasaCuenta(
+                                      2,
+                                      180,
+                                      "Desde 91 hasta 180 días"
+                                    )
                                   }
                                 }
                               },
@@ -44814,7 +45644,7 @@ var render = function() {
                                   staticClass: "mdi mdi-upload btn-icon-prepend"
                                 }),
                                 _vm._v(
-                                  "   \n                                    180 días\n                                "
+                                  "   \n                                    de 91 hasta 180 días\n                                "
                                 )
                               ]
                             ),
@@ -44829,7 +45659,11 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.cargarTasaCuenta(2, 360)
+                                    return _vm.cargarTasaCuenta(
+                                      2,
+                                      360,
+                                      "Desde 181 a 360 días"
+                                    )
                                   }
                                 }
                               },
@@ -44838,7 +45672,7 @@ var render = function() {
                                   staticClass: "mdi mdi-upload btn-icon-prepend"
                                 }),
                                 _vm._v(
-                                  "   \n                                    360 días\n                                "
+                                  "   \n                                    de 181 hasta 360 días\n                                "
                                 )
                               ]
                             ),
@@ -44853,7 +45687,11 @@ var render = function() {
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.cargarTasaCuenta(2, 361)
+                                    return _vm.cargarTasaCuenta(
+                                      2,
+                                      361,
+                                      "Desde 361 días a más de un año"
+                                    )
                                   }
                                 }
                               },
@@ -44862,7 +45700,7 @@ var render = function() {
                                   staticClass: "mdi mdi-upload btn-icon-prepend"
                                 }),
                                 _vm._v(
-                                  "   \n                                    361 días\n                                "
+                                  "   \n                                    más de un año\n                                "
                                 )
                               ]
                             )
@@ -44906,10 +45744,8 @@ var render = function() {
                       "form",
                       {
                         staticClass: "forms-sample",
-                        attrs: {
-                          id: "formRegistro",
-                          submit: "this.preventDefault()"
-                        }
+                        attrs: { id: "formRegistro" },
+                        on: { submit: _vm.prevenirDefault }
                       },
                       [
                         _c(
@@ -45024,7 +45860,7 @@ var render = function() {
                           "a",
                           {
                             staticClass: "btn btn-light",
-                            on: { click: _vm.limpiarformulario }
+                            on: { click: _vm.elegirTipoCuenta }
                           },
                           [_vm._v("Cancelar")]
                         )
@@ -45037,7 +45873,21 @@ var render = function() {
               _c("div", { staticClass: "col-md-6 grid-margin stretch-card" }, [
                 _c("div", { staticClass: "card" }, [
                   _c("div", { staticClass: "card-body" }, [
-                    _vm._m(2),
+                    _c("h3", { staticClass: " text-dark font-weight-bold" }, [
+                      _c("i", { staticClass: "mdi mdi-cash-usd mdi-36px" }),
+                      _vm._v(" "),
+                      _vm.tipocuenta == 1
+                        ? _c("span", [
+                            _vm._v("Datos de la nueva Cuenta de Ahorros")
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.tipocuenta == 2
+                        ? _c("span", [
+                            _vm._v("Datos de la nueva Cuenta a Plazo Fijo")
+                          ])
+                        : _vm._e()
+                    ]),
                     _vm._v(" "),
                     _c("hr"),
                     _vm._v(" "),
@@ -45048,6 +45898,18 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "row" }, [
+                      _vm.tipocuenta == 2
+                        ? _c("div", { staticClass: "col-md-12" }, [
+                            _c("h5", { staticClass: "font-weight-bold " }, [
+                              _vm._v("Plazo del depósito")
+                            ]),
+                            _vm._v(" "),
+                            _c("p", {
+                              domProps: { textContent: _vm._s(_vm.msg_plazo) }
+                            })
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
                       _c("div", { staticClass: "col-md-12" }, [
                         _c("h5", { staticClass: "font-weight-bold " }, [
                           _vm._v("Número de cuenta")
@@ -45072,7 +45934,7 @@ var render = function() {
                         })
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
+                      _c("div", { staticClass: "col-md-4" }, [
                         _c("h5", { staticClass: "font-weight-bold " }, [
                           _vm._v("Saldo efectivo")
                         ]),
@@ -45082,12 +45944,24 @@ var render = function() {
                         })
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-md-3" }, [
+                      _c("div", { staticClass: "col-md-4" }, [
                         _c("h5", { staticClass: "font-weight-bold " }, [
-                          _vm._v("Tasa")
+                          _vm._v("Tasa Efectiva Anual")
                         ]),
                         _vm._v(" "),
                         _c("p", { domProps: { textContent: _vm._s(_vm.tasa) } })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-4" }, [
+                        _c("h5", { staticClass: "font-weight-bold " }, [
+                          _vm._v("Monto mínimo de apertura")
+                        ]),
+                        _vm._v(" "),
+                        _c("p", {
+                          domProps: {
+                            textContent: _vm._s("S/." + _vm.monto_min)
+                          }
+                        })
                       ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-md-12" }, [
@@ -45113,7 +45987,7 @@ var render = function() {
               _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
                 _c("div", { staticClass: "card" }, [
                   _c("div", { staticClass: "card-body" }, [
-                    _vm._m(3),
+                    _vm._m(2),
                     _vm._v(" "),
                     _c("hr"),
                     _vm._v(" "),
@@ -45196,22 +46070,566 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("h3", { staticClass: " text-dark font-weight-bold" }, [
-      _c("i", { staticClass: "mdi mdi-cash-usd mdi-36px" }),
-      _vm._v(
-        "\n                                Datos de la nueva Cuenta de Ahorros\n                        "
-      )
+    return _c("h4", { staticClass: " text-primary text-center" }, [
+      _c("i", {
+        staticClass: "mdi mdi-checkbox-marked-circle-outline mdi-36px"
+      }),
+      _vm._v("Cuenta de Ahorros creada exitosamente")
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/CuentasSocio.vue?vue&type=template&id=c7e00e60&":
+/*!***********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ahorros/CuentasSocio.vue?vue&type=template&id=c7e00e60& ***!
+  \***********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "main",
+    [
+      _vm.showlista
+        ? [
+            _c("div", { staticClass: "row" }, [
+              _c(
+                "div",
+                { staticClass: "col-lg-12 grid-margin stretch-card " },
+                [
+                  _c("div", { staticClass: "card " }, [
+                    _c("div", { staticClass: "card-body " }, [
+                      _c("div", { staticClass: "row" }, [
+                        _vm._m(0),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("DNI:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: { textContent: _vm._s(_vm.infosocio.dni) }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Nombres y apellidos:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.infosocio.nombre +
+                                  " " +
+                                  _vm.infosocio.apellidos
+                              )
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Fecha nacimiento:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(_vm.infosocio.fechanacimiento)
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Dirección:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(_vm.infosocio.direccion)
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3 " }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Teléfono:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(_vm.infosocio.telefono)
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("Email:")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s(_vm.infosocio.email)
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _vm._m(1),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-3" }, [
+                          _c("h5", { staticClass: "font-weight-bold " }, [
+                            _vm._v("En total")
+                          ]),
+                          _vm._v(" "),
+                          _c("p", {
+                            domProps: {
+                              textContent: _vm._s("S/. " + _vm.interes_total)
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _vm._m(2),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-6 col-sm-6" }, [
+                          _c("div", { staticClass: "input-group" }, [
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.criterio,
+                                    expression: "criterio"
+                                  }
+                                ],
+                                staticClass: "form-control col-md-12",
+                                on: {
+                                  change: function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.criterio = $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  }
+                                }
+                              },
+                              [
+                                _c(
+                                  "option",
+                                  { attrs: { value: "numerocuenta" } },
+                                  [_vm._v("Número de cuenta")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "option",
+                                  { attrs: { value: "fechaapertura" } },
+                                  [_vm._v("Fecha de Apertura")]
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.buscar,
+                                  expression: "buscar"
+                                }
+                              ],
+                              staticClass: "form-control form-control-lg",
+                              attrs: {
+                                type: "text",
+                                placeholder: "Texto a buscar"
+                              },
+                              domProps: { value: _vm.buscar },
+                              on: {
+                                keyup: function($event) {
+                                  if (
+                                    !$event.type.indexOf("key") &&
+                                    _vm._k(
+                                      $event.keyCode,
+                                      "enter",
+                                      13,
+                                      $event.key,
+                                      "Enter"
+                                    )
+                                  ) {
+                                    return null
+                                  }
+                                  return _vm.listarCuentas(
+                                    1,
+                                    _vm.buscar,
+                                    _vm.criterio
+                                  )
+                                },
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.buscar = $event.target.value
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-outline-primary btn-sm",
+                                attrs: { type: "submit" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.listarCuentas(
+                                      1,
+                                      _vm.buscar,
+                                      _vm.criterio
+                                    )
+                                  }
+                                }
+                              },
+                              [
+                                _c("i", { staticClass: "fa fa-search" }),
+                                _vm._v(" "),
+                                _c("i", { staticClass: "mdi mdi-magnify" }),
+                                _vm._v(" Buscar")
+                              ]
+                            )
+                          ])
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "table-responsive pt-3 " }, [
+                        _c("table", { staticClass: "table table-bordered " }, [
+                          _vm._m(3),
+                          _vm._v(" "),
+                          _c(
+                            "tbody",
+                            _vm._l(_vm.arraycuentas, function(cuenta) {
+                              return _c("tr", { key: cuenta.id }, [
+                                _c("td", [
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass:
+                                        "btn btn-success btn-rounded btn-icon ",
+                                      attrs: { type: "button" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.mostrarDetalleCuentaAhorros(
+                                            cuenta.id
+                                          )
+                                        }
+                                      }
+                                    },
+                                    [_c("i", { staticClass: "mdi mdi-eye " })]
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _c(
+                                    "label",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "show",
+                                          rawName: "v-show",
+                                          value: cuenta.tipocuenta == 1,
+                                          expression: "cuenta.tipocuenta == 1"
+                                        }
+                                      ],
+                                      staticClass:
+                                        "badge badge-success text-white"
+                                    },
+                                    [_vm._v("Ahorros")]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "label",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "show",
+                                          rawName: "v-show",
+                                          value: cuenta.tipocuenta == 2,
+                                          expression: "cuenta.tipocuenta == 2"
+                                        }
+                                      ],
+                                      staticClass:
+                                        "badge badge-warning text-white"
+                                    },
+                                    [_vm._v("Plazo Fijo")]
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(cuenta.numerocuenta)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(cuenta.saldoefectivo)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: { textContent: _vm._s(cuenta.tasa) }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(cuenta.interes_ganado)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(cuenta.fechaapertura)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                cuenta.estado == 0
+                                  ? _c("td", [
+                                      _c(
+                                        "label",
+                                        {
+                                          staticClass:
+                                            "badge badge-danger text-white "
+                                        },
+                                        [_vm._v("Cancelada")]
+                                      )
+                                    ])
+                                  : _c("td", [
+                                      _c(
+                                        "label",
+                                        {
+                                          staticClass:
+                                            "badge badge-success text-white "
+                                        },
+                                        [_vm._v("Activa")]
+                                      )
+                                    ])
+                              ])
+                            }),
+                            0
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("nav", [
+                          _c(
+                            "ul",
+                            { staticClass: "pagination" },
+                            [
+                              _vm.pagination.current_page > 1
+                                ? _c("li", { staticClass: "page-item" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "page-link",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.cambiarPagina(
+                                              _vm.pagination.current_page - 1,
+                                              _vm.buscar,
+                                              _vm.criterio
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Anterior")]
+                                    )
+                                  ])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm._l(_vm.pagesNumber, function(page) {
+                                return _c(
+                                  "li",
+                                  {
+                                    key: page,
+                                    staticClass: "page-item",
+                                    class: [
+                                      page == _vm.isActived ? "active" : ""
+                                    ]
+                                  },
+                                  [
+                                    _c("a", {
+                                      staticClass: "page-link",
+                                      attrs: { href: "#" },
+                                      domProps: { textContent: _vm._s(page) },
+                                      on: {
+                                        click: function($event) {
+                                          $event.preventDefault()
+                                          return _vm.cambiarPagina(
+                                            page,
+                                            _vm.buscar,
+                                            _vm.criterio
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]
+                                )
+                              }),
+                              _vm._v(" "),
+                              _vm.pagination.current_page <
+                              _vm.pagination.last_page
+                                ? _c("li", { staticClass: "page-item" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "page-link",
+                                        attrs: { href: "#" },
+                                        on: {
+                                          click: function($event) {
+                                            $event.preventDefault()
+                                            return _vm.cambiarPagina(
+                                              _vm.pagination.current_page + 1,
+                                              _vm.buscar,
+                                              _vm.criterio
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Siguiente")]
+                                    )
+                                  ])
+                                : _vm._e()
+                            ],
+                            2
+                          )
+                        ])
+                      ])
+                    ])
+                  ])
+                ]
+              )
+            ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.showdetalle
+        ? [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-warning",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.listarCuentas(1, _vm.buscar, _vm.criterio)
+                  }
+                }
+              },
+              [
+                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _vm._v(" Historial de cuentas de Ahorro\n       ")
+              ]
+            ),
+            _vm._v(" "),
+            _c("detallecuentasocio", {
+              attrs: { ruta: _vm.ruta, id: _vm.idcuentaahorro }
+            })
+          ]
+        : _vm._e()
+    ],
+    2
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12 " }, [
+      _c("h4", { staticClass: "text-dark font-weight-bold" }, [
+        _c("i", { staticClass: "mdi mdi-account-location mdi-36px" }),
+        _vm._v("INFORMACIÓN DEL SOCIO")
+      ]),
+      _vm._v(" "),
+      _c("hr")
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("h4", { staticClass: " text-primary text-center" }, [
-      _c("i", {
-        staticClass: "mdi mdi-checkbox-marked-circle-outline mdi-36px"
-      }),
-      _vm._v("Cuenta de Ahorros creada exitosamente")
+    return _c("div", { staticClass: "col-md-12 " }, [
+      _c("h4", { staticClass: "text-dark font-weight-bold" }, [
+        _c("i", { staticClass: "mdi mdi-cash-usd mdi-36px" }),
+        _vm._v("INTERESES GANADOS POR LAS CUENTAS")
+      ]),
+      _vm._v(" "),
+      _c("hr")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12 " }, [
+      _c("h4", { staticClass: "text-dark font-weight-bold" }, [
+        _c("i", { staticClass: "mdi mdi-package-variant-closed mdi-36px" }),
+        _vm._v("CUENTAS DE AHORRO DEL SOCIO")
+      ]),
+      _vm._v(" "),
+      _c("hr")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", { staticClass: "bg bg-dark text-white " }, [
+        _c("th", [_vm._v("Opciones")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Tipo Cuenta")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("N° Cuenta ")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Saldo efectivo")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Tasa")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Interés ganados")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Fecha apertura")]),
+        _vm._v(" "),
+        _c("th", [_vm._v(" Estado")])
+      ])
     ])
   }
 ]
@@ -45248,6 +46666,29 @@ var render = function() {
                 _c("div", { staticClass: "template-demo " }, [
                   _c("div", { staticClass: "row" }, [
                     _vm._m(1),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-4 mt-2 text-white " }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary btn-icon-text",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.descargarDetalleCuenta()
+                            }
+                          }
+                        },
+                        [
+                          _c("i", {
+                            staticClass: "mdi mdi-file-pdf btn-icon-prepend"
+                          }),
+                          _vm._v(
+                            "Descargar Contrato\n                                        "
+                          )
+                        ]
+                      )
+                    ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-md-3" }, [
                       _c("h5", { staticClass: "font-weight-bold " }, [
@@ -45432,6 +46873,12 @@ var render = function() {
                             domProps: { textContent: _vm._s(movimiento.monto) }
                           }),
                           _vm._v(" "),
+                          _c("td", {
+                            domProps: {
+                              textContent: _vm._s(movimiento.interes_ganado)
+                            }
+                          }),
+                          _vm._v(" "),
                           movimiento.tipomovimiento == 0
                             ? _c("td", [
                                 _c(
@@ -45452,10 +46899,6 @@ var render = function() {
                             domProps: {
                               textContent: _vm._s(movimiento.usuario)
                             }
-                          }),
-                          _vm._v(" "),
-                          _c("td", {
-                            domProps: { textContent: _vm._s(movimiento.estado) }
                           })
                         ])
                       }),
@@ -45486,7 +46929,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-md-12" }, [
+    return _c("div", { staticClass: "col-md-8" }, [
       _c("h4", { staticClass: "text-dark font-weight-bold" }, [
         _c("i", { staticClass: "mdi mdi-package-variant-closed mdi-36px" }),
         _vm._v("Informacón de la Cueta de Ahorros ")
@@ -45513,6 +46956,278 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("h4", { staticClass: "text-dark font-weight-bold" }, [
+      _c("i", { staticClass: "mdi mdi-credit-card-multiple mdi-36px" }),
+      _vm._v("Historial de movimientos")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", { staticClass: "table-info text-white" }, [
+        _c("th", [_vm._v("#")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Boucher")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Fecha Registro")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Monto")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Interés ganado")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Tipo")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Cajero")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148&":
+/*!*****************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148& ***!
+  \*****************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("main", [
+    _c("div", { staticClass: "row " }, [
+      _c("div", { staticClass: "col-lg-12 grid-margin stretch-card " }, [
+        _c("div", { staticClass: "card " }, [
+          _c("div", { staticClass: "card-body " }, [
+            _c("div", { staticClass: "row bg bg-dark " }, [
+              _c("div", { staticClass: "col-md-12 mt-2 text-white " }, [
+                _vm.infocuenta.tipocuenta == 1
+                  ? _c("h4", [_vm._v("Detalle de Cuenta de Ahorros")])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.infocuenta.tipocuenta == 2
+                  ? _c("h4", [_vm._v("Detalle de Cuenta a Plazo Fijo")])
+                  : _vm._e()
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "row mt-4 " }, [
+              _c("div", { staticClass: "col-lg-12 " }, [
+                _c("div", { staticClass: "template-demo " }, [
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-8" }, [
+                      _c("h4", { staticClass: "text-dark font-weight-bold" }, [
+                        _c("i", {
+                          staticClass: "mdi mdi-package-variant-closed mdi-36px"
+                        }),
+                        _vm._v(" "),
+                        _vm.infocuenta.tipocuenta == 1
+                          ? _c("span", [
+                              _vm._v("Información de la Cuenta de Ahorros")
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.infocuenta.tipocuenta == 2
+                          ? _c("span", [
+                              _vm._v("Información de la Cuenta a Plazo Fijo")
+                            ])
+                          : _vm._e()
+                      ]),
+                      _vm._v(" "),
+                      _c("hr")
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-4 mt-2 text-white " }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary btn-icon-text",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.descargarDetalleCuenta()
+                            }
+                          }
+                        },
+                        [
+                          _c("i", {
+                            staticClass: "mdi mdi-file-pdf btn-icon-prepend"
+                          }),
+                          _vm._v(
+                            "Descargar Contrato\n                                        "
+                          )
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-3" }, [
+                      _c("h5", { staticClass: "font-weight-bold " }, [
+                        _vm._v("Número de Cuenta:")
+                      ]),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: {
+                          textContent: _vm._s(_vm.infocuenta.numerocuenta)
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-3 " }, [
+                      _c("h5", { staticClass: "font-weight-bold " }, [
+                        _vm._v("Saldo efectivo:")
+                      ]),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: {
+                          textContent: _vm._s(
+                            "S/." + _vm.infocuenta.saldoefectivo
+                          )
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-3 " }, [
+                      _c("h5", { staticClass: "font-weight-bold " }, [
+                        _vm._v("Tasa de Interes:")
+                      ]),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: { textContent: _vm._s(_vm.infocuenta.tasa) }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-3 " }, [
+                      _c("h5", { staticClass: "font-weight-bold " }, [
+                        _vm._v("Fecha Apertura:")
+                      ]),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: {
+                          textContent: _vm._s(_vm.infocuenta.fechaapertura)
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-3" }, [
+                      _c("h5", { staticClass: "font-weight-bold " }, [
+                        _vm._v("Creado por:")
+                      ]),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: {
+                          textContent: _vm._s(_vm.infocuenta.usuario)
+                        }
+                      })
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-lg-12 mt-4 " }, [
+                _vm._m(0),
+                _vm._v(" "),
+                _c("hr"),
+                _vm._v(" "),
+                _c("div", { staticClass: "table-responsive" }, [
+                  _c("table", { staticClass: "table  table-bordered" }, [
+                    _vm._m(1),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      _vm._l(_vm.arraymovimientos, function(movimiento, index) {
+                        return _c("tr", { key: movimiento.id }, [
+                          _c("td", { staticClass: "py-1" }, [
+                            _vm._v(_vm._s(index + 1))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c(
+                              "button",
+                              {
+                                staticClass:
+                                  "btn btn-success btn-rounded btn-icon ",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.boucherMovimiento(movimiento.id)
+                                  }
+                                }
+                              },
+                              [
+                                _c("i", {
+                                  staticClass: "mdi mdi-file-import mdi-24px"
+                                })
+                              ]
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", {
+                            domProps: {
+                              textContent: _vm._s(movimiento.fecharegistro)
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("td", {
+                            domProps: { textContent: _vm._s(movimiento.monto) }
+                          }),
+                          _vm._v(" "),
+                          _c("td", {
+                            domProps: {
+                              textContent: _vm._s(movimiento.interes_ganado)
+                            }
+                          }),
+                          _vm._v(" "),
+                          movimiento.tipomovimiento == 0
+                            ? _c("td", [
+                                _c(
+                                  "label",
+                                  { staticClass: "badge badge-warning" },
+                                  [_vm._v("Retiro")]
+                                )
+                              ])
+                            : _c("td", [
+                                _c(
+                                  "label",
+                                  { staticClass: "badge badge-success" },
+                                  [_vm._v("Aporte")]
+                                )
+                              ]),
+                          _vm._v(" "),
+                          _c("td", {
+                            domProps: {
+                              textContent: _vm._s(movimiento.usuario)
+                            }
+                          })
+                        ])
+                      }),
+                      0
+                    )
+                  ])
+                ])
+              ])
+            ])
+          ])
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h4", { staticClass: "text-dark font-weight-bold" }, [
       _c("i", { staticClass: "mdi mdi-account-location mdi-36px" }),
       _vm._v("Historial de movimientos")
     ])
@@ -45531,11 +47246,11 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Monto")]),
         _vm._v(" "),
+        _c("th", [_vm._v("Interés ganado")]),
+        _vm._v(" "),
         _c("th", [_vm._v("Tipo")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Cajaro")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Estado")])
+        _c("th", [_vm._v("Cajero")])
       ])
     ])
   }
@@ -45731,6 +47446,42 @@ var render = function() {
                                   )
                                 ]),
                                 _vm._v(" "),
+                                _c("td", [
+                                  _c(
+                                    "label",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "show",
+                                          rawName: "v-show",
+                                          value: cuenta.tipocuenta == 1,
+                                          expression: "cuenta.tipocuenta == 1"
+                                        }
+                                      ],
+                                      staticClass:
+                                        "badge badge-success text-white"
+                                    },
+                                    [_vm._v("Ahorros")]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "label",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "show",
+                                          rawName: "v-show",
+                                          value: cuenta.tipocuenta == 2,
+                                          expression: "cuenta.tipocuenta == 2"
+                                        }
+                                      ],
+                                      staticClass:
+                                        "badge badge-warning text-white"
+                                    },
+                                    [_vm._v("Plazo Fijo")]
+                                  )
+                                ]),
+                                _vm._v(" "),
                                 _c("td", {
                                   domProps: {
                                     textContent: _vm._s(cuenta.numerocuenta)
@@ -45899,17 +47650,19 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", { staticClass: "bg bg-dark text-white " }, [
-        _c("th", [_vm._v(" Opciones")]),
+        _c("th", [_vm._v("Opciones")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" N° Cuenta ")]),
+        _c("th", [_vm._v("Tipo Cuenta")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Saldo efectivo")]),
+        _c("th", [_vm._v("N° Cuenta ")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Fecha apertura")]),
+        _c("th", [_vm._v("Saldo efectivo")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" DNI Socio ")]),
+        _c("th", [_vm._v("Fecha apertura")]),
         _vm._v(" "),
-        _c("th", [_vm._v(" Nombres Socio ")])
+        _c("th", [_vm._v("DNI Socio")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Nombres Socio")])
       ])
     ])
   }
@@ -45939,7 +47692,29 @@ var render = function() {
     "div",
     { staticClass: "content-wrapper" },
     [
-      _vm.showfromregistro
+      _vm.showFormRegistroAhorros || _vm.showFormRegistroPlazoFijo
+        ? [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-warning",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    _vm.limpiarformulario()
+                    _vm.mostrarComponente(true, false, false, false)
+                  }
+                }
+              },
+              [
+                _c("i", { staticClass: "mdi mdi-arrow-left-bold" }),
+                _vm._v(" Elegir Tipo de cuenta\n        ")
+              ]
+            )
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.showElegirTipoCuenta
         ? [
             _c("div", { staticClass: "row " }, [
               _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
@@ -45949,18 +47724,92 @@ var render = function() {
                     _vm._v(" "),
                     _c("hr"),
                     _vm._v(" "),
+                    _c("h6", { staticClass: " text-primary text-center" }, [
+                      _vm._v("ELIJA UN TIPO DE CUENTA")
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "col-md-4" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success btn-icon-text",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                _vm.tipocuenta = 1
+                                _vm.mostrarComponente(false, true, false, false)
+                              }
+                            }
+                          },
+                          [
+                            _c("i", {
+                              staticClass:
+                                "mdi mdi-square-inc-cash btn-icon-prepend"
+                            }),
+                            _vm._v(
+                              "   \n                                    Cuenta Ahorros\n                                "
+                            )
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-4" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-warning btn-icon-text",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                _vm.tipocuenta = 2
+                                _vm.mostrarComponente(false, false, true, false)
+                              }
+                            }
+                          },
+                          [
+                            _c("i", {
+                              staticClass:
+                                "mdi mdi-square-inc-cash btn-icon-prepend"
+                            }),
+                            _vm._v(
+                              "\n                                    Cuenta Plazo Fijo\n                                "
+                            )
+                          ]
+                        )
+                      ])
+                    ])
+                  ])
+                ])
+              ])
+            ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.showFormRegistroAhorros
+        ? [
+            _c("div", { staticClass: "row " }, [
+              _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm._m(1),
+                    _vm._v(" "),
+                    _c("hr"),
+                    _vm._v(" "),
                     _c("p", { staticClass: "card-description text-primary" }, [
                       _vm._v(
                         "\n                            Verifique la Información antes de hacer el registro\n                        "
                       )
                     ]),
                     _vm._v(" "),
+                    _vm._m(2),
+                    _vm._v(" "),
                     _c(
                       "form",
                       {
                         staticClass: "forms-sample",
                         attrs: { id: "formRegistro" },
-                        on: { submit: _vm.enviarForm }
+                        on: { submit: _vm.prevenirDefault }
                       },
                       [
                         _c(
@@ -45987,7 +47836,7 @@ var render = function() {
                                 "on-search": _vm.selectCuenta,
                                 label: "identificador",
                                 options: _vm.arraycuentas,
-                                placeholder: "Ingrese un número de cuenta",
+                                placeholder: "Ingrese un DNI del socio",
                                 onChange: _vm.getDatosCuenta,
                                 clearable: ""
                               }
@@ -46193,14 +48042,19 @@ var render = function() {
                             type: "submit",
                             value: "Registrar Operación"
                           },
-                          on: { click: _vm.registrarMovimiento }
+                          on: { click: _vm.registrarMovimientoAhorros }
                         }),
                         _vm._v(" "),
                         _c(
                           "a",
                           {
                             staticClass: "btn btn-light",
-                            on: { click: _vm.limpiarformulario }
+                            on: {
+                              click: function($event) {
+                                _vm.limpiarformulario()
+                                _vm.mostrarComponente(true, false, false, false)
+                              }
+                            }
                           },
                           [_vm._v("Cancelar")]
                         )
@@ -46213,13 +48067,183 @@ var render = function() {
           ]
         : _vm._e(),
       _vm._v(" "),
-      _vm.showmsgregistro
+      _vm.showFormRegistroPlazoFijo
         ? [
             _c("div", { staticClass: "row " }, [
               _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
                 _c("div", { staticClass: "card" }, [
                   _c("div", { staticClass: "card-body" }, [
-                    _vm._m(1),
+                    _vm._m(3),
+                    _vm._v(" "),
+                    _c("hr"),
+                    _vm._v(" "),
+                    _c("p", { staticClass: "card-description text-primary" }, [
+                      _vm._v(
+                        "\n                            Verifique la Información antes de hacer el registro\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _vm._m(4),
+                    _vm._v(" "),
+                    _c(
+                      "form",
+                      {
+                        staticClass: "forms-sample",
+                        attrs: { id: "formRegistroFijo" },
+                        on: { submit: _vm.prevenirDefault }
+                      },
+                      [
+                        _c(
+                          "div",
+                          { staticClass: "form-group" },
+                          [
+                            _c(
+                              "label",
+                              {
+                                staticClass: "font-weight-bold",
+                                attrs: { for: "numcuentafijo" }
+                              },
+                              [_vm._v("Ingrese DNI del socio")]
+                            ),
+                            _vm._v(" "),
+                            _c("v-select", {
+                              staticClass: "col-md-12",
+                              class: [
+                                "border",
+                                _vm.errores.cuenta ? "border-danger" : ""
+                              ],
+                              attrs: {
+                                id: "numcuentafijo",
+                                "on-search": _vm.selectCuenta,
+                                label: "identificador",
+                                options: _vm.arraycuentas,
+                                placeholder: "Ingrese un DNI del socio",
+                                onChange: _vm.getDatosCuenta,
+                                clearable: ""
+                              }
+                            }),
+                            _vm._v(" "),
+                            _vm.idcuenta != ""
+                              ? _c("div", [
+                                  _c("label", {
+                                    staticClass: "badge badge-dark",
+                                    domProps: {
+                                      textContent: _vm._s(
+                                        _vm.nombre + " " + _vm.apellidos
+                                      )
+                                    }
+                                  })
+                                ])
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm.errores.cuenta
+                              ? _c("span", { staticClass: "text-danger" }, [
+                                  _vm._v("seleccione un número de cuenta")
+                                ])
+                              : _vm._e()
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", { staticClass: "font-weight-bold" }, [
+                            _vm._v("Monto de Depósito(S/)")
+                          ]),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("label", {
+                            domProps: { textContent: _vm._s(_vm.monto_fijo) }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", { staticClass: "font-weight-bold" }, [
+                            _vm._v("Tasa Efectiva Anual")
+                          ]),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("label", {
+                            domProps: { textContent: _vm._s(_vm.tasa_fijo) }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", { staticClass: "font-weight-bold" }, [
+                            _vm._v("Fecha Inicio Plazo")
+                          ]),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("label", {
+                            domProps: { textContent: _vm._s(_vm.fecha_inicio) }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", { staticClass: "font-weight-bold" }, [
+                            _vm._v("Fecha Límite Plazo")
+                          ]),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("label", {
+                            domProps: { textContent: _vm._s(_vm.fecha_fin) }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "a",
+                          {
+                            staticClass: "btn btn-warning mr-2 text-dark",
+                            on: {
+                              click: function($event) {
+                                return _vm.registrarMovimientoFijo(false)
+                              }
+                            }
+                          },
+                          [_vm._v("Cobrar y Cancelar cuenta")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "a",
+                          {
+                            staticClass: "btn btn-primary text-dark",
+                            on: {
+                              click: function($event) {
+                                return _vm.registrarMovimientoFijo(true)
+                              }
+                            }
+                          },
+                          [_vm._v("Cobrar y Renovar cuenta")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "a",
+                          {
+                            staticClass: "btn btn-light",
+                            on: {
+                              click: function($event) {
+                                _vm.limpiarformulario()
+                                _vm.mostrarComponente(true, false, false, false)
+                              }
+                            }
+                          },
+                          [_vm._v("Cancelar")]
+                        )
+                      ]
+                    )
+                  ])
+                ])
+              ])
+            ])
+          ]
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.showMsgRegistro
+        ? [
+            _c("div", { staticClass: "row " }, [
+              _c("div", { staticClass: "col-md-12 grid-margin stretch-card" }, [
+                _c("div", { staticClass: "card" }, [
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm._m(5),
                     _vm._v(" "),
                     _c("hr"),
                     _vm._v(" "),
@@ -46251,7 +48275,12 @@ var render = function() {
                             attrs: { type: "button" },
                             on: {
                               click: function($event) {
-                                return _vm.mostrarComponente(true, false)
+                                return _vm.mostrarComponente(
+                                  true,
+                                  false,
+                                  false,
+                                  false
+                                )
                               }
                             }
                           },
@@ -46260,7 +48289,7 @@ var render = function() {
                               staticClass: "mdi mdi-upload btn-icon-prepend"
                             }),
                             _vm._v(
-                              "\n                                    Nuevo Aporte\n                                "
+                              "\n                                    Nuevo Movimieto\n                                "
                             )
                           ]
                         )
@@ -46281,9 +48310,45 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("h4", { staticClass: " text-primary text-center" }, [
+      _c("i", {
+        staticClass: "mdi mdi-checkbox-marked-circle-outline mdi-36px"
+      }),
+      _vm._v("REGISTRAR MOVIMIENTO")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("h4", { staticClass: "card-title text-dark" }, [
       _c("i", { staticClass: "mdi mdi-cash-multiple mdi-36px" }),
       _vm._v(" Registrar Movimiento")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { attrs: { align: "center" } }, [
+      _c("h3", [_vm._v("CUENTA DE AHORROS")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h4", { staticClass: "card-title text-dark" }, [
+      _c("i", { staticClass: "mdi mdi-cash-multiple mdi-36px" }),
+      _vm._v(" Registrar Movimiento")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { attrs: { align: "center" } }, [
+      _c("h3", [_vm._v("CUENTA A PLAZO FIJO")])
     ])
   },
   function() {
@@ -46333,7 +48398,8 @@ var render = function() {
                     staticClass: "btn btn-success mr-2",
                     on: {
                       click: function($event) {
-                        return _vm.mostrarComponente(false, false, true)
+                        _vm.limpiarformulario()
+                        _vm.mostrarComponente(false, false, true)
                       }
                     }
                   },
@@ -46358,10 +48424,8 @@ var render = function() {
                       "form",
                       {
                         staticClass: "forms-sample",
-                        attrs: {
-                          id: "formRegistro",
-                          submit: "this.preventDefault()"
-                        }
+                        attrs: { id: "formRegistro" },
+                        on: { submit: _vm.prevenirDefault }
                       },
                       [
                         _c(
@@ -46378,7 +48442,11 @@ var render = function() {
                             ),
                             _vm._v(" "),
                             _c("v-select", {
-                              staticClass: "col-md-12",
+                              class: [
+                                "col-md-12",
+                                "border",
+                                _vm.errores.dni ? "border-danger" : ""
+                              ],
                               attrs: {
                                 id: "dnisocio",
                                 "on-search": _vm.selectSocio,
@@ -46400,6 +48468,12 @@ var render = function() {
                                     }
                                   })
                                 ])
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm.errores.dni
+                              ? _c("span", { staticClass: "text-danger" }, [
+                                  _vm._v(_vm._s(_vm.errores.dni[0]))
+                                ])
                               : _vm._e()
                           ],
                           1
@@ -46410,9 +48484,9 @@ var render = function() {
                             "label",
                             {
                               staticClass: "font-weight-bold",
-                              attrs: { for: "tasainteres" }
+                              attrs: { for: "montoaporte" }
                             },
-                            [_vm._v("Tasa de Aportes(%)")]
+                            [_vm._v("Tasa de interés")]
                           ),
                           _vm._v(" "),
                           _c("input", {
@@ -46426,17 +48500,10 @@ var render = function() {
                             ],
                             staticClass: "form-control",
                             attrs: {
-                              id: "tasainteres",
+                              id: "montoaporte",
                               type: "number",
-                              min: "1",
-                              max: "99",
-                              step: "any",
-                              placeholder: "Tasa de interes por aporte",
-                              oninvalid:
-                                "this.setCustomValidity('ingrese la tasa de interés')",
-                              oninput: "this.setCustomValidity('')",
-                              disabled: "",
-                              required: ""
+                              step: "0.01",
+                              disabled: ""
                             },
                             domProps: { value: _vm.tasa },
                             on: {
@@ -46469,15 +48536,15 @@ var render = function() {
                                 expression: "monto"
                               }
                             ],
-                            staticClass: "form-control",
+                            class: [
+                              "form-control",
+                              "border",
+                              _vm.errores.monto ? "border-danger" : ""
+                            ],
                             attrs: {
                               id: "montoaporte",
                               type: "number",
-                              placeholder: "Monto",
-                              oninvalid:
-                                "this.setCustomValidity('ingrese el monto del aporte')",
-                              oninput: "this.setCustomValidity('')",
-                              required: ""
+                              placeholder: "Monto"
                             },
                             domProps: { value: _vm.monto },
                             on: {
@@ -46488,7 +48555,13 @@ var render = function() {
                                 _vm.monto = $event.target.value
                               }
                             }
-                          })
+                          }),
+                          _vm._v(" "),
+                          _vm.errores.monto
+                            ? _c("span", { staticClass: "text-danger" }, [
+                                _vm._v(_vm._s(_vm.errores.monto[0]))
+                              ])
+                            : _vm._e()
                         ]),
                         _vm._v(" "),
                         _c("div", { staticClass: "form-group" }, [
@@ -46510,15 +48583,15 @@ var render = function() {
                                 expression: "descripcion"
                               }
                             ],
-                            staticClass: "form-control",
+                            class: [
+                              "form-control",
+                              "border",
+                              _vm.errores.descripcion ? "border-danger" : ""
+                            ],
                             attrs: {
                               id: "descripcionaporte",
                               type: "text",
-                              placeholder: "Detalle de Aporte",
-                              oninvalid:
-                                "this.setCustomValidity('ingrese una descripción sobre el aporte')",
-                              oninput: "this.setCustomValidity('')",
-                              required: ""
+                              placeholder: "Detalle de Aporte"
                             },
                             domProps: { value: _vm.descripcion },
                             on: {
@@ -46529,7 +48602,13 @@ var render = function() {
                                 _vm.descripcion = $event.target.value
                               }
                             }
-                          })
+                          }),
+                          _vm._v(" "),
+                          _vm.errores.descripcion
+                            ? _c("span", { staticClass: "text-danger" }, [
+                                _vm._v(_vm._s(_vm.errores.descripcion[0]))
+                              ])
+                            : _vm._e()
                         ]),
                         _vm._v(" "),
                         _c("input", {
@@ -46542,7 +48621,12 @@ var render = function() {
                           "a",
                           {
                             staticClass: "btn btn-light",
-                            on: { click: _vm.limpiarformulario }
+                            on: {
+                              click: function($event) {
+                                _vm.limpiarformulario()
+                                _vm.mostrarComponente(false, false, true)
+                              }
+                            }
                           },
                           [_vm._v("Cancelar")]
                         )
@@ -46572,7 +48656,11 @@ var render = function() {
                           {
                             staticClass: "btn btn-danger btn-icon-text",
                             attrs: { type: "button" },
-                            on: { click: _vm.descargarBoucher }
+                            on: {
+                              click: function($event) {
+                                return _vm.descargarBoucher(_vm.idaporte)
+                              }
+                            }
                           },
                           [
                             _c("i", {
@@ -46791,6 +48879,27 @@ var render = function() {
                             return _c("tr", { key: aporte.id }, [
                               _c("td", [_vm._v(_vm._s(index + 1))]),
                               _vm._v(" "),
+                              _c("td", [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-danger btn-icon-text",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.descargarBoucher(aporte.id)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass:
+                                        "mdi mdi-file-pdf btn-icon-prepend"
+                                    })
+                                  ]
+                                )
+                              ]),
+                              _vm._v(" "),
                               _c("td", {
                                 domProps: {
                                   textContent: _vm._s(aporte.fecharegistro)
@@ -46961,6 +49070,8 @@ var staticRenderFns = [
     return _c("thead", [
       _c("tr", { staticClass: "bg bg-info text-white" }, [
         _c("th", [_vm._v("#")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Descargar Boucher")]),
         _vm._v(" "),
         _c("th", [_vm._v("Fecha de registro")]),
         _vm._v(" "),
@@ -52991,7 +55102,11 @@ var render = function() {
             "button",
             {
               staticClass: "btn btn-success mr-2",
-              on: { click: _vm.ocultarDetalle }
+              on: {
+                click: function($event) {
+                  return _vm.mostrarComponenete(true, false, false, false)
+                }
+              }
             },
             [_vm._v("volver")]
           )
@@ -53293,7 +55408,42 @@ var render = function() {
                                     })
                                   ]
                                 )
-                              : _vm._e()
+                              : _c(
+                                  "button",
+                                  {
+                                    staticClass:
+                                      "btn btn-outline-danger btn-rounded btn-icon",
+                                    attrs: { type: "button", disabled: "" }
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass: "mdi mdi-delete-forever"
+                                    })
+                                  ]
+                                ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                directives: [
+                                  {
+                                    name: "show",
+                                    rawName: "v-show",
+                                    value: _vm.tipo == 0,
+                                    expression: "tipo==0"
+                                  }
+                                ],
+                                staticClass:
+                                  "btn btn-info btn-rounded btn-icon",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.mostrarCuentasDeSocio(persona.id)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "mdi mdi-currency-usd" })]
+                            )
                           ]),
                           _vm._v(" "),
                           _c("td", {
@@ -53588,7 +55738,11 @@ var render = function() {
           }
         ],
         attrs: { ruta: _vm.ruta, tipo: _vm.tipo, bus: _vm.bus }
-      })
+      }),
+      _vm._v(" "),
+      _vm.showcuentas
+        ? _c("cuentassocio", { attrs: { id: _vm.idsocio, ruta: _vm.ruta } })
+        : _vm._e()
     ],
     1
   )
@@ -53658,7 +55812,7 @@ var render = function() {
                   {
                     staticClass: "forms-sample mt-4",
                     attrs: { id: "formRegistro" },
-                    on: { submit: _vm.validarform }
+                    on: { submit: _vm.prevenirDefault }
                   },
                   [
                     _c("div", { staticClass: "row" }, [
@@ -66733,6 +68887,8 @@ Vue.component('configuraciones', __webpack_require__(/*! ./components/configurac
 Vue.component('notificacion', __webpack_require__(/*! ./components/Notificacion.vue */ "./resources/js/components/Notificacion.vue")["default"]); //CAJA
 
 Vue.component('caja', __webpack_require__(/*! ./components/Caja.vue */ "./resources/js/components/Caja.vue")["default"]);
+Vue.component('cuentassocio', __webpack_require__(/*! ./components/ahorros/CuentasSocio.vue */ "./resources/js/components/ahorros/CuentasSocio.vue")["default"]);
+Vue.component('detallecuentasocio', __webpack_require__(/*! ./components/ahorros/DetalleCuentaSocio.vue */ "./resources/js/components/ahorros/DetalleCuentaSocio.vue")["default"]);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -66811,15 +68967,14 @@ if (token) {
 /*!******************************************!*\
   !*** ./resources/js/components/Caja.vue ***!
   \******************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Caja_vue_vue_type_template_id_d55e4300___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Caja.vue?vue&type=template&id=d55e4300& */ "./resources/js/components/Caja.vue?vue&type=template&id=d55e4300&");
 /* harmony import */ var _Caja_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Caja.vue?vue&type=script&lang=js& */ "./resources/js/components/Caja.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Caja_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Caja_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -66849,7 +69004,7 @@ component.options.__file = "resources/js/components/Caja.vue"
 /*!*******************************************************************!*\
   !*** ./resources/js/components/Caja.vue?vue&type=script&lang=js& ***!
   \*******************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -67102,6 +69257,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/ahorros/CuentasSocio.vue":
+/*!**********************************************************!*\
+  !*** ./resources/js/components/ahorros/CuentasSocio.vue ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _CuentasSocio_vue_vue_type_template_id_c7e00e60___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CuentasSocio.vue?vue&type=template&id=c7e00e60& */ "./resources/js/components/ahorros/CuentasSocio.vue?vue&type=template&id=c7e00e60&");
+/* harmony import */ var _CuentasSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CuentasSocio.vue?vue&type=script&lang=js& */ "./resources/js/components/ahorros/CuentasSocio.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _CuentasSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _CuentasSocio_vue_vue_type_template_id_c7e00e60___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _CuentasSocio_vue_vue_type_template_id_c7e00e60___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/ahorros/CuentasSocio.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/ahorros/CuentasSocio.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/components/ahorros/CuentasSocio.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CuentasSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./CuentasSocio.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/CuentasSocio.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CuentasSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/ahorros/CuentasSocio.vue?vue&type=template&id=c7e00e60&":
+/*!*****************************************************************************************!*\
+  !*** ./resources/js/components/ahorros/CuentasSocio.vue?vue&type=template&id=c7e00e60& ***!
+  \*****************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CuentasSocio_vue_vue_type_template_id_c7e00e60___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./CuentasSocio.vue?vue&type=template&id=c7e00e60& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/CuentasSocio.vue?vue&type=template&id=c7e00e60&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CuentasSocio_vue_vue_type_template_id_c7e00e60___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CuentasSocio_vue_vue_type_template_id_c7e00e60___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/ahorros/DetalleCuentaAhorro.vue":
 /*!*****************************************************************!*\
   !*** ./resources/js/components/ahorros/DetalleCuentaAhorro.vue ***!
@@ -67166,6 +69390,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DetalleCuentaAhorro_vue_vue_type_template_id_10720ba8___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DetalleCuentaAhorro_vue_vue_type_template_id_10720ba8___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/ahorros/DetalleCuentaSocio.vue":
+/*!****************************************************************!*\
+  !*** ./resources/js/components/ahorros/DetalleCuentaSocio.vue ***!
+  \****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _DetalleCuentaSocio_vue_vue_type_template_id_5a4e4148___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148& */ "./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148&");
+/* harmony import */ var _DetalleCuentaSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DetalleCuentaSocio.vue?vue&type=script&lang=js& */ "./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DetalleCuentaSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DetalleCuentaSocio_vue_vue_type_template_id_5a4e4148___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _DetalleCuentaSocio_vue_vue_type_template_id_5a4e4148___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/ahorros/DetalleCuentaSocio.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************!*\
+  !*** ./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DetalleCuentaSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./DetalleCuentaSocio.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DetalleCuentaSocio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148&":
+/*!***********************************************************************************************!*\
+  !*** ./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148& ***!
+  \***********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DetalleCuentaSocio_vue_vue_type_template_id_5a4e4148___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ahorros/DetalleCuentaSocio.vue?vue&type=template&id=5a4e4148&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DetalleCuentaSocio_vue_vue_type_template_id_5a4e4148___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DetalleCuentaSocio_vue_vue_type_template_id_5a4e4148___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -68173,8 +70466,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\xampp2\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\zamora\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\zamora\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

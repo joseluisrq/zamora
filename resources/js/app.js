@@ -59,6 +59,9 @@ Vue.component('notificacion', require('./components/Notificacion.vue').default);
 //CAJA
 Vue.component('caja', require('./components/Caja.vue').default);
 
+Vue.component('cuentassocio', require('./components/ahorros/CuentasSocio.vue').default);
+ Vue.component('detallecuentasocio', require('./components/ahorros/DetalleCuentaSocio.vue').default);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

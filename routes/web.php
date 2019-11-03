@@ -77,7 +77,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/ahorro/detalle/', 'CuentaAhorroController@detalleCuentaAhorro');
         Route::get('/ahorro/selectsocio', 'CuentaAhorroController@selectSocio');
         Route::post('/cuentaahorros/crear', 'CuentaAhorroController@store');
-        Route::get('/ahorro/movimiento/imprimirboucher', 'CuentaAhorroController@imprimirBoucherMovimiento');
+        Route::get('/ahorro/movimiento/imprimirboucher', 'MovimientoController@imprimirBoucherMovimiento');
         Route::get('/ahorro/cuenta/imprimirdetalle', 'CuentaAhorroController@imprimirDetalleCuenta');
         //MOVIMIENTOS
         Route::get('/movimiento/selectCuenta', 'MovimientoController@selectCuenta');
@@ -102,6 +102,23 @@ Route::group(['middleware' => ['auth']], function () {
        
         //EMPRESA
         Route::get('/empresa/tasaCuenta', 'EmpresaController@tasaCrearCuenta');
+
+        Route::post('/movimiento/registrarAhorros', 'MovimientoController@storeAhorros');
+
+
+            Route::post('/movimiento/registrarFijos', 'MovimientoController@storeFijo');
+            Route::get('/ahorro/cuentassocio', 'CuentaAhorroController@cuentasSocio');
+            Route::get('/ahorro/intereses', 'CuentaAhorroController@obtenerInteresesGanados');
+            Route::get('/empresa/tasaAportes', 'EmpresaController@tasaAportes');
+            Route::get('/infosocio', 'PersonaController@infosocio');
+
+        //CAJA
+        Route::post('/caja/abrirCaja', 'CajaController@abrirCaja');//abrir caja
+        Route::get('/caja/seleccionarCaja', 'CajaController@seleccionarCaja');//cajalista
+        Route::get('/caja/CajasAperturadas', 'CajaController@CajasAperturadas');//cajalista
+        Route::get('/caja/MovimientosCaja', 'CajaController@MovimientosCaja');//cajalista
+      
+
     });  
 
 

@@ -5,7 +5,7 @@
         <template v-if="showregistro">
             <div class="row ">
                 <div class="col-lg-12">
-                    <button class="btn btn-success mr-2" @click="mostrarComponente(false, false, true)">Lista de Aportes</button>
+                    <button class="btn btn-success mr-2" @click="limpiarformulario();mostrarComponente(false, false, true)">Lista de Aportes</button>
                 </div>
                 <div class="col-md-12 grid-margin stretch-card">
                     <div class="card">
@@ -15,38 +15,41 @@
                             <p class="card-description text-primary">
                                 Verifique la Información antes de hacer el aporte
                             </p>
-                            <form id="formRegistro" submit="this.preventDefault()" class="forms-sample">
+                            <form id="formRegistro" @submit="prevenirDefault" class="forms-sample">
                                 <div class="form-group">
                                     <label for="dnisocio" class="font-weight-bold">Socio (Ingrese N° de DNI )</label>
                                     <v-select
                                         id="dnisocio"
+                                        :class="['col-md-12', 'border',errores.dni ? 'border-danger' : '']"
                                         :on-search="selectSocio"
                                         label="dni"
                                         :options="arraysocios"
                                         placeholder="Ingrese DNI del socio..."
                                         :onChange="getDatosSocio"
-                                        class="col-md-12"
                                     >
                                     </v-select>
                                     <div v-if="idsocio!=0">
                                         <label class="badge badge-dark" v-text="nombre+' '+apellidos"/>
                                     </div>
+                                    <span v-if="errores.dni" class="text-danger">{{ errores.dni[0] }}</span>
                                 </div>
                                 <div class="form-group">
-                                        <label for="tasainteres" class="font-weight-bold">Tasa de Aportes(%)</label>
-                                        <input id="tasainteres" type="number" min="1" max="99"  step="any" v-model="tasa" class="form-control" placeholder="Tasa de interes por aporte" oninvalid="this.setCustomValidity('ingrese la tasa de interés')" oninput="this.setCustomValidity('')" disabled required>
+                                    <label for="montoaporte" class="font-weight-bold">Tasa de interés</label>
+                                    <input id="montoaporte" type="number" step="0.01" v-model="tasa" class="form-control" disabled="">
                                 </div>
                                 <div class="form-group">
                                     <label for="montoaporte" class="font-weight-bold">Monto de Aporte(S/)</label>
-                                    <input id="montoaporte" type="number" v-model="monto" class="form-control" placeholder="Monto" oninvalid="this.setCustomValidity('ingrese el monto del aporte')" oninput="this.setCustomValidity('')" required>
+                                    <input id="montoaporte" type="number" v-model="monto" :class="['form-control', 'border',errores.monto ? 'border-danger' : '']" placeholder="Monto">
+                                    <span v-if="errores.monto" class="text-danger">{{ errores.monto[0] }}</span>
                                 </div>
                                 <div class="form-group">
                                     <label for="descripcionaporte" class="font-weight-bold">Descripción</label>
-                                    <input id="descripcionaporte" type="text" v-model="descripcion" class="form-control" placeholder="Detalle de Aporte" oninvalid="this.setCustomValidity('ingrese una descripción sobre el aporte')" oninput="this.setCustomValidity('')" required>
+                                    <input id="descripcionaporte" type="text" v-model="descripcion" :class="['form-control', 'border',errores.descripcion ? 'border-danger' : '']" placeholder="Detalle de Aporte">
+                                    <span v-if="errores.descripcion" class="text-danger">{{ errores.descripcion[0] }}</span>
                                 </div>                                
                             
                                 <input type="submit" class="btn btn-primary mr-2" value="Registrar Aporte" @click="registraraporte"/>
-                                <a class="btn btn-light" @click="limpiarformulario">Cancelar</a>
+                                <a class="btn btn-light" @click="limpiarformulario();mostrarComponente(false, false, true)">Cancelar</a>
                             </form>
                         </div>
                     </div>
@@ -65,7 +68,7 @@
                             <hr>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <button type="button" class="btn btn-danger btn-icon-text" @click="descargarBoucher">
+                                    <button type="button" class="btn btn-danger btn-icon-text" @click="descargarBoucher(idaporte)">
                                         <i class="mdi mdi-upload btn-icon-prepend"></i>   
                                         Descargar Boucher
                                     </button>
@@ -121,6 +124,7 @@
                                     <thead>
                                         <tr class="bg bg-info text-white">
                                             <th>#</th>
+                                            <th>Descargar Boucher</th>
                                             <th>Fecha de registro</th>
                                             <th>DNI Socio</th>
                                             <th>Nombres y  Apellidos</th>
@@ -132,6 +136,9 @@
                                     <tbody>
                                         <tr v-for="(aporte, index) in arrayaportes" :key="aporte.id">
                                             <td>{{ index + 1 }}</td>
+                                            <td>
+                                                <button type="button" @click="descargarBoucher(aporte.id)" class="btn btn-danger btn-icon-text"><i class="mdi mdi-file-pdf btn-icon-prepend"></i></button>
+                                            </td>
                                             <td v-text="aporte.fecharegistro"></td>
                                             <td v-text="aporte.dni"></td>
                                             <td v-text="aporte.nombre + ' ' + aporte.apellidos"></td>
@@ -173,11 +180,13 @@
         data: function(){
             return {
                 idsocio: 0,
+                idaporte: '',
                 dni: '',
                 nombre: '',
                 apellidos: '',
                 monto: '',
                 descripcion: '',
+
                 tasa: '',
 
                 socioseleccionado: false,
@@ -199,7 +208,9 @@
 
                 showregistro : false,
                 showmsgregistro : false,
-                showlista : true
+                showlista : true,
+
+                errores: []
             }
         },
         components:{
@@ -250,11 +261,16 @@
                     timer: tiempo
                 });
             },
+            prevenirDefault(e){
+                e.preventDefault();
+            },
             limpiarformulario(){
                 let me = this;
+                me.idaporte = '';
                 me.monto = '';
                 me.descripcion = '';
-                me.tasa = '';
+
+                me.errore = [];
 
                 me.limpiarselect();
             },
@@ -289,39 +305,30 @@
             registraraporte(){
                 let me = this;
 
-                if(!me.socioseleccionado){
-                    me.mostraralerta('top-end', 'error', '¡¡¡ Por favor seleccione un socio para registrar el aporte !!!', false, 2500);
-                    return;
-                }
+                me.errores = [];
 
-                let form = document.getElementById("formRegistro");
-                form.classList.add('was-validated');
-
-                if(form.checkValidity()){
-                    let aporte = {
+                let aporte = {
                         'idsocio': me.idsocio,
                         'dni': me.dni,
                         'monto': me.monto,
-                        'descripcion': me.descripcion,
-                        'tasa': me.tasa
+                        'descripcion': me.descripcion
                     };
 
                     axios.post(me.ruta + '/aporte/registrar', aporte)
                     .then(res => {
-                        form.classList.remove('was-validated');
                         me.limpiarformulario();
+                        me.idaporte = res.data.idaporte;
                         me.mostrarComponente(false, true, false);//Mostrar el mensaje de confirmación de aporte registrado
                     })
                     .catch(err => {
-                        me.mostraralerta('top-end', 'error', '¡¡¡ Error, el registro no se completó correctamente !!!', false, 2500);
+                        me.errores = err.response.data.errors;
                         console.log(err);
                     });
-                }
             },
             selectSocio(search, loading){
-                let me=this;
+                let me = this;
                  loading(true)
-                var url= this.ruta+'/aporte/selectsocio?filtro='+search;
+                var url = me.ruta+'/aporte/selectsocio?filtro='+search;
                 axios.get(url).then(function (response) {
                     let respuesta = response.data;
                     q:search;
@@ -346,40 +353,33 @@
                     me.limpiarselect();
                 }
             },
-
-               cargarValores()
-            {
-                let me = this;
-
-                axios.get(this.ruta+'/config/valores')
-                    .then(res => {
-                        //  me.array_empresa=res.data.config;
-                      
-                        me.tasa=res.data.config.tasa_aportes;
-                     
-                    
-                    })
-                    .catch(err => {
-                    // me.mostraralerta('top-end', 'error', '¡¡¡ Error al cargar las tasas', false, 2500);
-                        console.log(err);
-                    });
-            },
             mostrarComponente(valregistro, valmensaje, vallista){
                 let me = this;
                 me.showregistro = valregistro;
                 me.showmsgregistro = valmensaje;
                 me.showlista = vallista;
                 if(vallista) me.listaraportes(1, '', '');
+                if(valregistro) me.cargarTasaAportes();
             },
-            descargarBoucher(){
+            cargarTasaAportes(){
+                let me = this;
+                var url = me.ruta+'/empresa/tasaAportes';
+                axios.get(url).then(res => {
+                    me.tasa = res.data.tasa;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            descargarBoucher(idaporte){
                 let me = this;
                 me.mostrarComponente(false, false, true);
-                window.open(me.ruta + '/aporte/pdfDetalleAporte/','_blank');
+                window.open(me.ruta + '/aporte/pdfDetalleAporte?id='+idaporte,'_blank');
             }
         },
         mounted() {
+            this.cargarTasaAportes();
             this.listaraportes(1, '', '');
-              this.cargarValores();
         }
     };
 </script>

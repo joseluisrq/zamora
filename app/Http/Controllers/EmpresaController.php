@@ -50,7 +50,7 @@ class EmpresaController extends Controller
     'hoy'=>$mytime];
 	}
 
-    public function tasaCrearCuenta(Request $request)
+    public function tasaCrearCuenta0(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
 
@@ -104,5 +104,55 @@ class EmpresaController extends Controller
         } catch (Exception $e){
             DB::rollBack();
         }
-	}
+    }
+    public function tasaCrearCuenta(Request $request)//Devuelve la tasa y monto mínimo para crear lacuenta
+   
+ {
+        if (!$request->ajax()) return redirect('/');
+
+    
+    $tipo = $request->tipo;
+
+        $campo_tasa = 'tasa_';
+        $campo_monto_min = 'monto_min_';
+
+     
+   if($tipo == 1) {//ES UNA CUENTA DE AHORROS
+            $campo_tasa .= 'ahorros';
+       
+     $campo_monto_min .= 'ahorros';
+        }
+        else {
+            $campo_tasa .= 'ahorroplazo_' . $request->tiempo;
+       
+     $campo_monto_min .= $request->tiempo;
+        }
+
+        $datos_empresa = Empresa::select(['empresa.'.$campo_tasa, 'empresa.'.$campo_monto_min])
+   
+     ->orderBy('empresa.id', 'desc')->take(1)->get()[0];
+
+        $tasa = $datos_empresa->$campo_tasa;
+        $monto_min = $datos_empresa->$campo_monto_min;
+       
+  
+        return ["tasa" => $tasa, "monto_min" => $monto_min];
+    }
+
+    public function tasaAportes(Request $request)//Devuelve la tasa de aportes
+   
+ {
+        if (!$request->ajax()) return redirect('/');
+
+        $tasa = Empresa::select('empresa.tasa_aportes')
+   
+     ->orderBy('empresa.id', 'desc')->take(1)->get()[0]->tasa_aportes;
+         
+        return ["tasa" => $tasa];
+    }
+
+
+
+
+
 }

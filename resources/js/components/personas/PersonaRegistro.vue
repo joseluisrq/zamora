@@ -11,7 +11,7 @@
 							</div>
 						</div>
 						
-						<form id="formRegistro" @submit="validarform" class="forms-sample mt-4">
+						<form id="formRegistro" @submit="prevenirDefault" class="forms-sample mt-4">
 							<div class="row">
 								<div class="col-md-2 form-group">
 									<label for="formdni">DNI</label>
@@ -193,7 +193,7 @@
 
                 this.bus.$emit('limpiarDetalle');//Limpiar el detalle del cliente
     		},
-    		validarform: function (e) {
+    		prevenirDefault: function (e) {
     			e.preventDefault();//Esto evita que que el formulario recargue la página cunado se envía la info
 		    },
     		cargaroles: function(){
