@@ -117,7 +117,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/caja/seleccionarCaja', 'CajaController@seleccionarCaja');//cajalista
         Route::get('/caja/CajasAperturadas', 'CajaController@CajasAperturadas');//cajalista
         Route::get('/caja/MovimientosCaja', 'CajaController@MovimientosCaja');//cajalista
-      
+        Route::put('/caja/CerrarCaja', 'CajaController@CerrarCaja');//cajalista
+        Route::put('/caja/ActualizarMontoIncial', 'CajaController@ActualizarMontoIncial');//cajalista
 
     });  
 

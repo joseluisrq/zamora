@@ -2048,6 +2048,50 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['ruta'],
   data: function data() {
@@ -2072,6 +2116,7 @@ __webpack_require__.r(__webpack_exports__);
       sumaaportes: 0,
       sumapagos: 0,
       sumamovimiento: 0,
+      restamovimiento: 0,
       sumadesembolso: 0
     };
   },
@@ -2135,7 +2180,9 @@ __webpack_require__.r(__webpack_exports__);
           axios.post(_this.ruta + '/caja/abrirCaja', {
             'montoinicial': me.montoinicial
           }).then(function (response) {
+            me.CajasAperturadas();
             me.cajaabierta = true;
+            me.seleccionarCaja();
             Swal.fire('CAJA ABIERTA', 'Ya puede registrar operaciones', 'success');
           })["catch"](function (error) {
             console.log(error);
@@ -2154,13 +2201,25 @@ __webpack_require__.r(__webpack_exports__);
           me.arrayCaja = respuesta.datoscaja;
           me.montoapertura = me.arrayCaja[0].montoinicial;
           me.arrayMovimientos.map(function (x) {
-            me.totaldinero = parseFloat(x.monto) + parseFloat(me.totaldinero);
-            if (x.tipo == 1) me.sumaaportes = parseFloat(x.monto) + parseFloat(me.sumaaportes);else if (x.tipo == 2) me.sumamovimiento = parseFloat(x.monto) + parseFloat(me.sumamovimiento);else if (x.tipo == 3) me.sumapagos = parseFloat(x.monto) + parseFloat(me.sumapagos);else if (x.tipo == 4) me.sumadesembolso = parseFloat(x.monto) + parseFloat(me.sumadesembolso);
+            //SUMA TOTAL
+            if (x.estado == 1) me.totaldinero = parseFloat(me.totaldinero) + parseFloat(x.monto);else if (x.estado == 0) me.totaldinero = parseFloat(me.totaldinero) - parseFloat(x.monto); //SUMA DE PORCIONES
+
+            if (x.tipo == 1) me.sumaaportes = parseFloat(x.monto) + parseFloat(me.sumaaportes);else if (x.tipo == 2) {
+              if (x.estado == 1) me.sumamovimiento = parseFloat(x.monto) + parseFloat(me.sumamovimiento);else if (x.estado == 0) me.restamovimiento = parseFloat(me.restamovimiento) + parseFloat(x.monto);
+            } else if (x.tipo == 3) me.sumapagos = parseFloat(x.monto) + parseFloat(me.sumapagos);else if (x.tipo == 4) me.sumadesembolso = parseFloat(x.monto) + parseFloat(me.sumadesembolso);
           });
         })["catch"](function (error) {
           console.log(error);
         });
       }
+    },
+    descargarBoucher: function descargarBoucher(movimiento, tipo) {
+      var me = this; //APORTES
+
+      if (tipo == 1) window.open(me.ruta + '/aporte/pdfDetalleAporte?id=' + movimiento, '_blank'); //CUENTA DE AHORROS
+      else if (tipo == 2) window.open(me.ruta + '/ahorro/movimiento/imprimirboucher?id=' + movimiento, '_blank'); //PAGOCUOTAS
+        else if (tipo == 3) window.open(me.ruta + '/cuota/detallecuotapdf/' + movimiento + '', '_blank'); //DESEMBOLSOS
+          else if (tipo == 4) window.open(me.ruta + '/credito/pdfDetallecredito/' + movimiento, '_blank');
     },
     mostrarMovimientos: function mostrarMovimientos(id) {
       var me = this;
@@ -2170,8 +2229,60 @@ __webpack_require__.r(__webpack_exports__);
       me.arrayMovimientos.map(function (x) {
         if (x.tipo == id) {
           me.arrayTabla.push(x);
-          me.totalTabla = parseFloat(x.monto) + parseFloat(me.totalTabla);
+          if (x.estado == 1) me.totalTabla = parseFloat(me.totalTabla) + parseFloat(x.monto);else if (x.estado == 0) me.totalTabla = parseFloat(me.totalTabla) - parseFloat(x.monto);
         }
+      });
+    },
+    cerrarCaja: function cerrarCaja(id) {
+      var me = this;
+      axios.put(this.ruta + '/caja/CerrarCaja', {
+        'id': id,
+        'montorecaudado': this.totaldinero
+      }).then(function (res) {
+        me.seleccionarCaja();
+        me.CajasAperturadas();
+        me.cajaabierta = false;
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'La Caja ha sido cerrada',
+          showConfirmButton: false,
+          timer: 2000
+        });
+      })["catch"](function (err) {
+        Swal.fire({
+          position: 'top-end',
+          type: 'error',
+          title: 'Error, No se realizó el cierre de Caja',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      });
+    },
+    ActualizarMontoIncial: function ActualizarMontoIncial(id) {
+      var me = this;
+      axios.put(this.ruta + '/caja/ActualizarMontoIncial', {
+        'id': id,
+        'montoinicial': this.montoinicial
+      }).then(function (res) {
+        me.seleccionarCaja();
+        me.CajasAperturadas();
+        me.cajaabierta = true;
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'El monto inicial ha sido Actualizado',
+          showConfirmButton: false,
+          timer: 2000
+        });
+      })["catch"](function (err) {
+        Swal.fire({
+          position: 'top-end',
+          type: 'error',
+          title: 'Error, No se ha actualizado el monto ',
+          showConfirmButton: false,
+          timer: 1500
+        });
       });
     }
   },
@@ -6319,6 +6430,7 @@ __webpack_require__.r(__webpack_exports__);
       arraysocios: [],
       detalecuota: false,
       personacredito_id: 0,
+      caja: 0,
       arrayCuotas: [],
       hoy: '',
       pagination: {
@@ -6423,8 +6535,28 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     pagarcuota: function pagarcuota(id) {
-      this.personacredito_id = id;
-      this.detalecuota = true;
+      var me = this;
+      var url = me.ruta + '/caja/seleccionarCaja';
+      axios.get(url).then(function (response) {
+        var respuesta = response.data;
+        var datosCaja = respuesta.caja[0].idusuario;
+        me.caja = respuesta.caja[0].id; //me.montoapertura= me.datosCaja[0].montoinicial; 
+
+        var user = respuesta.user;
+
+        if (user == datosCaja) {
+          me.personacredito_id = id;
+          me.detalecuota = true;
+        } else {
+          Swal.fire({
+            type: 'error',
+            title: 'Error',
+            text: 'Debe aperturar una caja'
+          });
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
     },
     fechaactual: function fechaactual() {
       var date = new Date();
@@ -6451,6 +6583,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
@@ -6683,7 +6817,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['idcliente'],
+  props: ['idcliente', 'caja'],
   data: function data() {
     return {
       //ruta
@@ -6743,7 +6877,7 @@ __webpack_require__.r(__webpack_exports__);
 
       if (me.transacciondeposito != '' && me.fechapagodeposito != '' && me.montodeposito != 0) {
         if (me.montoestandar <= me.montodeposito) {
-          axios.put(this.ruta + '/cuota/pagarCuotaDeposito', {
+          axios.put(this.ruta + '/cuota/pagarCuotaDeposito', _defineProperty({
             'id': me.dataC[0].idcuota,
             'descripcion': this.descpagocuota,
             'mora': this.morahastahoy,
@@ -6751,8 +6885,9 @@ __webpack_require__.r(__webpack_exports__);
             'montodeposito': me.montodeposito,
             'transacciondeposito': me.transacciondeposito,
             'fechapagodeposito': me.fechapagodeposito,
-            'estadomora': this.estadomora
-          }).then(function (res) {
+            'estadomora': this.estadomora,
+            'caja': this.caja
+          }, "montodeposito", this.montodeposito)).then(function (res) {
             _this2.mostrarpagar = false;
             _this2.identificadorcuota = me.dataC[0].idcuota;
             Swal.fire({
@@ -6796,7 +6931,9 @@ __webpack_require__.r(__webpack_exports__);
         'descripcion': this.descpagocuota,
         'mora': this.morahastahoy,
         'idsocio': idpersona,
-        'estadomora': this.estadomora
+        'estadomora': this.estadomora,
+        'caja': this.caja,
+        'montodeposito': this.montodeposito
       }).then(function (res) {
         Swal.fire({
           position: 'top-end',
@@ -44460,9 +44597,57 @@ var render = function() {
                               [
                                 _c(
                                   "button",
-                                  { staticClass: "btn btn-danger" },
+                                  {
+                                    staticClass: "btn btn-danger",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.cerrarCaja(
+                                          _vm.arrayCaja[0].id
+                                        )
+                                      }
+                                    }
+                                  },
                                   [_vm._v("Cerrar Caja")]
-                                )
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-warning",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.ActualizarMontoIncial(
+                                          _vm.arrayCaja[0].id
+                                        )
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Editar el Monto Inicial")]
+                                ),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.montoinicial,
+                                      expression: "montoinicial"
+                                    }
+                                  ],
+                                  staticClass: "text-dark font-weight-bold ",
+                                  attrs: { type: "number" },
+                                  domProps: { value: _vm.montoinicial },
+                                  on: {
+                                    input: function($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.montoinicial = $event.target.value
+                                    }
+                                  }
+                                })
                               ]
                             ],
                             2
@@ -44703,23 +44888,63 @@ var render = function() {
                           "tbody",
                           [
                             _vm._l(_vm.arrayTabla, function(t) {
-                              return _c("tr", { key: t.idmovimiento }, [
-                                _c("td", {
-                                  domProps: {
-                                    textContent: _vm._s(t.idmovimiento)
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("td", {
-                                  domProps: { textContent: _vm._s(t.monto) }
-                                }),
-                                _vm._v(" "),
-                                _c("td", {
-                                  domProps: { textContent: _vm._s(t.fecha) }
-                                }),
-                                _vm._v(" "),
-                                _vm._m(2, true)
-                              ])
+                              return _c(
+                                "tr",
+                                { key: t.idmovimiento },
+                                [
+                                  _c("td", {
+                                    domProps: {
+                                      textContent: _vm._s(t.idmovimiento)
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  t.estado == 1
+                                    ? [
+                                        _c(
+                                          "td",
+                                          { staticClass: "text-success" },
+                                          [_vm._v("Abono")]
+                                        )
+                                      ]
+                                    : t.estado == 0
+                                    ? [
+                                        _c(
+                                          "td",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("Retiro")]
+                                        )
+                                      ]
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  _c("td", {
+                                    domProps: { textContent: _vm._s(t.monto) }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("td", {
+                                    domProps: { textContent: _vm._s(t.fecha) }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-danger",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.descargarBoucher(
+                                              t.idmovimiento,
+                                              t.tipo
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Descargar")]
+                                    )
+                                  ])
+                                ],
+                                2
+                              )
                             }),
                             _vm._v(" "),
                             _c("p", [
@@ -44741,50 +44966,84 @@ var render = function() {
                   _c("div", { staticClass: "card " }, [
                     _c("div", { staticClass: "card-body " }, [
                       _c("div", { staticClass: "row " }, [
-                        _c("div", { staticClass: "col-lg-6 " }, [
+                        _c("div", { staticClass: "col-lg-12 " }, [
                           _c("h4", { staticClass: "card-title " }, [
                             _vm._v("Montos Totales")
                           ]),
                           _vm._v(" "),
                           _c("div", { staticClass: "row " }, [
-                            _vm._m(3),
-                            _vm._v(" "),
                             _c("div", { staticClass: "col-sm-12 " }, [
                               _c(
                                 "ul",
                                 { staticClass: "graphl-legend-rectangle " },
                                 [
-                                  _c("li", [
-                                    _c("span", { staticClass: "bg-danger " }),
-                                    _vm._v(
-                                      "Total Aportes de Socios: " +
-                                        _vm._s(_vm.sumaaportes)
-                                    )
+                                  _c("div", { staticClass: "row" }, [
+                                    _c("div", { staticClass: "col-md-2" }, [
+                                      _c("li", [
+                                        _c("span", {
+                                          staticClass: "bg-danger "
+                                        }),
+                                        _vm._v("S/ " + _vm._s(_vm.sumaaportes))
+                                      ])
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._m(2)
                                   ]),
                                   _vm._v(" "),
-                                  _c("li", [
-                                    _c("span", { staticClass: "bg-warning " }),
-                                    _vm._v(
-                                      "Total Movimientos en Cuentas de Ahorros : " +
-                                        _vm._s(_vm.sumamovimiento) +
-                                        " "
-                                    )
+                                  _c("div", { staticClass: "row" }, [
+                                    _c("div", { staticClass: "col-md-2" }, [
+                                      _c("li", [
+                                        _c("span", { staticClass: "bg-info " }),
+                                        _vm._v(
+                                          "S/ " + _vm._s(_vm.sumadesembolso)
+                                        )
+                                      ])
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._m(3)
                                   ]),
                                   _vm._v(" "),
-                                  _c("li", [
-                                    _c("span", { staticClass: "bg-info " }),
-                                    _vm._v(
-                                      "Total Desembolsos de Créditos : " +
-                                        _vm._s(_vm.sumadesembolso)
-                                    )
+                                  _c("div", { staticClass: "row" }, [
+                                    _c("div", { staticClass: "col-md-2" }, [
+                                      _c("li", [
+                                        _c("span", {
+                                          staticClass: "bg-warning "
+                                        }),
+                                        _vm._v("S/ " + _vm._s(_vm.sumapagos))
+                                      ])
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._m(4)
                                   ]),
                                   _vm._v(" "),
-                                  _c("li", [
-                                    _c("span", { staticClass: "bg-success " }),
-                                    _vm._v(
-                                      "Total Pagos de Cuotas : " +
-                                        _vm._s(_vm.sumapagos)
-                                    )
+                                  _c("div", { staticClass: "row" }, [
+                                    _c("div", { staticClass: "col-md-2" }, [
+                                      _c("li", [
+                                        _c("span", {
+                                          staticClass: "bg-success "
+                                        }),
+                                        _vm._v(
+                                          "S/ " + _vm._s(_vm.sumamovimiento)
+                                        )
+                                      ])
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._m(5)
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "row" }, [
+                                    _c("div", { staticClass: "col-md-2" }, [
+                                      _c("li", [
+                                        _c("span", {
+                                          staticClass: "bg-primary "
+                                        }),
+                                        _vm._v(
+                                          "S/ " + _vm._s(_vm.restamovimiento)
+                                        )
+                                      ])
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._m(6)
                                   ])
                                 ]
                               )
@@ -44833,6 +45092,8 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", [_vm._v("ID")]),
         _vm._v(" "),
+        _c("th", [_vm._v("Tipo")]),
+        _vm._v(" "),
         _c("th", [_vm._v("Monto.")]),
         _vm._v(" "),
         _c("th", [_vm._v("Fecha")]),
@@ -44845,59 +45106,54 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("label", { staticClass: "badge badge-danger" }, [_vm._v("Descargar")])
+    return _c("div", { staticClass: "col-md-10" }, [
+      _c("p", { staticClass: "text-dark" }, [
+        _vm._v("Total Aportes de Socios "),
+        _c("span", { staticClass: "text-success" }, [_vm._v("Abono  ")])
+      ])
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-sm-12 " }, [
-      _c("div", { staticClass: "progress progress-lg grouped mb-2 " }, [
-        _c("div", {
-          staticClass: "progress-bar bg-danger ",
-          staticStyle: { width: "40%" },
-          attrs: {
-            role: "progressbar ",
-            "aria-valuenow": "25 ",
-            "aria-valuemin": "0 ",
-            "aria-valuemax": "100 "
-          }
-        }),
-        _vm._v(" "),
-        _c("div", {
-          staticClass: "progress-bar bg-info ",
-          staticStyle: { width: "10%" },
-          attrs: {
-            role: "progressbar ",
-            "aria-valuenow": "50 ",
-            "aria-valuemin": "0 ",
-            "aria-valuemax": "100 "
-          }
-        }),
-        _vm._v(" "),
-        _c("div", {
-          staticClass: "progress-bar bg-warning ",
-          staticStyle: { width: "20%" },
-          attrs: {
-            role: "progressbar ",
-            "aria-valuenow": "50 ",
-            "aria-valuemin": "0 ",
-            "aria-valuemax": "100 "
-          }
-        }),
-        _vm._v(" "),
-        _c("div", {
-          staticClass: "progress-bar bg-success ",
-          staticStyle: { width: "30%" },
-          attrs: {
-            role: "progressbar ",
-            "aria-valuenow": "50 ",
-            "aria-valuemin": "0 ",
-            "aria-valuemax": "100 "
-          }
-        })
+    return _c("div", { staticClass: "col-md-10" }, [
+      _c("p", { staticClass: "text-dark" }, [
+        _vm._v("Total Desembolsos de Créditos "),
+        _c("span", { staticClass: "text-danger" }, [_vm._v("Retiro  ")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-10" }, [
+      _c("p", { staticClass: "text-dark" }, [
+        _vm._v("Total Pagos de Cuotas  "),
+        _c("span", { staticClass: "text-success" }, [_vm._v("Abono  ")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-10" }, [
+      _c("p", { staticClass: "text-dark" }, [
+        _vm._v("Total Aporte en Cuentas de Ahorros "),
+        _c("span", { staticClass: "text-success" }, [_vm._v("Abono  ")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-10" }, [
+      _c("p", { staticClass: "text-dark" }, [
+        _vm._v("Total Retiros en Cuentas de Ahorros "),
+        _c("span", { staticClass: "text-danger" }, [_vm._v("Retiro  ")])
       ])
     ])
   }
@@ -53100,7 +53356,9 @@ var render = function() {
               [_vm._v("\n            Buscar Cuotas\n        ")]
             ),
             _vm._v(" "),
-            _c("pagarcuota", { attrs: { idcliente: _vm.personacredito_id } })
+            _c("pagarcuota", {
+              attrs: { idcliente: _vm.personacredito_id, caja: _vm.caja }
+            })
           ]
     ],
     2

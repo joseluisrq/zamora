@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Cuota;
 use App\Credito;
+use App\DetalleCaja;
 use App\Persona;
 use App\Socio;
 use Carbon\Carbon;
@@ -276,6 +277,17 @@ class CuotaController extends Controller
                 $cliente->save();
             }
 
+            $mytime= Carbon::now('America/Lima');
+            $caja=new DetalleCaja();
+            $caja->idcaja =$request->caja; 
+            $caja->idmovimiento = $request->id;
+            $caja->tipo = 3;
+            $caja->estado = 1;
+            $caja->monto = $request->montodeposito;
+            $caja->fecha =  $mytime;           
+            $caja->save();
+           
+
       
             DB::commit();
  
@@ -325,6 +337,16 @@ class CuotaController extends Controller
                 $cliente->estadocredito = "2";//Crédito finalizado
                 $cliente->save();
             }
+
+            $mytime= Carbon::now('America/Lima');
+            $caja=new DetalleCaja();
+            $caja->idcaja =$request->caja; 
+            $caja->idmovimiento = $request->id;
+            $caja->tipo = 3;
+            $caja->estado = 1;
+            $caja->monto = $request->montodeposito;
+            $caja->fecha =  $mytime;           
+            $caja->save();
 
       
             DB::commit();

@@ -231,7 +231,7 @@
 
 <script>
 export default {
-    props : ['idcliente'],
+    props : ['idcliente','caja'],
     data (){
             return {
                 //ruta
@@ -319,7 +319,10 @@ export default {
                             'montodeposito':me.montodeposito,
                             'transacciondeposito':me.transacciondeposito,
                             'fechapagodeposito':me.fechapagodeposito,
-                            'estadomora':this.estadomora
+                            'estadomora':this.estadomora,
+
+                             'caja':this.caja,
+                            'montodeposito':this.montodeposito,
                         
                         })
                             .then(res => {
@@ -372,7 +375,9 @@ export default {
                     'descripcion': this.descpagocuota,
                     'mora': this.morahastahoy,
                     'idsocio':idpersona,
-                    'estadomora':this.estadomora
+                    'estadomora':this.estadomora,
+                    'caja':this.caja,
+                    'montodeposito':this.montodeposito,
                   
                 })
                     .then(res => {

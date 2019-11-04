@@ -34,7 +34,8 @@ class CajaController extends Controller
              'detallecaja.monto',
              'detallecaja.idmovimiento',
              'detallecaja.fecha',
-             'detallecaja.tipo'
+             'detallecaja.tipo',
+             'detallecaja.estado'
              )
         ->where('cajas.id','=',$idcaja)
         ->where('cajas.estado','=',1)
@@ -92,5 +93,27 @@ class CajaController extends Controller
          catch (Exception $e){
             DB::rollBack();
          }
+    }
+    public function CerrarCaja(Request $request){
+
+        $mytime= Carbon::now('America/Lima');
+
+        $caja = Caja::findOrFail($request->id);         
+        $caja->fechacierre = $mytime;       
+        $caja->montorecaudado = $request->montorecaudado;
+        $caja->estado =0;
+        $caja->save();
+       
+       
+    }
+    public function ActualizarMontoIncial(Request $request){
+
+        $mytime= Carbon::now('America/Lima');
+
+        $caja = Caja::findOrFail($request->id);         
+        $caja->montoinicial =$request->montoinicial; 
+        $caja->save();
+       
+       
     }
 }

@@ -64,7 +64,10 @@
                             <h3 class="font-weight-bold text-dark ">
                                
                                 <template>
-                                       <button class="btn btn-danger">Cerrar Caja</button>
+                                    <button type="button" @click="cerrarCaja(arrayCaja[0].id)" class="btn btn-danger">Cerrar Caja</button>
+                                    <button type="button" @click="ActualizarMontoIncial(arrayCaja[0].id)" class="btn btn-warning">Editar el Monto Inicial</button>
+                                      <input type="number" class="text-dark font-weight-bold " v-model="montoinicial">
+                              
                                 </template>
                                 
                             </h3>
@@ -150,17 +153,26 @@
                             <thead>
                             <tr>
                                 <th>ID</th>
+                                 <th>Tipo</th>
                                 <th>Monto.</th>
                                 <th>Fecha</th>
+                               
                                 <th>Voucher</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="t in arrayTabla" :key="t.idmovimiento">
                                 <td v-text="t.idmovimiento"></td>
+                                <template v-if="t.estado==1">
+                                    <td class="text-success" >Abono</td>
+                                </template>
+                                <template v-else-if="t.estado==0">
+                                    <td class="text-danger" >Retiro</td>
+                                </template>
+                                 
                                 <td v-text="t.monto"></td>  
                                  <td v-text="t.fecha"></td>                              
-                                <td><label class="badge badge-danger">Descargar</label></td>
+                                <td><button type="button" class="btn btn-danger" @click="descargarBoucher(t.idmovimiento,t.tipo)">Descargar</button></td>
                             </tr>
                             <p>Total : {{totalTabla}}</p>
                         
@@ -175,23 +187,55 @@
                     <div class="card-body ">
                         <div class="row ">
                            
-                            <div class="col-lg-6 ">
+                            <div class="col-lg-12 ">
                                 <h4 class="card-title ">Montos Totales</h4>
                                 <div class="row ">
-                                    <div class="col-sm-12 ">
-                                        <div class="progress progress-lg grouped mb-2 ">
-                                            <div class="progress-bar bg-danger " role="progressbar " style="width: 40% " aria-valuenow="25 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                            <div class="progress-bar bg-info " role="progressbar " style="width: 10% " aria-valuenow="50 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                            <div class="progress-bar bg-warning " role="progressbar " style="width: 20% " aria-valuenow="50 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                            <div class="progress-bar bg-success " role="progressbar " style="width: 30% " aria-valuenow="50 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                        </div>
-                                    </div>
+                                 
                                     <div class="col-sm-12 ">
                                         <ul class="graphl-legend-rectangle ">
-                                            <li><span class="bg-danger "></span>Total Aportes de Socios: {{sumaaportes}}</li>
-                                            <li><span class="bg-warning "></span>Total Movimientos en Cuentas de Ahorros : {{sumamovimiento}} </li>
-                                            <li><span class="bg-info "></span>Total Desembolsos de Créditos : {{sumadesembolso}}</li>
-                                            <li><span class="bg-success "></span>Total Pagos de Cuotas : {{sumapagos}}</li>
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                     <li><span class="bg-danger "></span>S/ {{sumaaportes}}</li>
+                                                </div>
+                                                <div class="col-md-10">
+                                                   <p class="text-dark">Total Aportes de Socios <span class="text-success">Abono  </span> </p>
+                                                </div>
+                                            </div>
+                                             <div class="row">
+                                                <div class="col-md-2">
+                                                     <li><span class="bg-info "></span>S/ {{sumadesembolso}}</li>
+                                                </div>
+                                                <div class="col-md-10">
+                                                   <p class="text-dark">Total Desembolsos de Créditos <span class="text-danger">Retiro  </span> </p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                     <li><span class="bg-warning "></span>S/ {{sumapagos}}</li>
+                                                </div>
+                                                <div class="col-md-10">
+                                                   <p class="text-dark">Total Pagos de Cuotas  <span class="text-success">Abono  </span> </p>
+                                                </div>
+                                            </div>
+                                             <div class="row">
+                                                <div class="col-md-2">
+                                                     <li><span class="bg-success "></span>S/ {{sumamovimiento}}</li>
+                                                </div>
+                                                <div class="col-md-10">
+                                                   <p class="text-dark">Total Aporte en Cuentas de Ahorros <span class="text-success">Abono  </span> </p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                     <li><span class="bg-primary "></span>S/ {{restamovimiento}}</li>
+                                                </div>
+                                                <div class="col-md-10">
+                                                   <p class="text-dark">Total Retiros en Cuentas de Ahorros <span class="text-danger">Retiro  </span> </p>
+                                                </div>
+                                            </div>
+                                           
+                                            
+                                              
                                         </ul>
                                     </div>
                                 </div>
@@ -235,6 +279,7 @@ export default {
             sumaaportes:0,
             sumapagos:0,
             sumamovimiento:0,
+            restamovimiento:0,
             sumadesembolso:0
 
         }
@@ -303,11 +348,14 @@ export default {
                      cancelButtonText: 'Cancelar',
                     confirmButtonText: 'Si'
                     }).then((result) => {
+                      
                     if (result.value) {
                        axios.post(this.ruta+'/caja/abrirCaja',{
                         'montoinicial': me.montoinicial,  
                         }).then(function (response) {
-                        me.cajaabierta=true;
+                            me.CajasAperturadas();
+                            me.cajaabierta=true;
+                            me.seleccionarCaja(); 
                         Swal.fire(
                         'CAJA ABIERTA',
                         'Ya puede registrar operaciones',
@@ -332,9 +380,18 @@ export default {
                     me.montoapertura= me.arrayCaja[0].montoinicial; 
                     
                     me.arrayMovimientos.map(function(x){
-                        me.totaldinero=parseFloat(x.monto)+parseFloat(me.totaldinero)
-                        if(x.tipo==1)me.sumaaportes=parseFloat(x.monto)+parseFloat(me.sumaaportes);
-                        else if(x.tipo==2)me.sumamovimiento=parseFloat(x.monto)+parseFloat(me.sumamovimiento);
+                        //SUMA TOTAL
+                        if(x.estado==1)me.totaldinero=parseFloat(me.totaldinero)+parseFloat(x.monto)
+                        else if(x.estado==0)me.totaldinero=parseFloat(me.totaldinero)-parseFloat(x.monto)
+
+                        //SUMA DE PORCIONES
+                        if(x.tipo==1) me.sumaaportes=parseFloat(x.monto)+parseFloat(me.sumaaportes);
+                        else if(x.tipo==2)
+                            {                         
+                            if(x.estado==1) me.sumamovimiento=parseFloat(x.monto)+parseFloat(me.sumamovimiento);
+                            else if(x.estado==0) me.restamovimiento=parseFloat(me.restamovimiento)+parseFloat(x.monto);
+
+                            }
                         else if(x.tipo==3)me.sumapagos=parseFloat(x.monto)+parseFloat(me.sumapagos);
                         else if(x.tipo==4)me.sumadesembolso=parseFloat(x.monto)+parseFloat(me.sumadesembolso);                   
                      });
@@ -344,6 +401,18 @@ export default {
                 });
                 }
 
+            },
+            descargarBoucher(movimiento,tipo){
+                let me=this;
+                //APORTES
+                if(tipo==1)window.open(me.ruta + '/aporte/pdfDetalleAporte?id='+movimiento,'_blank');
+                //CUENTA DE AHORROS
+                else if(tipo==2) window.open(me.ruta + '/ahorro/movimiento/imprimirboucher?id='+movimiento,'_blank');
+                //PAGOCUOTAS
+                else if(tipo==3)window.open(me.ruta +'/cuota/detallecuotapdf/'+movimiento+'','_blank');          
+               //DESEMBOLSOS
+                else if(tipo==4)window.open(me.ruta + '/credito/pdfDetallecredito/'+movimiento,'_blank');    
+                
             },
             mostrarMovimientos(id){
                 let me=this;
@@ -360,18 +429,80 @@ export default {
                 me.arrayMovimientos.map(function(x){
                     if(x.tipo==id){
                         me.arrayTabla.push(x);
-                        me.totalTabla=parseFloat(x.monto)+parseFloat(me.totalTabla)                       
+                        if(x.estado==1)me.totalTabla=parseFloat(me.totalTabla)+parseFloat(x.monto)
+                        else if(x.estado==0)me.totalTabla=parseFloat(me.totalTabla)-parseFloat(x.monto)  
+                                            
                     }
                    
                 });
                
+
+            },
+            cerrarCaja(id){
+                let me=this;
+                 axios.put(this.ruta+'/caja/CerrarCaja',{
+                    'id': id,
+                    'montorecaudado': this.totaldinero,                   
+                  
+                })
+                    .then(res => {
+                         me.seleccionarCaja();
+                         me.CajasAperturadas();
+                         me.cajaabierta=false;
+                    Swal.fire({
+                        position: 'top-end',
+                        type: 'success',
+                        title: 'La Caja ha sido cerrada',
+                        showConfirmButton: false,
+                        timer: 2000
+                        })                
+                    })
+                    .catch(err => {
+                        Swal.fire({
+                        position: 'top-end',
+                        type: 'error',
+                        title: 'Error, No se realizó el cierre de Caja',
+                        showConfirmButton: false,
+                        timer: 1500
+                        })
+                    });
+
+            },
+              ActualizarMontoIncial(id){
+                let me=this;
+                 axios.put(this.ruta+'/caja/ActualizarMontoIncial',{
+                    'id': id,
+                    'montoinicial': this.montoinicial,                   
+                  
+                })
+                    .then(res => {
+                         me.seleccionarCaja();
+                         me.CajasAperturadas();
+                         me.cajaabierta=true;
+                    Swal.fire({
+                        position: 'top-end',
+                        type: 'success',
+                        title: 'El monto inicial ha sido Actualizado',
+                        showConfirmButton: false,
+                        timer: 2000
+                        })                
+                    })
+                    .catch(err => {
+                        Swal.fire({
+                        position: 'top-end',
+                        type: 'error',
+                        title: 'Error, No se ha actualizado el monto ',
+                        showConfirmButton: false,
+                        timer: 1500
+                        })
+                    });
 
             }
       },
     mounted() {
         
       this.seleccionarCaja();
-       this.CajasAperturadas();
+      this.CajasAperturadas();
       
     }
 }

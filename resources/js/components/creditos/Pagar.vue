@@ -149,7 +149,7 @@
             <button type="button"   @click="detalecuota=false" class="btn btn-primary">
                 Buscar Cuotas
             </button>
-            <pagarcuota :idcliente="personacredito_id" ></pagarcuota>
+            <pagarcuota :idcliente="personacredito_id" :caja="caja"></pagarcuota>
         </template>       
     </main>
    
@@ -180,6 +180,7 @@ export default {
 
                 detalecuota:false,
                 personacredito_id:0,
+                caja:0,
 
 
                 arrayCuotas:[],
@@ -285,8 +286,35 @@ export default {
                 });
             },
             pagarcuota(id){
-                this.personacredito_id=id;
-                this.detalecuota=true;
+
+                let me=this;
+                 var url= me.ruta+'/caja/seleccionarCaja';
+                 axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    var datosCaja = respuesta.caja[0].idusuario;
+                    me.caja = respuesta.caja[0].id;
+                    //me.montoapertura= me.datosCaja[0].montoinicial; 
+                    var user = respuesta.user; 
+                    if(user==datosCaja)
+                    {   
+                        me.personacredito_id=id;
+                        me.detalecuota=true;
+                       
+                    }else{
+                        Swal.fire({
+                        type: 'error',
+                        title: 'Error',
+                        text: 'Debe aperturar una caja',
+                          })
+                    }
+
+                                  
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+                
             },
              fechaactual() 
             {

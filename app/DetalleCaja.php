@@ -14,7 +14,8 @@ class DetalleCaja extends Model
            'idmovimiento ',
            'tipo ',
            'fecha ',
-           'monto ',             
+           'monto ',   
+           'estado ',          
      
     ];
     public $timestamps = false;
