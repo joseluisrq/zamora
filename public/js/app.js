@@ -5286,7 +5286,8 @@ __webpack_require__.r(__webpack_exports__);
       errorRequisistos: 0,
       errorMostrarMsjRequisistos: [],
       requisistos: [],
-      estadoaprobado: ''
+      estadoaprobado: '',
+      caja: 0
     };
   },
   computed: {},
@@ -5310,33 +5311,52 @@ __webpack_require__.r(__webpack_exports__);
       window.open(this.ruta + '/cuota/detallecuotapdf/' + id + '', '_blank');
     },
     desembolsar: function desembolsar(id) {
-      var _this = this;
-
       var me = this;
-      Swal.fire({
-        title: '',
-        text: "¿Está seguro que desea DESEMBOLSAR EL CREDITO?",
-        type: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        cancelButtonText: 'Cancelar',
-        confirmButtonText: 'Si'
-      }).then(function (result) {
-        if (result.value) {
-          axios.put(_this.ruta + '/credito/desembolsar', {
-            'id': id
-          }).then(function (response) {
-            Swal.fire('', 'El credito ha sido REGISTRADO COMO DESEMBOLSADO', 'success');
-            this.detalleCredito();
-          })["catch"](function (error) {
-            console.log(error);
+      var url = this.ruta + '/caja/seleccionarCaja';
+      axios.get(url).then(function (response) {
+        var respuesta = response.data;
+        var datosCaja = respuesta.caja[0].idusuario;
+        me.caja = respuesta.caja[0].id; //me.montoapertura= me.datosCaja[0].montoinicial; 
+
+        var user = respuesta.user;
+
+        if (user == datosCaja) {
+          Swal.fire({
+            title: '',
+            text: "¿Está seguro que desea DESEMBOLSAR EL CREDITO?",
+            type: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Si'
+          }).then(function (result) {
+            if (result.value) {
+              axios.put(me.ruta + '/credito/desembolsar', {
+                'id': id,
+                'caja': me.caja,
+                'montodesembolsado': me.arrayCreditos[0].montodesembolsado
+              }).then(function (response) {
+                Swal.fire('', 'El credito ha sido REGISTRADO COMO DESEMBOLSADO', 'success');
+                this.detalleCredito();
+              })["catch"](function (error) {
+                console.log(error);
+              });
+            }
+          });
+        } else {
+          Swal.fire({
+            type: 'error',
+            title: 'Error',
+            text: 'Debe aperturar una caja'
           });
         }
+      })["catch"](function (error) {
+        console.log(error);
       });
     },
     aprobar: function aprobar(id) {
-      var _this2 = this;
+      var _this = this;
 
       if (this.validarRequisistos() == true) {
         var me = this;
@@ -5351,7 +5371,7 @@ __webpack_require__.r(__webpack_exports__);
           confirmButtonText: 'Si'
         }).then(function (result) {
           if (result.value) {
-            axios.put(_this2.ruta + '/credito/aprobar', {
+            axios.put(_this.ruta + '/credito/aprobar', {
               'id': id
             }).then(function (response) {
               me.vistas = 3;
@@ -5378,7 +5398,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     desaprobar: function desaprobar(id) {
-      var _this3 = this;
+      var _this2 = this;
 
       var me = this;
       Swal.fire({
@@ -5392,7 +5412,7 @@ __webpack_require__.r(__webpack_exports__);
         confirmButtonText: 'Si'
       }).then(function (result) {
         if (result.value) {
-          axios.put(_this3.ruta + '/credito/desaprobar', {
+          axios.put(_this2.ruta + '/credito/desaprobar', {
             'id': id
           }).then(function (response) {
             me.vistas = 3;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\DetalleCaja;
 use App\Credito;
 use App\Cuota;
 use App\Persona;
@@ -316,6 +317,23 @@ class CreditoController extends Controller
         $cuota = Credito::findOrFail($request->id);
         $cuota->estadodesembolso = '2';      
         $cuota->save();
+        try{
+            DB::beginTransaction();
+            $mytime= Carbon::now('America/Lima');
+            $caja=new DetalleCaja();
+            $caja->idcaja =$request->caja; 
+            $caja->idmovimiento = $request->id;
+            $caja->tipo = 4;
+            $caja->estado = 0;
+            $caja->monto = $request->montodesembolsado;
+            $caja->fecha =  $mytime;           
+            $caja->save();
+            DB::commit();
+        }
+        catch (Exception $e){
+            DB::rollBack();
+        }
+
     }
 
       //aprobar CREDITO

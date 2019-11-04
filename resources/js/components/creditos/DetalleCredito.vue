@@ -379,6 +379,7 @@ export default {
             errorMostrarMsjRequisistos :[],
             requisistos:[],
             estadoaprobado:'',
+            caja:0
         }
     },
     computed:
@@ -410,7 +411,17 @@ export default {
             desembolsar(id){
                 
                   let me = this;
-                    Swal.fire({
+
+                var url= this.ruta+'/caja/seleccionarCaja';
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    var datosCaja = respuesta.caja[0].idusuario;
+                    me.caja = respuesta.caja[0].id;
+                    //me.montoapertura= me.datosCaja[0].montoinicial; 
+                    var user = respuesta.user; 
+                    if(user==datosCaja)
+                    {   
+                        Swal.fire({
                     title: '',
                     text: "¿Está seguro que desea DESEMBOLSAR EL CREDITO?",
                     type: 'question',
@@ -421,8 +432,12 @@ export default {
                     confirmButtonText: 'Si'
                     }).then((result) => {
                     if (result.value) {
-                       axios.put(this.ruta+'/credito/desembolsar',{
-                    'id': id,
+                       axios.put(me.ruta+'/credito/desembolsar',{
+                        'id': id,
+                        'caja':me.caja,
+                        'montodesembolsado':me.arrayCreditos[0].montodesembolsado
+
+
                         }).then(function (response) {
 
                         Swal.fire(
@@ -436,6 +451,22 @@ export default {
                             });
                     }
                  })
+                       
+                    }else{
+                        Swal.fire({
+                        type: 'error',
+                        title: 'Error',
+                        text: 'Debe aperturar una caja',
+                          })
+                    }
+
+                                  
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+                  
+                   
             },
         aprobar(id){
              if (this.validarRequisistos()==true){ 
