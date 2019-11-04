@@ -1,9 +1,9 @@
 <template>
     <div class="content-wrapper">
 
-        <template v-if="showFormRegistroAhorros || showFormRegistroPlazoFijo">
-            <button type="button" class="btn btn-warning" @click="limpiarformulario();mostrarComponente(true, false, false, false)">
-               <i class="mdi mdi-arrow-left-bold"></i> Elegir Tipo de cuenta
+        <template v-if="showFormRegistroAhorros || showFormRegistroPlazoFijo || showInteres">
+            <button type="button" class="btn btn-warning" @click="limpiarformulario();mostrarComponente(true, false, false, false, false)">
+               <i class="mdi mdi-arrow-left-bold"></i> Ver opciones
             </button>
          </template>
 
@@ -15,18 +15,24 @@
                         <div class="card-body">                            
                             <h4 class=" text-primary text-center"><i class="mdi mdi-checkbox-marked-circle-outline mdi-36px"></i>REGISTRAR MOVIMIENTO</h4>
                             <hr>
-                            <h6 class=" text-primary text-center">ELIJA UN TIPO DE CUENTA</h6>
+                            <h6 class=" text-primary text-center">ELIJA UNA OPCIÓN</h6>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <button type="button" class="btn btn-success btn-icon-text" @click="tipocuenta=1;mostrarComponente(false, true, false, false)">
+                                    <button type="button" class="btn btn-success btn-icon-text" @click="tipocuenta=1;mostrarComponente(false, true, false, false, false)">
                                         <i class="mdi mdi-square-inc-cash btn-icon-prepend"></i>   
                                         Cuenta Ahorros
                                     </button>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="button" class="btn btn-warning btn-icon-text" @click="tipocuenta=2;mostrarComponente(false, false, true, false)">
+                                    <button type="button" class="btn btn-warning btn-icon-text" @click="tipocuenta=2;mostrarComponente(false, false, true, false, false)">
                                         <i class="mdi mdi-square-inc-cash btn-icon-prepend"></i>
                                         Cuenta Plazo Fijo
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-info btn-icon-text" @click="mostrarComponente(false, false, false, false, true)">
+                                        <i class="mdi mdi-square-inc-cash btn-icon-prepend"></i>
+                                        Cobrar Intereses
                                     </button>
                                 </div>
                             </div>
@@ -89,7 +95,7 @@
                                     <span v-if="errores.tipo" class="text-danger">{{ errores.tipo[0] }}</span>
                                 </div>
                                 <input type="submit" class="btn btn-primary mr-2" value="Registrar Operación" @click="registrarMovimientoAhorros"/>
-                                <a class="btn btn-light" @click="limpiarformulario();mostrarComponente(true, false, false, false)">Cancelar</a>
+                                <a class="btn btn-light" @click="limpiarformulario();mostrarComponente(true, false, false, false, false)">Cancelar</a>
                             </form>
                         </div>
                     </div>
@@ -148,7 +154,7 @@
                                 </div>
                                 <a class="btn btn-warning mr-2 text-dark" @click="registrarMovimientoFijo(false)">Cobrar y Cancelar cuenta</a>
                                 <a class="btn btn-primary text-dark" @click="registrarMovimientoFijo(true)">Cobrar y Renovar cuenta</a>
-                                <a class="btn btn-light" @click="limpiarformulario();mostrarComponente(true, false, false, false)">Cancelar</a>
+                                <a class="btn btn-light" @click="limpiarformulario();mostrarComponente(true, false, false, false, false)">Cancelar</a>
                             </form>
                         </div>
                     </div>
@@ -156,6 +162,63 @@
             </div>
         </template>
         <!-- FIN MOVIMINEOT PLAZO FIJO -->
+
+        <!-- INICIO RETIRO INTERESES -->
+        <template v-if="showInteres">
+            <div class="row ">
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title text-dark"><i class="mdi mdi-cash-multiple mdi-36px"></i>Cobrar Intereses</h4>
+                            <hr>
+                            <p class="card-description text-primary">
+                                Verifique la Información antes de hacer el registro
+                            </p>
+                            <form id="formRegistroFijo" @submit="prevenirDefault" class="forms-sample">
+                                <div class="form-group">
+                                    <label for="numcuentafijo" class="font-weight-bold">Ingrese DNI del socio</label>
+                                    <v-select
+                                        id="numCuentaInteres"
+                                        :class="['col-md-12', 'border',errores.cuenta ? 'border-danger' : '']"
+                                        :on-search="selectCuentaInteres"
+                                        label="identificador"
+                                        :options="arraycuentasInteres"
+                                        placeholder="Ingrese un DNI del socio"
+                                        :onChange="getDatosCuentaInteres"
+                                        clearable
+                                    >
+                                    </v-select>
+                                    <div v-if="idcuenta!=''">
+                                        <label class="badge badge-dark" v-text="nombre+' '+apellidos"/>
+                                    </div>
+                                    <span v-if="errores.cuenta" class="text-danger">seleccione un número de cuenta</span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">SOCIO</label><br>
+                                    <label v-text="nombre+' '+apellidos"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Número cuenta</label><br>
+                                    <label v-text="numerocuenta"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Interés disponible</label><br>
+                                    <label v-text="interes_disponible"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Monto a retirar(S/)</label><br>
+                                    <input id="montoRetiro" type="number" step="0.01" v-model="monto_retiro" :class="['form-control', 'border',errores.monto_retiro ? 'border-danger' : '']" placeholder="Ingrese el monto a retirar">
+                                    <span v-if="errores.monto_retiro" class="text-danger">{{ errores.monto_retiro[0] }}</span>
+                                </div>
+                                <a class="btn btn-warning mr-2 text-dark" @click="cobrarIntereses()">Realizar cobro</a>
+                                <a class="btn btn-light" @click="limpiarformulario();mostrarComponente(true, false, false, false, false)">Cancelar</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <!-- FIN RETIRO INTERESES -->
 
         <!-- INICIO MOVIMIENTO REGISTRADO CON ÉXITO -->
         <template v-if="showMsgRegistro">
@@ -173,7 +236,7 @@
                                     </button>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="button" class="btn btn-success btn-icon-text" @click="mostrarComponente(true, false, false, false)">
+                                    <button type="button" class="btn btn-success btn-icon-text" @click="mostrarComponente(true, false, false, false, false)">
                                         <i class="mdi mdi-upload btn-icon-prepend"></i>
                                         Nuevo Movimieto
                                     </button>
@@ -199,12 +262,16 @@
                 dni: '',
                 numerocuenta: '',
 
+                interes_disponible: '',
+
                 nombre: '',
                 apellidos: '',
                 
                 monto: '',
                 descripcion: '',
                 tipo: '',
+
+                monto_retiro: 0,
 
                 tipocuenta: '',
                 tasa_fijo: '',
@@ -214,12 +281,14 @@
 
                 cuentaseleccionada: false,
 
-                arraycuentas: [], 
+                arraycuentas: [],
+                arraycuentasInteres: [],
 
                 showElegirTipoCuenta: true,
                 showFormRegistroAhorros: false,
                 showFormRegistroPlazoFijo: false,
                 showMsgRegistro: false,
+                showInteres: false,
 
                 idmovimiento: 0,
 
@@ -250,6 +319,8 @@
                 me.idcuenta = '';
                 me.dni = '';
                 me.numerocuenta = '';
+
+                me.interes_disponible = '';
                 
                 me.nombre = '';
                 me.apellidos = '';
@@ -258,6 +329,8 @@
                 me.descripcion = '';
                 me.tipo = '';
 
+                me.monto_retiro = 0;
+
                 me.tasa_fijo = '';
                 me.monto_fijo = '';
                 me.fecha_inicio = '';
@@ -265,7 +338,9 @@
 
                 me.cuentaseleccionada = false;
 
+                me.errores = [];
                 me.arraycuentas = [];
+                me.arraycuentasInteres = [];
 
                 me.idmovimiento = 0;
 
@@ -281,69 +356,97 @@
             registrarMovimientoAhorros(){
                 let me = this;
 
-                let movimiento = {
-                    'cuenta': me.idcuenta,
-                    'monto': me.monto,
-                    'descripcion': me.descripcion,
-                    'tipo': me.tipo
-                };
+                Swal.fire(
+                {
+                    title: 'Confirmar registro de operación',
+                    text: "¿Está seguro de realizar esta operación?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Aceptar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value)
+                    {
+                        let movimiento = {
+                            'cuenta': me.idcuenta,
+                            'monto': me.monto,
+                            'descripcion': me.descripcion,
+                            'tipo': me.tipo
+                        };
 
-                me.errores = [];
+                        me.errores = [];
 
-                axios.post(me.ruta + '/movimiento/registrarAhorros', movimiento)
-                .then(res => {
+                        axios.post(me.ruta + '/movimiento/registrarAhorros', movimiento)
+                        .then(res => {
 
-                    if(res.data.excep){
-                        me.errores = {
-                            monto: ['Usted sólo dispone de S/.' + res.data.monto + " para retirar"]
-                        }
-                    }
-                    else{
-                        me.limpiarformulario();
-                        me.idmovimiento = res.data.id;
-                        me.mostrarComponente(false, false, false, true);
+                            if(res.data.excep){
+                                me.errores = {
+                                    monto: ['Usted sólo dispone de S/.' + res.data.monto + " para retirar"]
+                                }
+                            }
+                            else{
+                                me.limpiarformulario();
+                                me.idmovimiento = res.data.id;
+                                me.mostrarComponente(false, false, false, true, false);
+                            }
+                        })
+                        .catch(err => {
+                            me.errores = err.response.data.errors;
+                            console.log(err);
+                        });
                     }
                 })
-                .catch(err => {
-                    me.errores = err.response.data.errors;
-                    console.log(err);
-                });
             },
             registrarMovimientoFijo(renovar){
                 let me = this;
 
-                let movimiento = {
-                    'cuenta': me.idcuenta,
-                    'renovar': renovar
-                };
+                Swal.fire(
+                {
+                    title: 'Confirmar registro de operación',
+                    text: "¿Está seguro de realizar esta operación?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Aceptar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value)
+                    {
+                        let movimiento = {
+                            'cuenta': me.idcuenta,
+                            'renovar': renovar
+                        };
 
-                me.errores = [];
+                        me.errores = [];
 
-                axios.post(me.ruta + '/movimiento/registrarFijos', movimiento)
-                .then(res => {
+                        axios.post(me.ruta + '/movimiento/registrarFijos', movimiento)
+                        .then(res => {
 
-                    if(!res.data.plazocumplido){
-                        let min_dias = res.data.minimo_dias;
-                        let msg = 'No puede registrar movimientos en esta cuenta debido que aún no vence el plazo desde ' + min_dias;
+                            if(!res.data.plazocumplido){
+                                let min_dias = res.data.minimo_dias;
+                                let msg = 'No puede registrar movimientos en esta cuenta debido que aún no vence el plazo desde ' + min_dias;
 
-                        if(min_dias == 361)
-                            msg += 'días a más de un año';
-                        else
-                            msg += ' hasta ' + res.data.plazo_establecido + ' días';
+                                if(min_dias == 361)
+                                    msg += 'días a más de un año';
+                                else
+                                    msg += ' hasta ' + res.data.plazo_establecido + ' días';
 
-                        msg += ', establecido desde la fecha ' + res.data.fecha_inicio + '.\n\n Podrá retirar su dinero e intereses a partir de la fecha ' + res.data.fecha_fin;
+                                msg += ', establecido desde la fecha ' + res.data.fecha_inicio + '.\n\n Podrá retirar su dinero e intereses a partir de la fecha ' + res.data.fecha_fin;
 
-                        me.mostraralerta('center', 'error', msg);
-                    } else {
-                        me.limpiarformulario();
-                        me.idmovimiento = res.data.id;
-                        me.mostrarComponente(false, false, false, true);
+                                me.mostraralerta('center', 'error', msg);
+                            } else {
+                                me.limpiarformulario();
+                                me.idmovimiento = res.data.id;
+                                me.mostrarComponente(false, false, false, true, false);
+                            }
+                        })
+                        .catch(err => {
+                            me.errores = err.response.data.errors;
+                            console.log(err);
+                        });
                     }
                 })
-                .catch(err => {
-                    me.errores = err.response.data.errors;
-                    console.log(err);
-                });
             },
             selectCuenta(search, loading){
                 let me=this;
@@ -378,24 +481,94 @@
                         me.fecha_fin = value.fecha_fin;
                     }
 
-                    me.errores.cuenta = null;//Para limpiar el error después de selecciona una cuenta
+                    me.errores = [];//Para limpiar el error después de selecciona una cuenta
 
                     me.cuentaseleccionada = true;
                 }else{//en el caso de que no exista, se limpia el label de v-select
                     me.limpiarselect();
                 }
             },
-            mostrarComponente(elegirTipo, showAhorros, showFijo, showMessage){
+            cobrarIntereses(){
+                let me = this;
+
+                Swal.fire(
+                {
+                    title: 'Confirmar registro de operación',
+                    text: "¿Está seguro de realizar esta operación?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Aceptar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value)
+                    {
+                        let movimiento = {
+                            'cuenta': me.idcuenta,
+                            'monto_retiro': me.monto_retiro
+                        };
+
+                        me.errores = [];
+
+                        axios.post(me.ruta + '/movimiento/registrarRetiroInteres', movimiento)
+                        .then(res => {
+                            me.limpiarformulario();
+                            me.idmovimiento = res.data.id;
+                            me.mostrarComponente(false, false, false, true, false);
+                        })
+                        .catch(err => {
+                            me.errores = err.response.data.errors;
+                            console.log(err);
+                        });
+                    }
+                })
+            },
+            selectCuentaInteres(search, loading){
+                let me=this;
+                 loading(true)
+                var url= this.ruta+'/movimiento/selectCuentaInteres?filtro='+search;
+                axios.get(url).then(function (response) {
+                    let respuesta = response.data;
+                    q:search;
+                    me.cuentaseleccionada = false;
+                    me.arraycuentasInteres = respuesta.cuentas;
+                    loading(false)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            getDatosCuentaInteres(value){//Capturar el valor seleccionado de la lista
+                let me = this;
+                if(value){//si existe un valor para socio
+                    me.loading = true;
+                    me.idcuenta = value.id;
+                    me.numerocuenta = value.numerocuenta;
+                    me.nombre = value.nombre;
+                    me.apellidos = value.apellidos;
+
+                    me.tipocuenta = value.tipocuenta;// 1:AHORROS, 2:PLAZO FIJO
+                    me.interes_disponible = value.interes_disponible;
+
+                    me.errores = [];//Para limpiar el error después de selecciona una cuenta
+
+                    me.cuentaseleccionada = true;
+                }else{//en el caso de que no exista, se limpia el label de v-select
+                    me.limpiarselect();
+                }
+            },
+            mostrarComponente(elegirTipo, showAhorros, showFijo, showMessage, showInteres){
                 let me = this;
 
                 me.showElegirTipoCuenta = elegirTipo;
                 me.showFormRegistroAhorros = showAhorros;
                 me.showFormRegistroPlazoFijo = showFijo;
                 me.showMsgRegistro = showMessage;
+                me.showInteres = showInteres;
             },
             descargarBoucherMovimiento(){
                 let me = this;
-                me.mostrarComponente(true, false, false, false);
+                me.mostrarComponente(true, false, false, false, false);
                 window.open(me.ruta + '/ahorro/movimiento/imprimirboucher?id=' + me.idmovimiento,'_blank');
             }
         },

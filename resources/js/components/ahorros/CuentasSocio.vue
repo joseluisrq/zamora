@@ -42,19 +42,47 @@
                             <div class="row">
                                 <div class="col-md-12 ">
                                     <h4 class="text-dark font-weight-bold">
-                                        <i class="mdi mdi-cash-usd mdi-36px"></i>INTERESES GANADOS POR LAS CUENTAS</h4>
+                                        <i class="mdi mdi-cash-usd mdi-36px"></i>INTERESES DISPONIBLES</h4>
                                     <hr>
                                 </div>
                                 <div class="col-md-3">
-                                    <h5 class="font-weight-bold ">En total</h5>
-                                    <p v-text="'S/. ' + interes_total"></p>
+                                    <h5 class="font-weight-bold ">De cuentas</h5>
+                                    <p v-text="'S/ ' + interes_cuentas"></p>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5 class="font-weight-bold ">De aportes</h5>
+                                    <p v-text="'S/ ' + interes_aportes"></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 ">
+                                    <h4 class="text-dark font-weight-bold">
+                                        <i class="mdi mdi-cash-usd mdi-36px"></i>COBRAR INTERESES DE APORTES</h4>
+                                    <hr>
+                                </div>
+                                <div v-if="!showMsgExito" class="col-md-6">
+                                    <form id="formRegistro" @submit="prevenirDefault" class="forms-sample">
+                                        <div class="form-group">
+                                            <label for="montoaporte" class="font-weight-bold">Monto a Retirar(S/)</label>
+                                            <input id="montoaporte" type="number" step="0.01" v-model="monto_retiro" :class="['form-control', 'border',errores.monto_retiro ? 'border-danger' : '']" placeholder="Ingrese el monto a retirar">
+                                            <span v-if="errores.monto_retiro" class="text-danger">{{ errores.monto_retiro[0] }}</span>
+                                        </div>
+                                        <a class="btn btn-primary text-dark mr-2" @click="cobrarInteresesAporte()">Realizar cobro</a>
+                                        <a class="btn btn-light text-dark" @click="monto_retiro='';errores=[]">Cancelar</a>
+                                    </form>
+                                </div>
+                                <div v-if="showMsgExito" class="col-md-6">
+                                    <h3 align="center">Operación exitosa</h3>
+                                    <hr><br>
+                                    <a class="btn btn-success text-dark mr-2" @click="showMsgExito=false;descargarBoucherCobroInteresAporte()">Descargar Boucher</a>
+                                    <a class="btn btn-warning text-dark" @click="showMsgExito=false">Nuevo retiro</a>
                                 </div>
                             </div>
                             <br>
                             <div class="row">
                                 <div class="col-md-12 ">
                                     <h4 class="text-dark font-weight-bold">
-                                        <i class="mdi mdi-package-variant-closed mdi-36px"></i>CUENTAS DE AHORRO DEL SOCIO</h4>
+                                        <i class="mdi mdi-package-variant-closed mdi-36px"></i>CUENTAS DEL SOCIO</h4>
                                     <hr>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
@@ -79,7 +107,8 @@
                                             <th>N° Cuenta </th>
                                             <th>Saldo efectivo</th>
                                             <th>Tasa</th>
-                                            <th>Interés ganados</th>
+                                            <th>Interés ganado</th>
+                                            <th>Interés dsponible</th>
                                             <th>Fecha apertura</th>
                                             <th> Estado</th>
                                         </tr>
@@ -99,6 +128,7 @@
                                             <td v-text="cuenta.saldoefectivo"></td>
                                             <td v-text="cuenta.tasa"></td>
                                             <td v-text="cuenta.interes_ganado"></td>
+                                            <td v-text="cuenta.interes_disponible"></td>
                                             <td v-text="cuenta.fechaapertura"></td>
                                          
                                             <td v-if="cuenta.estado==0">
@@ -158,9 +188,14 @@
                     email: ''
                 },
 
-                interes_total: 0,
+                interes_cuentas: 0,
+                interes_aportes: 0,
 
                 arraycuentas: [],
+
+                idaporte: '',
+                monto_retiro: '',
+                errores: [],
 
                 pagination : {
                     'total' : 0,
@@ -176,6 +211,7 @@
 
                 showlista: true,
                 showdetalle: false,
+                showMsgExito: false
             }
         },
         computed:{
@@ -207,6 +243,9 @@
             }
         },
         methods:{
+            prevenirDefault(e){
+                e.preventDefault();
+            },
             cambiarPagina(page,buscar,criterio){
                 let me = this;
                 //Actualiza la página actual
@@ -228,15 +267,62 @@
                     console.log(error);
                 });
             },
-            obtenerIntereses(idcuenta){
+            obtenerIntereses(){
                 let me = this;
                 var url= me.ruta+'/ahorro/intereses?id='+me.id;
                 axios.get(url).then(res => {
-                    me.interes_total = (res.data.interes_total == null) ? 0: res.data.interes_total;
+                    me.interes_cuentas = res.data.interes_cuentas;
+                    me.interes_aportes = res.data.interes_aportes;
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
+            },
+            cobrarInteresesAporte(){
+                let me = this;
+
+                Swal.fire(
+                {
+                    title: 'Confirmar cobro de interés',
+                    text: "¿Está seguro de realizar esta operación?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Aceptar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value)
+                    {
+                        let movimiento = {
+                            "idsocio" : me.id,
+                            "monto_retiro" : me.monto_retiro
+                        };
+
+                        var url= me.ruta+'/aporte/cobrarInteresAportes';
+                        axios.post(url, movimiento)
+                        .then(res => {
+                            me.errores = [];
+                            me.monto_retiro = '';
+
+                            me.idaporte = res.data.id;
+                            me.obtenerIntereses();
+
+                            me.showMsgExito = true;
+
+                            Swal.fire({
+                                position: 'center',
+                                type: 'success',
+                                title: 'Operación existosa',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        })
+                        .catch(err => {
+                            me.errores = err.response.data.errors;
+                            console.log(err);
+                        });
+                    }
+                })
             },
             obtenerInfoSocio(){
                 let me = this;
@@ -257,12 +343,19 @@
                 let me = this;
                 me.showlista = lista;
                 me.showdetalle = detalle;
+            },
+            descargarBoucherCobroInteresAporte(){
+                let me = this;
+                window.open(me.ruta + '/aporte/pdfDetalleAporte?id=' + me.idaporte,'_blank');
             }
         },
         mounted() {
             this.listarCuentas(1,'','');
             this.obtenerInfoSocio();
             this.obtenerIntereses();
+            this.errores = [];
+            this.monto_retiro = '';
+            this.showMsgExito = false;
         }
     };
 </script>

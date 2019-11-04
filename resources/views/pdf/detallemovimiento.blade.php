@@ -63,12 +63,8 @@
                   
                     <p>
                         MONTO DE OPERACIÓN N: S/. {{ $mov->monto }}
-                        <br><br>
-                        <strong>INTERÉS GANADO</strong>
-                        <br>Desde el último movimiento: S/. {{ $mov->interes_ganado }}
-                        <br>En total: S/. {{ $mov->interes_ganado_total }}
                         @if($tipocuenta == 2){{-- Si se trata de cuenta a plazo fijo --}}
-                            <br><br><strong>DEPÓSITO ACTUAL</strong>
+                            <br><strong>DEPÓSITO ACTUAL</strong>
                             <br>Plazo fijo desde {{ $min_dias }} 
                             @if($min_dias == 361)
                                 días a más de un año.

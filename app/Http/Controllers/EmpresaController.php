@@ -42,7 +42,22 @@ class EmpresaController extends Controller
 
             //calculo de mora
             'empresa.tasa_compensatoria_anual',
-            'empresa.tasa_moratoria_anual'
+            'empresa.tasa_moratoria_anual',
+
+            'empresa.monto_min_30',
+            'empresa.monto_min_90',
+            'empresa.monto_min_180',
+            'empresa.monto_min_360',
+            'empresa.monto_min_361',
+
+            'empresa.monto_min_ahorros',
+            'empresa.monto_min_retiro_interes',
+            'empresa.monto_min_interes_aporte',
+            'empresa.monto_min_aporte'
+
+
+
+            //
         )
         ->orderBy('empresa.id', 'desc')->take(1)->get()[0];
          
@@ -50,27 +65,42 @@ class EmpresaController extends Controller
     'hoy'=>$mytime];
 	}
 
-    public function tasaCrearCuenta0(Request $request)
+    public function tasaCrearCuenta(Request $request)//Devuelve la tasa y monto mínimo para crear lacuenta
     {
         if (!$request->ajax()) return redirect('/');
 
         $tipo = $request->tipo;
 
-        $campo = 'tasa_';
+        $campo_tasa = 'tasa_';
+        $campo_monto_min = 'monto_min_';
 
         if($tipo == 1) {//ES UNA CUENTA DE AHORROS
-            $campo .= 'ahorros';
+            $campo_tasa .= 'ahorros';
+            $campo_monto_min .= 'ahorros';
         }
         else {
-            $campo .= 'ahorroplazo_' . $request->tiempo;   
+            $campo_tasa .= 'ahorroplazo_' . $request->tiempo;
+            $campo_monto_min .= $request->tiempo;
         }
 
-        $tasa = Empresa::select(['empresa.'.$campo])
-        ->orderBy('empresa.id', 'desc')->take(1)->get()[0]->$campo;
-         
-        return ['tasa' => $tasa];
+        $datos_empresa = Empresa::select(['empresa.'.$campo_tasa, 'empresa.'.$campo_monto_min])
+        ->orderBy('empresa.id', 'desc')->take(1)->get()[0];
 
-    }    
+        $tasa = $datos_empresa->$campo_tasa;
+        $monto_min = $datos_empresa->$campo_monto_min;
+         
+        return ["tasa" => $tasa, "monto_min" => $monto_min];
+    }
+
+    public function tasaAportes(Request $request)//Devuelve la tasa de aportes
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $tasa = Empresa::select('empresa.tasa_aportes')
+        ->orderBy('empresa.id', 'desc')->take(1)->get()[0]->tasa_aportes;
+         
+        return ["tasa" => $tasa];
+    }
 
 	public function update(Request $request)
 	{
@@ -93,10 +123,16 @@ class EmpresaController extends Controller
             $empresa->tasa_ahorroplazo_180=$request->tasa_ahorroplazo_180;
             $empresa->tasa_ahorroplazo_360=$request->tasa_ahorroplazo_360;
             $empresa->tasa_ahorroplazo_361=$request->tasa_ahorroplazo_361;
-            
 
-
-
+            $empresa->monto_min_30=$request->monto_min_30;       
+            $empresa->monto_min_90=$request->monto_min_90;       
+            $empresa->monto_min_180=$request->monto_min_180;      
+            $empresa->monto_min_360=$request->monto_min_360;        
+            $empresa->monto_min_361=$request->monto_min_361;
+            $empresa->monto_min_ahorros=$request->monto_min_ahorros;       
+            $empresa->monto_min_retiro_interes=$request->monto_min_retiro_interes;        
+            $empresa->monto_min_interes_aporte=$request->monto_min_interes_aporte;       
+            $empresa->monto_min_aporte=$request->monto_min_aporte;   
             
         $empresa->save();
              DB::commit();
@@ -104,55 +140,5 @@ class EmpresaController extends Controller
         } catch (Exception $e){
             DB::rollBack();
         }
-    }
-    public function tasaCrearCuenta(Request $request)//Devuelve la tasa y monto mínimo para crear lacuenta
-   
- {
-        if (!$request->ajax()) return redirect('/');
-
-    
-    $tipo = $request->tipo;
-
-        $campo_tasa = 'tasa_';
-        $campo_monto_min = 'monto_min_';
-
-     
-   if($tipo == 1) {//ES UNA CUENTA DE AHORROS
-            $campo_tasa .= 'ahorros';
-       
-     $campo_monto_min .= 'ahorros';
-        }
-        else {
-            $campo_tasa .= 'ahorroplazo_' . $request->tiempo;
-       
-     $campo_monto_min .= $request->tiempo;
-        }
-
-        $datos_empresa = Empresa::select(['empresa.'.$campo_tasa, 'empresa.'.$campo_monto_min])
-   
-     ->orderBy('empresa.id', 'desc')->take(1)->get()[0];
-
-        $tasa = $datos_empresa->$campo_tasa;
-        $monto_min = $datos_empresa->$campo_monto_min;
-       
-  
-        return ["tasa" => $tasa, "monto_min" => $monto_min];
-    }
-
-    public function tasaAportes(Request $request)//Devuelve la tasa de aportes
-   
- {
-        if (!$request->ajax()) return redirect('/');
-
-        $tasa = Empresa::select('empresa.tasa_aportes')
-   
-     ->orderBy('empresa.id', 'desc')->take(1)->get()[0]->tasa_aportes;
-         
-        return ["tasa" => $tasa];
-    }
-
-
-
-
-
+	}
 }

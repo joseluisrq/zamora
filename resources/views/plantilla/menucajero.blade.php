@@ -41,6 +41,7 @@
                           </ul>
                       </div>
                 </li>
+
                 
                 <!--Socios-->
                 <li class="nav-item">
@@ -56,6 +57,14 @@
                                                         
                           </ul>
                       </div>
+                </li>
+                  <!--Caja-->
+                  <li @click="menu=15" class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="mdi mdi-grid menu-icon"></i>
+                      <span class="menu-title">Caja</span>
+                      <i class="menu-arrow"></i>
+                    </a>
                 </li>
                 
               

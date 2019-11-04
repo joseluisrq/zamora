@@ -198,6 +198,39 @@ class PersonaController extends Controller
         return ["infosocio" => $infosocio];
     }
 
+    public function selectUsuarios(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $dni = $request->dni;
+
+        $idsocios = Socio::select('id')
+        ->where('estado', '=', '1')
+        ->get();
+
+        $usuarios = Persona::join('users', 'personas.id', '=', 'users.id')
+        ->select(
+            'personas.dni',
+            'personas.nombre',
+            'personas.apellidos',
+            'personas.fechanacimiento',
+            'personas.departamento',
+            'personas.ciudad',
+            'personas.direccion',
+            'personas.telefono',
+            'personas.email'
+        )
+        ->where([
+            ['personas.dni', 'like', '%'.$dni.'%'],
+            ['users.idrol', '=', '1'],//SOLO SE PUEDE REGISTRAR COMO SOCIOS A LOS USUARIOS QUE SON ADMIN
+            ['users.condicion', '=', '1']
+        ])
+        ->whereNotIn('users.id', $idsocios)
+        ->get();
+
+        return ["usuarios" => $usuarios];
+    }
+
 	public function store(Request $request)
     {
 		if (!$request->ajax()) return redirect('/');
@@ -256,53 +289,31 @@ class PersonaController extends Controller
 
         $request->validate($validar, $traducciones);
 
-        $id = Persona::select('id')->where('personas.dni', '=', $request->dni)->get();
+        // VALIDAR PERSONAS ACTIVAS
+        $socios_activos = Persona::join('socios', 'personas.id', '=', 'socios.id')
+        ->select('personas.id')
+        ->where([['personas.dni', '=', $request->dni], ['socios.estado', '=', '1']])
+        ->get();
 
-        if(sizeof($id) > 0)//Existe una persona registrada con ese DNI
-        {
-            $id = $id[0]->id;
-            $socio_duplicado = Socio::where('socios.id', '=', $id)->get();
+        $usuarios = Persona::join('users', 'personas.id', '=', 'users.id')
+        ->select('personas.id')
+        ->where('personas.dni', '=', $request->dni)
+        ->get();
 
-            if($tipo == 0)// SE ESTÁ REGISTRANDO UN SOCIO
-            {
-                if(sizeof($socio_duplicado) > 0) return ["existe" => true, "noadmin" => false];
-                else
-                {
-                    $usuario = User::join('roles', 'roles.id', '=', 'users.idrol')
-                    ->select(
-                        'users.id',
-                        'roles.nombre'
-                    )
-                    ->where([
-                        ['users.id', '=', $id],
-                        ['roles.nombre', 'like', 'Admin'.'%']
-                    ])->get();
+        if((sizeof($socios_activos) > 0) or (sizeof($usuarios) > 0))//Existe una persona registrada con ese DNI
+            return ["existe" => true];
 
-                    if(sizeof($usuario) == 0) return ["existe" => true, "noadmin" => true];//No se puede registrar USUARIOS que no son ADMIN
+        $socios_inactivos = Persona::join('socios', 'personas.id', '=', 'socios.id')
+        ->select('personas.id')
+        ->where([['personas.dni', '=', $request->dni], ['socios.estado', '=', 0]])
+        ->get();
 
-                    try {
-                        DB::beginTransaction();
-
-                        $socio = new Socio();//REGISTRAR A LA PERSONA COMO SOCIO
-                        $socio->id = $id;
-                        $socio->estadoahorro = '0';
-                        $socio->estadocredito = '0';
-                        $socio->tipo = 'socio';
-                        $socio->interes_aportaciones = 0;
-                        $socio->estado = 1;
-                        $socio->save();
-
-                        DB::commit();
-                    } catch (Exception $e) {
-                        DB::rollBack();
-                    }
-                    return [
-                        "existe" => false,
-                        "id" => $id
-                    ];
-                }
-            }
-            return ["existe" => true, "noadmin" => false];
+        if(sizeof($socios_inactivos) > 0)//Existe un socio registrado con ese DNI, pero esa inactivo
+        {//EN ESTE CASO SE ACTUALIZAN EL DNI DE LA PERSONA PARA EVITAR CONFLICTOS AL REGISTRAR NUEVOS SOCIOS
+            $person = Persona::findOrFail($socios_inactivos[0]->id);
+            $person->dni = substr($person->dni, 0, 8);
+            $person->dni .= '-d-' . $person->id;
+            $person->save();
         }
 
         try{
@@ -322,7 +333,7 @@ class PersonaController extends Controller
             // SI TIPO==0, REGISTRAMOS UN SOCIO
             if($tipo == 0)
             {
-                $socio = new Socio();//REISTRAR A LA PERSONA COMO SOCIO
+                $socio = new Socio();//REGISTRAR A LA PERSONA COMO SOCIO
                 $socio->id = $persona->id;
                 $socio->estadoahorro = '0';
                 $socio->estadocredito = '0';
@@ -343,16 +354,55 @@ class PersonaController extends Controller
             }            
  
             DB::commit();
+
+            return [
+                "existe" => false,
+                "id" => $persona->id
+            ];
  
         } catch (Exception $e){
             DB::rollBack(); 
         }
-
-        return [
-                "existe" => false,
-                "id" => $persona->id
-            ];
 	}
+
+    public function storeUserComoSocio(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $request->validate(
+            ['dni' => 'required'],
+            ['dni.required' => 'ingrese un número de DNI de socio']
+        );
+
+        $idpersona = Persona::select('id')
+        ->where('dni', '=', $request->dni)
+        ->get()[0]->id;
+
+        try {
+            DB::beginTransaction();
+
+            $socio_des = Socio::where('socios.id', '=', $idpersona)->get();
+
+            // SI EXISTE EL SOCIO Y ESTÁ DESACTIVADO, SÓLO SE ACTUALIZA SU INFORMACIÓN
+            //SI NO EXISTE, SE CREA
+            $socio = (sizeof($socio_des) > 0)? Socio::findOrFail($idpersona) : new Socio();
+
+            $socio->id = $idpersona;
+            $socio->estadoahorro = '0';
+            $socio->estadocredito = '0';
+            $socio->tipo = 'socio';
+            $socio->interes_aportaciones = 0;
+            $socio->estado = 1;
+            $socio->save();
+
+            DB::commit();
+
+            return ["id" => $idpersona];
+
+        } catch (Exception $e) {
+            DB::rollBack();
+        }
+    }
 
 	public function update(Request $request)
     {
@@ -369,6 +419,19 @@ class PersonaController extends Controller
             'telefono' => 'required'
         ];
 
+        $traducciones = [
+            'dni.required' => 'ingrese un número de DNI de socio',
+            'dni.size' => 'el DNI debe ser de 8 dígitos',
+            'nombres.required' => 'ingrese los nombres del socio',
+            'apellidos.required' => 'ingrese los apellidos del socio',
+            'fechanacimiento.required' => 'ingrese la fecha de nacimiento del socio',
+            'fechanacimiento.date' => 'ingrese una fecha válida',
+            'departamento.required' => 'ingrese el nombre del departamento del socio',
+            'ciudad.required' => 'ingrese la ciudadd del socio',
+            'direccion.required' => 'ingrese la dirección del socio',
+            'telefono.required' => 'ingrese el número de teléfono del socio'
+        ];
+
         if(isset($request->correo)) $validar += array('correo' => 'email');
 
         $tipo = $request->tipo;
@@ -381,9 +444,16 @@ class PersonaController extends Controller
                 // 'repetirpassword' => 'required|same:password',
                 'rol' => 'required'
             );
+
+            $traducciones += array(
+                'correo.required' => 'ingrese el correo del usuario',
+                'correo.email' => 'ingrese un correo válido',
+                'usuario.required' => 'ingrese un nombre de usuario',
+                'rol.required' => 'seleccione un rol de usuario'
+            );
         }
 
-        $request->validate($validar);
+        $request->validate($validar, $traducciones);
 
         if($request->dniprevio != $request->dni)//QUIERE DECIR QUE INTENTA CAMBIAR SU NÚMERO DE DNI
         {
@@ -467,12 +537,6 @@ class PersonaController extends Controller
 
             if($tipo == 0)
             {
-                //CAMBIAR DATOS PARA EVITAR CONFLICTOS AL REGISTRAR NUEVOS SOCIOS
-                $persona = Persona::findOrFail($request->id);
-                $persona->dni = substr($persona->dni, 0, 8);
-                $persona->dni .= '-d-' . $request->id;
-                $persona->save();
-
                 $socio = Socio::findOrFail($request->id);//DESACTIVAR SOCIO
                 $socio->estado = 0;
                 $socio->save();
@@ -480,7 +544,6 @@ class PersonaController extends Controller
             else if($tipo == 1)
             {
                 $user = User::findOrFail($request->id);//DESACTIVAR USUARIO
-                $user->usuario = 'DES-' . $request->id;
                 $user->condicion = 0;
                 $user->save();
             }

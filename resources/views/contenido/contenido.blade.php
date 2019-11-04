@@ -53,7 +53,7 @@
                 
 
                     <template v-if="menu==16">
-                            <h1>Reportes</h1>
+                        <reportes :ruta="ruta" :rol="1"></reportes>
                     </template>
 
                     {{-- INICIO MENU ACCESO --}}
@@ -75,8 +75,9 @@
                     {{-- FIN CONFIGURACIÓN --}}
                     
                     <!--Caja-->
-                    <template v-if="menu==15">
-                        <caja :ruta='ruta'/>
+                      <!--Caja-->
+                      <template v-if="menu==77">
+                        <cajaadmin :ruta='ruta'/>
                     </template>
 
 
@@ -132,6 +133,13 @@
                     <template v-if="menu==21">
                         <registrarpersona :key="4" :ruta='ruta' :tipo="1" :registrar="1"></registrarpersona>
                     </template>
+
+                    <template v-if="menu==16">
+                        <reportes :ruta="ruta" :rol="1"></reportes>
+                    </template>
+
+                   
+
                   
                     {{-- FIN ACCESO --}}
 
@@ -140,6 +148,9 @@
                     @elseif (Auth::user()->idrol == 3)
                     <template v-if="menu==0">
                         <example-component :ruta="ruta"></example-component>
+                    </template>
+                    <template v-if="menu==15">
+                        <caja :ruta='ruta'/>
                     </template>
                     <template v-if="menu==40">
                             <listarcredito :ruta="ruta" :rol="3"></listarcredito>

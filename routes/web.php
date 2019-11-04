@@ -120,6 +120,18 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/caja/CerrarCaja', 'CajaController@CerrarCaja');//cajalista
         Route::put('/caja/ActualizarMontoIncial', 'CajaController@ActualizarMontoIncial');//cajalista
 
+
+
+        Route::get('/persona/selectUsuarios', 'PersonaController@selectUsuarios');
+	    Route::post('/persona/registrar/usercomosocio', 'PersonaController@storeUserComoSocio');
+
+	    Route::get('/movimiento/selectCuentaInteres', 'MovimientoController@selectCuentaInteres');
+	    Route::post('/movimiento/registrarRetiroInteres', 'MovimientoController@cobrarInteres');
+
+	    Route::post('/aporte/cobrarInteresAportes', 'AporteController@cobrarInteresAportes');
+        
+
+        Route::get('/ahorro/reporte', 'CuentaAhorroController@reportes');
     });  
 
 

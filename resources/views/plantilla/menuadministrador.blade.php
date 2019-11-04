@@ -63,7 +63,7 @@
                 </li>
                 
                  <!--Caja-->
-                <li @click="menu=15" class="nav-item">
+                <li @click="menu=77" class="nav-item">
                     <a href="#" class="nav-link">
                       <i class="mdi mdi-grid menu-icon"></i>
                       <span class="menu-title">Caja</span>

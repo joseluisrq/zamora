@@ -270,7 +270,7 @@
                 me.monto = '';
                 me.descripcion = '';
 
-                me.errore = [];
+                me.errores = [];
 
                 me.limpiarselect();
             },
@@ -307,23 +307,37 @@
 
                 me.errores = [];
 
-                let aporte = {
-                        'idsocio': me.idsocio,
-                        'dni': me.dni,
-                        'monto': me.monto,
-                        'descripcion': me.descripcion
-                    };
+                Swal.fire(
+                {
+                    title: 'Confirmar pago de Aporte',
+                    text: "¿Está seguro de realizar registrar el pago de Aporte?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Aceptar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value)
+                    {
+                        let aporte = {
+                            'idsocio': me.idsocio,
+                            'dni': me.dni,
+                            'monto': me.monto,
+                            'descripcion': me.descripcion
+                        };
 
-                    axios.post(me.ruta + '/aporte/registrar', aporte)
-                    .then(res => {
-                        me.limpiarformulario();
-                        me.idaporte = res.data.idaporte;
-                        me.mostrarComponente(false, true, false);//Mostrar el mensaje de confirmación de aporte registrado
-                    })
-                    .catch(err => {
-                        me.errores = err.response.data.errors;
-                        console.log(err);
-                    });
+                        axios.post(me.ruta + '/aporte/registrar', aporte)
+                        .then(res => {
+                            me.limpiarformulario();
+                            me.idaporte = res.data.idaporte;
+                            me.mostrarComponente(false, true, false);//Mostrar el mensaje de confirmación de aporte registrado
+                        })
+                        .catch(err => {
+                            me.errores = err.response.data.errors;
+                            console.log(err);
+                        });
+                    }
+                })
             },
             selectSocio(search, loading){
                 let me = this;

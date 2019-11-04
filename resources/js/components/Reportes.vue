@@ -1,64 +1,14 @@
 <template>
-    <main>
-        <!--seccion 1
+ <main>     
+
+<!--CREDITOS-->
+    <template>
         <div class="row">
-            <div class="card ">
-                <div class="card-body ">
-                    <div class="row ">
-                        <div class="col-lg-4 ">
-                            <h4 class="card-title ">Sales Difference</h4>
-                            <canvas id="salesDifference "></canvas>
-                            <p class="mt-3 mb-4 mb-lg-0 ">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                            </p>
-                        </div>
-                        <div class="col-lg-5 ">
-                            <h4 class="card-title ">Best Sellers</h4>
-                            <div class="row ">
-                                <div class="col-sm-4 ">
-                                    <ul class="graphl-legend-rectangle ">
-                                        <li><span class="bg-danger "></span>Automotive</li>
-                                        <li><span class="bg-warning "></span>Books</li>
-                                        <li><span class="bg-info "></span>Software</li>
-                                        <li><span class="bg-success "></span>Video games</li>
-                                    </ul>
-                                </div>
-                                <div class="col-sm-8 grid-margin ">
-                                    <canvas id="bestSellers "></canvas>
-                                </div>
-                            </div>
-                            <p class="mt-3 mb-4 mb-lg-0 ">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                            </p>
-                        </div>
-                        <div class="col-lg-3 ">
-                            <h4 class="card-title ">Social Media Statistics</h4>
-                            <div class="row ">
-                                <div class="col-sm-12 ">
-                                    <div class="progress progress-lg grouped mb-2 ">
-                                        <div class="progress-bar bg-danger " role="progressbar " style="width: 40% " aria-valuenow="25 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                        <div class="progress-bar bg-info " role="progressbar " style="width: 10% " aria-valuenow="50 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                        <div class="progress-bar bg-warning " role="progressbar " style="width: 20% " aria-valuenow="50 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                        <div class="progress-bar bg-success " role="progressbar " style="width: 30% " aria-valuenow="50 " aria-valuemin="0 " aria-valuemax="100 "></div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 ">
-                                    <ul class="graphl-legend-rectangle ">
-                                        <li><span class="bg-danger "></span>Instagram (15%)</li>
-                                        <li><span class="bg-warning "></span>Facebook (20%)</li>
-                                        <li><span class="bg-info "></span>Website (25%)</li>
-                                        <li><span class="bg-success "></span>Youtube (40%)</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <p class="mb-0 mt-2 ">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-md-12 card bg bg-info">
+                <h2 class="text-white">Créditos</h2>
             </div>
         </div>
-        fin seccion 1-->
-
-           <!--seccion 02-->
+        <!--seccion 02-->
         <div class="row  mt-4">
              <div class="col-md-12">
                <h3 class="text-primary font-weight-bold">Cantidad de Créditos</h3> 
@@ -145,10 +95,44 @@
         </div>
          <!--fin seccion 2-->
 
-          <!--seccion 04-->
+        <!-- Sesccion 3-->
+        <div class="row ">
+            <div class="col-sm-6 grid-margin grid-margin-md-0 stretch-card ">
+                <div class="card ">
+                    <div class="card-body ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h4 class="card-title ">Desembolsos de Créditos por Mes</h4>
+                            <h4 class="text-success font-weight-bold ">Año<span class="text-dark ml-3 ">{{ano}}</span></h4>
+                        </div>
+                        <div id="support-tracker-legend " class="support-tracker-legend "></div>
+                        <canvas id="desembolsos"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 grid-margin grid-margin-md-0 stretch-card ">
+                <div class="card ">
+                    <div class="card-body ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h4 class="card-title ">Canitdad de Desembolsos de Créditos por Mes</h4>
+                            <h4 class="text-success font-weight-bold ">Año<span class="text-dark ml-3 ">{{ano}}</span></h4>
+                        </div>
+                        <div id="support-tracker-legend " class="support-tracker-legend "></div>
+                        <canvas id="desembolsospormes"></canvas>
+                    </div>
+                </div>
+            </div>
+         
+        </div>
+         <!--fin seccion 3-->
+    </template>
+<!--FIN CREDITOS-->
+
+<!--Cuentas de Ahorroo-->
+   <template>
+         <!--seccion 04-->
         <div class="row mt-4">
-            <div class="col-md-12 ">
-                <h3 class="text-primary font-weight-bold">Cuentas de Ahorro</h3>
+            <div class="col-md-12 card bg bg-info">
+                <h2 class="text-white">Cuentas de Ahorro</h2>
             </div>
         </div>
         <div class="row mt-4">
@@ -236,10 +220,11 @@
                 </div>
             </div>
         </div>
+    </template>
          <!--fin seccion 4-->
-    </main>
+<!--fin cuentas de ahorro-->
 
- 
+ </main> 
 </template>
 
 <script>
@@ -252,9 +237,16 @@
                 desembolsos:[],
                 varTotalDesembolsos:[],
                 varMesDesembolsos:[],
+
+                 cvarDesembolsos:null,
+                ccharDesembolso:null,
+                cdesembolsos:[],
+                cvarTotalDesembolsos:[],
+                cvarMesDesembolsos:[],
+
                 ano:'1993',
 
-               enproceso:0,
+                enproceso:0,
                 rechazados:0,
                 terminados:0,
                 totalcreditos:0,
@@ -262,6 +254,7 @@
 
                 creditoporDes:0,
                 creditoDes:0,
+
 
                 ahorros_activos: 0,
                 ahorros_inactivos: 0,
@@ -274,10 +267,13 @@
                 montos_plazofijo: 0,
                 interes_ganado_plazofijo: 0
 
+
+
+
             }
         },
         methods:{
-           getDesembolsos(){
+            getDesembolsos(){
                  let me=this;
                  var url=me.ruta+'/reportes';
                  axios.get(url).then(function(response){
@@ -345,6 +341,60 @@
                             label: 'Desembolsos',
                             data: me.varTotalDesembolsos,
                             backgroundColor: 
+                                'rgba(75, 192, 192, 0.2)',                              
+                              
+                              
+                            borderColor: 
+                                'rgba(75, 192, 192, 0.2)',
+                              
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            
+            
+            
+            },
+            loadCreditpsporMes(){
+                 let me=this;
+                 me.cdesembolsos.map(function(x){
+                     if(x.mes==1)me.varMesDesembolsos.push('Enero');
+                     else if(x.mes==2)me.cvarMesDesembolsos.push('Febrero');
+                     else if(x.mes==3)me.cvarMesDesembolsos.push('Marzo');
+                     else if(x.mes==4)me.cvarMesDesembolsos.push('Abril');
+                     else if(x.mes==5)me.cvarMesDesembolsos.push('Mayo');
+                     else if(x.mes==6)me.cvarMesDesembolsos.push('Junio');
+                     else if(x.mes==7)me.cvarMesDesembolsos.push('Julio');
+                     else if(x.mes==8)me.cvarMesDesembolsos.push('Agosto');
+                    else if(x.mes==9)me.cvarMesDesembolsos.push('Setiembre');
+                    else if(x.mes==10)me.cvarMesDesembolsos.push('Octubre');
+                    else if(x.mes==11)me.cvarMesDesembolsos.push('Noviembre');
+                    else if(x.mes==12)me.cvarMesDesembolsos.push('Diciembre');
+
+                     
+                     //me.varMesDesembolsos.push(x.mes);
+                     me.cvarTotalDesembolsos.push(x.total);
+
+                 });
+                 me.cvarDesembolsos=document.getElementById('desembolsospormes').getContext('2d');
+
+                 me.ccharDesembolso = new Chart(me.cvarDesembolsos, {
+                    type: 'bar',
+                    data: {
+                        labels: me.cvarMesDesembolsos,
+                        datasets: [{
+                            label: 'Cantidad de Desembolsos',
+                            data: me.cvarTotalDesembolsos,
+                            backgroundColor: 
                                 'rgba(255, 99, 132, 0.2)',
                               
                             borderColor: 
@@ -363,8 +413,11 @@
                         }
                     }
                 });
+            
+            
+            
             },
-            cargarReporteCuentas(){
+               cargarReporteCuentas(){
                 let me=this;
                 var url=me.ruta+'/ahorro/reporte';
                 axios.get(url).then(function(response){
@@ -385,10 +438,11 @@
                      console.log(error);
                  });
             }
+
+
         },
         mounted() {
           this.getDesembolsos();
-          this.cargarReporteCuentas();
           this.cargarReporteCuentas();
         }
     }

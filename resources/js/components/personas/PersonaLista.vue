@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <button v-if="!showlista" class="btn btn-success mr-2" @click="mostrarComponenete(true, false, false, false)">volver</button>
+        <button v-if="!showlista" class="btn btn-success mr-2" @click="ocultarDetalle();mostrarComponenete(true, false, false, false)">volver</button>
         <div v-show="showlista" class="row">
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">

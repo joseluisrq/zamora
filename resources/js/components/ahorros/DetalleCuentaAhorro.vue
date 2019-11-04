@@ -31,7 +31,7 @@
                                         </div>
                                         <div class="col-md-3 ">
                                             <h5 class="font-weight-bold ">Saldo efectivo:</h5>
-                                             <p v-text="'S/.'+infocuenta.saldoefectivo"></p>
+                                             <p v-text="'S/ '+infocuenta.saldoefectivo"></p>
                                         </div>
                                         <div class="col-md-3 ">
                                             <h5 class="font-weight-bold ">Tasa de Interes:</h5>
@@ -40,6 +40,10 @@
                                         <div class="col-md-3 ">
                                             <h5 class="font-weight-bold ">Fecha Apertura:</h5>
                                             <p v-text="infocuenta.fechaapertura"></p>
+                                        </div>
+                                        <div class="col-md-12 ">
+                                            <h5 class="font-weight-bold ">Interés disponible</h5>
+                                            <p v-text="'S/ '+infocuenta.interes_ganado"></p>
                                         </div>
                                         <div class="col-md-3">
                                             <h5 class="font-weight-bold ">Creado por:</h5>
@@ -93,7 +97,6 @@
                                                 <th>Boucher</th>
                                                 <th>Fecha Registro</th>
                                                 <th>Monto</th>
-                                                <th>Interés ganado</th>
                                                 <th>Tipo</th>
                                                 <th>Cajero</th>
                                             </tr>
@@ -108,7 +111,6 @@
                                                 </td>
                                                 <td v-text="movimiento.fecharegistro" ></td>   
                                                 <td v-text="movimiento.monto"></td>
-                                                <td v-text="movimiento.interes_ganado"></td>
                                                 <td v-if="movimiento.tipomovimiento==0">
                                                     <label class="badge badge-warning">Retiro</label>
                                                 </td>
@@ -140,6 +142,7 @@ export default {
                 saldoefectivo: '',
                 fechaapertura: '',
                 tasa: '',
+                interes_ganado:'',
                 usuario: ''
             },
             infosocio: {

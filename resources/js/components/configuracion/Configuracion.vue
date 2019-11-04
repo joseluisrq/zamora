@@ -41,7 +41,7 @@
                            </div>
                             <div class="col-md-12">
                                <div class="form-group">
-                                    <h3>Configuración Cuenta de Ahorros-Cuenta Cor</h3>
+                                    <h3>Configuración Cuenta de Ahorros-Cuenta Corrriente</h3>
                                     <hr>
                                </div>
                            </div>
@@ -106,7 +106,45 @@
                                       </label>
                                     <input id="descripcionaporte" type="text" v-model="tasa_ahorroplazo_361" class="form-control" placeholder="Detalle de operación">
                                 </div>
+                           </div> 
+                           <div class="col-md-2">
+                              
                            </div>    
+                           <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo : 30 Días (%)
+                                       </label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_30" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo :  31 - 90 Días  (%)
+                                       </label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_90" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                             <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo :  91 - 180 Días (%)
+                                      </label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_180" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>    
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo :  181 -360 días  (%)
+                                      </label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_360" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>  
+                              <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo :  + de 360 Días (%)
+                                      </label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_361" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>  
 
                          <div class="col-md-12">
                                <div class="form-group">
@@ -118,6 +156,37 @@
                                <div class="form-group">
                                     <label for="descripcionaporte" class="font-weight-bold">Tasa Aportes (%)</label>
                                     <input id="descripcionaporte" type="text" v-model="tasa_aportes" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                           <div class="col-md-12">
+                               <div class="form-group">
+                                    <h3>Configuración de Montos mínimos</h3>
+                                    <hr>
+                               </div>
+                           </div>
+
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo Ahorros</label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_ahorros" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo de Retiro de Intereses</label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_retiro_interes" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo de Retiro de Aportes</label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_interes_aporte" class="form-control" placeholder="Detalle de operación">
+                                </div>
+                           </div>
+                            <div class="col-md-2">
+                               <div class="form-group">
+                                    <label for="descripcionaporte" class="font-weight-bold">Monto Mínimo de un aporte</label>
+                                    <input id="descripcionaporte" type="text" v-model="monto_min_aporte" class="form-control" placeholder="Detalle de operación">
                                 </div>
                            </div>
                        </div>
@@ -165,7 +234,18 @@
                 tasa_ahorroplazo_360:'',
                 tasa_ahorroplazo_361:'',
 
-                tasa_mensual:''
+                tasa_mensual:'',
+
+
+                    monto_min_30:0,
+                    monto_min_90:0,
+                    monto_min_180:0,
+                    monto_min_360:0,
+                    monto_min_361:0,
+                    monto_min_ahorros:0,
+                    monto_min_retiro_interes:0,
+                    monto_min_interes_aporte:0,
+                    monto_min_aporte:0
 
 
 
@@ -209,6 +289,17 @@
                             me.tasa_ahorroplazo_361=res.data.config.tasa_ahorroplazo_361;
 
 
+                            me.monto_min_30=res.data.config.monto_min_30;
+                            me.monto_min_90=res.data.config.monto_min_90;
+                            me.monto_min_180=res.data.config.monto_min_180;
+                            me.monto_min_360=res.data.config.monto_min_360;
+                            me.monto_min_361=res.data.config.monto_min_361;
+                            me.monto_min_ahorros=res.data.config.monto_min_ahorros;
+                            me.monto_min_retiro_interes=res.data.config.monto_min_retiro_interes;
+                            me.monto_min_interes_aporte=res.data.config.monto_min_interes_aporte;
+                            me.monto_min_aporte=res.data.config.monto_min_aporte;
+
+
                     var tnominal=(Math.pow(1+me.tasa_creditos/100,0.0833333333333333)-1)*12*100;
                     var mensual=tnominal/12;
                     me.tasa_mensual=this.deci(mensual,2)
@@ -244,7 +335,17 @@
                        'tasa_ahorroplazo_90':me.tasa_ahorroplazo_90,
                        'tasa_ahorroplazo_180':me.tasa_ahorroplazo_180,
                        'tasa_ahorroplazo_360':me.tasa_ahorroplazo_360,
-                       'tasa_ahorroplazo_361':me.tasa_ahorroplazo_361
+                       'tasa_ahorroplazo_361':me.tasa_ahorroplazo_361,
+
+                        'monto_min_30':me.monto_min_30,        
+                        'monto_min_90':me.monto_min_90,        
+                        'monto_min_180':me.monto_min_180,       
+                        'monto_min_360':me.monto_min_360,        
+                        'monto_min_361':me.monto_min_361,        
+                        'monto_min_ahorros':me.monto_min_ahorros,       
+                        'monto_min_retiro_interes':me.monto_min_retiro_interes,        
+                        'monto_min_interes_aporte':me.monto_min_interes_aporte,       
+                        'monto_min_aporte':me.monto_min_aporte       
                         
                 })
                     .then(res => {

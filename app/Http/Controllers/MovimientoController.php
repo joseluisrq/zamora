@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Aporte;
+use App\Caja;
 use App\CuentaAhorro;
 use App\DepositoFijo;
+use App\DetalleCaja;
 use App\Empresa;
 use App\Movimiento;
+use App\Socio;
 use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -76,6 +80,67 @@ class MovimientoController extends Controller
         return [ 'cuentas' => $cuentas ];
 	}
 
+    public function selectCuentaInteres(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $dni = $request->filtro;
+
+        //SOLO SE PUEDE COBRAR LOS INTERESES DEL LAS CUENTAS DE AHORROS, PORQUE EL PLAZO FIJO SE COBRA AL FINAL DEL PERIODO ESTABLECIDO
+
+        $cuentas = CuentaAhorro::join('personas', 'personas.id', '=', 'cuentaahorros.idsocio')
+        ->join('socios', 'socios.id', '=', 'cuentaahorros.idsocio')
+        ->select(
+            'cuentaahorros.id',
+            'cuentaahorros.numerocuenta',
+            'cuentaahorros.tipocuenta',
+            'cuentaahorros.interes_ganado',
+            'cuentaahorros.interes_disponible',
+
+            'personas.nombre',
+            'personas.apellidos',
+
+            DB::raw('CONCAT(personas.dni, " - ", cuentaahorros.numerocuenta) AS identificador')
+        )
+        ->where([
+            ['cuentaahorros.estado', '=', '1'],
+            ['cuentaahorros.tipocuenta', '=', '1'],//SOLO SE MUESTRAN LAS CUENTAS DE AHORROS
+            ['personas.dni', 'like', '%'. $dni . '%'],
+            ['socios.estado', '=', '1']
+        ]) //socio activo
+        ->get();
+
+        for($i = 0; $i < sizeof($cuentas); $i++)
+        {
+            $cuentas[$i]->interes_disponible += $this->interesDesdeUltMovimiento($cuentas[$i]->id);
+            $cuentas[$i]->interes_disponible = number_format($cuentas[$i]->interes_disponible, 2, '.', '');
+        }    
+
+        return [ 'cuentas' => $cuentas ];
+    }
+
+    private function interesDesdeUltMovimiento($idcuenta)
+    {
+        $cuenta = CuentaAhorro::findOrFail($idcuenta);
+
+        $tea = ($cuenta->tasa)/100;//TASA EFECTIVA ANUAL
+        $tem = pow((1 + $tea), (1/12)) - 1;//TASA EFECTIVA MENSUAL
+        $tna = $tem * 12;//TASA NOMINAL ANUAL
+        $tnd = $tna / 360;//TASA NOMINAL DIARIA
+
+
+        $ult_movimiento = Movimiento::findOrFail($cuenta->ultimomovimiento);
+
+        $fecha_actual = Carbon::now('America/Lima');
+        $fecha_ult_movimiento = Carbon::parse($ult_movimiento->fecharegistro);
+
+        $dias_transcurridos = $fecha_actual->diffInDays($fecha_ult_movimiento);
+
+        $interes_ganado = $tnd * $cuenta->saldoefectivo * $dias_transcurridos;
+
+        return $interes_ganado;
+    }
+
 	public function storeAhorros(Request $request)// MOVIMIENTOS PARA CUENTAS DE AHORRO
 	{
 		if (!$request->ajax()) return redirect('/');
@@ -107,13 +172,17 @@ class MovimientoController extends Controller
 
             $saldoefectivo = $cuentaahorros->saldoefectivo;
 
+            $estado_dinero = 1;//ENTRA DINERO A LA CAJA
+
 			if($tipo == 0)
 			{//Si se trata de retiro, se debe verificar que tenga el dinero suficientes
 
 				if($saldoefectivo < $monto)
 					return ["excep" => true, "monto" => $saldoefectivo ]; //Significa que quiere retirar más de lo que dispone
-				else
+				else{
+                    $estado_dinero = 0;//SALE DINERO DE LA CAJA
 					$cuentaahorros->saldoefectivo = $saldoefectivo - $monto;
+                }
 			}
 			else //Si se trata de aporte solo se incremeta el saldo
 			{
@@ -136,7 +205,24 @@ class MovimientoController extends Controller
 
             $cuentaahorros->ultimomovimiento = $movimiento->id;//Se actualiza el último movimiento de la cuenta
             $cuentaahorros->interes_ganado += $interes_ganado;
+            $cuentaahorros->interes_disponible += $interes_ganado;
             $cuentaahorros->save();
+
+            $idcaja = Caja::where([
+                ['idusuario', '=', \Auth::user()->id],
+                ['estado', '=', 1]
+            ])
+            ->orderBy('id', 'desc')
+            ->get()[0]->id;
+
+            $detallecaja = new DetalleCaja();
+            $detallecaja->idcaja = $idcaja;
+            $detallecaja->idmovimiento = $movimiento->id;
+            $detallecaja->tipo = 2;//SE TRATA DE MOVIMIENTOS
+            $detallecaja->estado = $estado_dinero;//ENTRA O SALE DINERO DE LA CAJA
+            $detallecaja->fecha = Carbon::now('America/Lima');
+            $detallecaja->monto = $monto;
+            $detallecaja->save();
 
             DB::commit();
 
@@ -201,8 +287,7 @@ class MovimientoController extends Controller
 
             $interes_ganado = $this->calcularInteresCuentaAhorros($cuentaahorros, $saldoefectivo, $plazo_establecido, $dias_transcurridos);
 
-            $cuentaahorros->interes_ganado += $interes_ganado;
-            $interes_total = $cuentaahorros->interes_ganado;
+            $interes_total = $cuentaahorros->interes_ganado + $interes_ganado;
 
             // SE ASUME QUE SE CANCELA LA CUENTA AL FINAL DEL PLAZO
             $deposito_cobro = DepositoFijo::findOrFail($id_deposito_cobro);
@@ -220,9 +305,9 @@ class MovimientoController extends Controller
             $movimiento->idusuario = \Auth::user()->id;
             $movimiento->idahorro = $idcuenta;
             $movimiento->fecharegistro = Carbon::now('America/Lima');
-            $movimiento->monto = $deposito_cobro->monto;
+            $movimiento->monto = $deposito_cobro->monto + $interes_ganado;
             $movimiento->descripcion = 'COBRO DE MONTO E INTERÉS Y CANCELACIÓN DE CUENTA';
-            $movimiento->tipomovimiento = '0';//Es un retiro
+            $movimiento->tipomovimiento = 0;//Es un retiro
             $movimiento->interes_ganado = $interes_ganado;
             $movimiento->interes_ganado_total = $interes_total;
             $movimiento->estado = '1';
@@ -248,9 +333,9 @@ class MovimientoController extends Controller
                 $cuentaahorros->saldoefectivo = $deposito_fijo->monto;
                 $cuentaahorros->estado = 1;
 
-                $movimiento->monto = 0;
+                $movimiento->monto = $interes_ganado;
                 $movimiento->descripcion = 'COBRO DE INTERÉS Y RENOVACIÓN DE CUENTA';
-                $movimiento->tipomovimiento = '1';//Es un aporte/ renovación
+                $movimiento->tipomovimiento = 0;//SE TRATA DEL COBRO DE LOS INTERESES GENERADOS
             }
 
             $deposito_cobro->save();
@@ -258,7 +343,25 @@ class MovimientoController extends Controller
             $movimiento->save();
 
             $cuentaahorros->ultimomovimiento = $movimiento->id;//Se actualiza el último movimiento de la cuenta
+            $cuentaahorros->interes_ganado += $interes_ganado;
+            //El interés disponible queda siempre en 0 para las cuentas a plazo fijo, ya que se cobra al final del plazo
             $cuentaahorros->save();
+
+            $idcaja = Caja::where([
+                ['idusuario', '=', \Auth::user()->id],
+                ['estado', '=', 1]
+            ])
+            ->orderBy('id', 'desc')
+            ->get()[0]->id;
+
+            $detallecaja = new DetalleCaja();
+            $detallecaja->idcaja = $idcaja;
+            $detallecaja->idmovimiento = $movimiento->id;
+            $detallecaja->tipo = 2;//SE TRATA DE MOVIMIENTOS
+            $detallecaja->estado = 0;//SALE DINERO DE LA CAJA
+            $detallecaja->fecha = Carbon::now('America/Lima');
+            $detallecaja->monto = $movimiento->monto;
+            $detallecaja->save();
 
             DB::commit();
 
@@ -268,6 +371,82 @@ class MovimientoController extends Controller
             DB::rollBack(); //DESHACER TODO SI HUBIERA ALGÚN ERROR
         }
     }
+
+    public function cobrarInteres(Request $request)// MOVIMIENTOS PARA CUENTAS DE AHORRO
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $request->validate(['cuenta' => 'required'], ['cuenta.required' => 'Seleccione un número de cuenta']);
+
+        $idcuenta = $request->cuenta;
+
+        $cuenta = CuentaAhorro::findOrFail($idcuenta);
+
+        $interes_ganado = $this->interesDesdeUltMovimiento($idcuenta);
+        $interes_disponible = $cuenta->interes_disponible + $interes_ganado;
+
+        // MONTO MÍNIMO DE RETIRO DE INTERÉS
+        $min_interes = Empresa::get()[0]->monto_min_retiro_interes;
+        $min_interes = number_format($min_interes, 2,'.','');
+
+        $max_interes = $interes_disponible;
+        $max_interes = number_format($max_interes, 2,'.','');
+
+        $request->validate([
+            'monto_retiro' => 'required|numeric|min:'.$min_interes.'|max:'.$max_interes
+        ], 
+        [
+            'monto_retiro.required' => 'Ingrese un monto',
+            'monto_retiro.min' => 'El monto mínimo de retiro es S/ '.$min_interes,
+            'monto_retiro.max' => 'Usted dispone de S/ '.$max_interes
+        ]);
+
+        try{
+            DB::beginTransaction();
+
+            $monto = $request->monto_retiro;
+
+            $movimiento = new Movimiento();
+            $movimiento->idusuario = \Auth::user()->id;
+            $movimiento->idahorro = $idcuenta;
+            $movimiento->fecharegistro = Carbon::now('America/Lima');
+            $movimiento->monto = $monto;
+            $movimiento->descripcion = 'COBRO DE INTERÉS CUENTA AHORROS';
+            $movimiento->tipomovimiento = 0;// SE TRATA DE UN RETIRO
+            $movimiento->interes_ganado = number_format($interes_ganado, 2,'.','');
+            $movimiento->interes_ganado_total = number_format(($cuenta->interes_ganado + $interes_ganado), 2, '.', '');
+            $movimiento->estado = '1';
+            $movimiento->save();
+
+            $cuenta->ultimomovimiento = $movimiento->id;//Se actualiza el último movimiento de la cuenta
+            $cuenta->interes_ganado += $interes_ganado;
+            $cuenta->interes_disponible = number_format(($interes_disponible - $monto), 2, '.', '');
+            $cuenta->save();
+
+            $idcaja = Caja::where([
+                ['idusuario', '=', \Auth::user()->id],
+                ['estado', '=', 1]
+            ])
+            ->orderBy('id', 'desc')
+            ->get()[0]->id;
+
+            $detallecaja = new DetalleCaja();
+            $detallecaja->idcaja = $idcaja;
+            $detallecaja->idmovimiento = $movimiento->id;
+            $detallecaja->tipo = 2;//SE TRATA DE MOVIMIENTOS
+            $detallecaja->estado = 0;//SALE DINERO DE LA CAJA
+            $detallecaja->fecha = Carbon::now('America/Lima');
+            $detallecaja->monto = $monto;
+            $detallecaja->save();
+
+            DB::commit();
+
+            return ["id" => $movimiento->id];
+ 
+        } catch (Exception $e){
+            DB::rollBack(); //DESHACER TODO SI HUBIERA ALGÚN ERROR
+        }
+    }    
 
     private function plazoCumplido($plazo_establecido, $dias_transcurridos, Carbon $fecha_inicio)
     {
@@ -342,7 +521,7 @@ class MovimientoController extends Controller
             $interes_ganado = $monto_deposito * (pow((1 + $tea), ($nro_dias/360)) - 1);//Con capitalización diaria
         }
 
-        return number_format($interes_ganado, 2, '.', ' ');
+        return number_format($interes_ganado, 2, '.', '');
     }
 
     public function imprimirBoucherMovimiento(Request $request)
@@ -364,8 +543,6 @@ class MovimientoController extends Controller
             'movimientos.descripcion',
             'movimientos.tipomovimiento',
             'movimientos.fecharegistro',
-            'movimientos.interes_ganado',
-            'movimientos.interes_ganado_total',
 
             'users.usuario'
         )
@@ -419,7 +596,6 @@ class MovimientoController extends Controller
             }
 
         }
-
 
         $pdf= \PDF::loadView('pdf.detallemovimiento',[
             "mov" => $movimiento,

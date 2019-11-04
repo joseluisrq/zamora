@@ -35,36 +35,47 @@
             }
     </style>
     <body>
-        @foreach ($aporte as $apte)
-            <div class="coupon">
-                <div class="container" style="background-color:white">
-                    <div align='center'>
-                        <img src="./images/logo.png" width="120px" alt="">
+        <div class="coupon">
+            <div class="container" style="background-color:white">
+                <div align='center'>
+                    <img src="./images/logo.png" width="120px" alt="">
+                    @if($aporte->tipooperacion == 1)
                         <h4>Boucher de Aporte</h4>
-                    </div>
-                    <p>
-                        SOCIO :  {{ $apte->nombre . ' ' . $apte->apellidos }}<br><br>
-                        DIRECCIÓN SOCIO:  {{ $apte->direccion }}
-                    </p>
-                  
-                    <p>NRO OPERACIÓN: {{$apte->id}}
-                        <br>DNI SOCIO  : {{$apte->dni}}
-                        <br>MONTO DE APORTE N: S/. {{ $apte->monto }}
-                        <br>TASA:  {{ $apte->tasa}} %
-                        <br>Observaciones: {{$apte->descripcion}}
-                        <br>Fecha de registro de aporte: {{$apte->fecharegistro}}
-                    </p>
-                    <p>
-                        USUARIO(CAJERO): {{$apte->usuario}}
-                    </p>
-                    <p>
-                        DOC.IDE ..........................FIRMA...............................
-                  </p>
-                  <div align="center">
-                      <p><strong>GRACIAS POR SU PREFERENCIA</strong></p>
-                  </div>
+                    @else
+                        <h4>Boucher de retiro de interes de Aporte</h4>
+                    @endif
+                    <hr>
                 </div>
+                <p>
+                    <strong>DATOS DEL SOCIO</strong><br>
+                    DNI: {{$aporte->dni}}<br>
+                    SOCIO:  {{ $aporte->nombre . ' ' . $aporte->apellidos }}<br>
+                    DIRECCIÓN:  {{ $aporte->direccion }}
+                </p>
+                
+                <p>
+                    @if($aporte->tipooperacion == 1)
+                        <strong>DATOS DEL APORTE</strong>
+                    @else
+                        <strong>DATOS DEL RETIRO DE INTERÉS DE APORTE</strong>
+                    @endif
+                    <br>
+                    Monto: S/ {{ $aporte->monto }}<br>
+                    @if($aporte->tipooperacion == 1) Tasa:  {{ $aporte->tasa}} %<br>
+                    @endif
+                    Observaciones: {{$aporte->descripcion}}<br>
+                    Fecha de registro de aporte: {{$aporte->fecharegistro}}
+                </p>
+                <p>
+                    USUARIO(CAJERO): {{$aporte->usuario}}
+                </p>
+                <p>
+                    DOC.IDE ..........................FIRMA...............................
+              </p>
+              <div align="center">
+                  <p><strong>GRACIAS POR SU PREFERENCIA</strong></p>
+              </div>
             </div>
-        @endforeach
+        </div>
     </body>
 </html>

@@ -58,9 +58,13 @@ Vue.component('notificacion', require('./components/Notificacion.vue').default);
 
 //CAJA
 Vue.component('caja', require('./components/Caja.vue').default);
+Vue.component('cajaadmin', require('./components/CajaAdmin.vue').default);
 
 Vue.component('cuentassocio', require('./components/ahorros/CuentasSocio.vue').default);
- Vue.component('detallecuentasocio', require('./components/ahorros/DetalleCuentaSocio.vue').default);
+Vue.component('detallecuentasocio', require('./components/ahorros/DetalleCuentaSocio.vue').default);
+
+
+Vue.component('reportes', require('./components/Reportes.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -71,7 +75,7 @@ Vue.component('cuentassocio', require('./components/ahorros/CuentasSocio.vue').d
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 15,
+        menu: 16,
         ruta: 'http://localhost/zamora/public',
 
     },
