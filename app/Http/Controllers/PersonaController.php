@@ -555,5 +555,28 @@ class PersonaController extends Controller
         } catch (Exception $e){
             DB::rollBack(); //DESHACER TODO SI HUBIERA ALGÚN ERROR
         }
-	}
+    }
+    public function pdfreportesociosactivos(Request $request, $id)
+    {
+      $socios = Persona::join('socios','personas.id','=','socios.id')      
+      ->select(
+          'personas.nombre',
+          'personas.id',
+          'socios.estado',
+          'personas.dni',
+          'personas.direccion',
+          'personas.telefono',
+          'personas.email',
+          'personas.apellidos')
+          ->where('socios.estado','=',$id)->get();
+
+        
+        
+          $pdf= \PDF::loadView('pdf.reportesociosactivos',[
+              'socios'=>$socios,
+              ]);
+          return $pdf->download('ReporteSocios.pdf');
+      
+  }
+
 }

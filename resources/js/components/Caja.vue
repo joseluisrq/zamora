@@ -1,5 +1,6 @@
 <template>
 <main>
+    <!--Cajas aperturadas-->
     <template>
          <div class="col-sm-12 grid-margin stretch-card ">
             <div class="card ">
@@ -15,40 +16,49 @@
                                                       
                             </div>
                         </template>
+                       
                         
                      </div>
                 </div>
         </div>
          </div>
     </template>
+    <!--fin caja aperturadas-->
+
+
+    <!--si la caja esta cerrada-->
     <template v-if="cajaabierta==false">
-        <div class="col-sm-12 grid-margin stretch-card ">
-            <div class="card ">
-                <div class="card-body ">
-                    <div class="row ">
-                        <div class="col-lg-8 ">
-                            <h1 class="font-weight-bold text-dark ">Abrir Caja</h1><hr>
-                            <p class="text-dark ">Fecha de Apertura : {{fecha}}</p>
-                             <p class="text-dark ">Moneda : {{moneda}}</p>
-                            <div class="d-lg-flex align-items-baseline mb-3 ">
-                                   <h3  class="text-dark" > Monto Incial &nbsp;&nbsp;  </h3>
-                                <input type="number" class="text-dark font-weight-bold " v-model="montoinicial">
-                                <p class="text-muted ml-3 ">{{moneda}}</p>
+      
+            <div class="col-sm-12 grid-margin stretch-card ">
+                <div class="card ">
+                    <div class="card-body ">
+                        <div class="row ">
+                            <div class="col-lg-8 ">
+                                <h1 class="font-weight-bold text-dark ">Abrir Caja</h1><hr>
+                                <p class="text-dark ">Fecha de Apertura : {{fecha}}</p>
+                                <p class="text-dark ">Moneda : {{moneda}}</p>
+                                <div class="d-lg-flex align-items-baseline mb-3 ">
+                                    <h3  class="text-dark" > Monto Incial &nbsp;&nbsp;  </h3>
+                                    <input type="number" class="text-dark font-weight-bold " v-model="montoinicial">
+                                    <p class="text-muted ml-3 ">{{moneda}}</p>
+                                </div>
                             </div>
+                            <div class="col-lg-12 ">
+                                <h3 class="font-weight-bold text-dark ">
+                                    <template>
+                                        <button type="button" @click="abrirCaja()" class="btn btn-primary" >Abrir Caja</button>
+                                    </template>
+                                
+                                </h3>
+                        </div>                       
                         </div>
-                         <div class="col-lg-12 ">
-                            <h3 class="font-weight-bold text-dark ">
-                                <template>
-                                    <button type="button" @click="abrirCaja()" class="btn btn-primary" >Abrir Caja</button>
-                                </template>
-                               
-                            </h3>
-                      </div>                       
                     </div>
                 </div>
             </div>
-        </div>
+      
     </template>
+
+    <!--caja abierta-->
     <template v-else>
       <div class="row">
         <div class="col-sm-12 grid-margin stretch-card ">
@@ -83,7 +93,7 @@
                                         <p class="mb-0 ">Movimientos</p>
                                     </div>
                                     <div class="col-sm-9 climate-info-border mt-lg-0 mt-2 ">
-                                        <h2>S/ {{totaldinero}}</h2>
+                                        <h2>S/ {{totaldinero.toFixed(2)}}</h2>
                                         <p class="mb-0 ">Total Efectivo Movimientos</p>
                                     </div>
                                 </div>
@@ -104,7 +114,7 @@
                                 </div>
                                 <div>
                                     <p class="font-weight-medium text-dark text-small "> Monto Total</p>
-                                    <h3 class="font-weight-bold text-dark mb-0 ">{{parseFloat(montoapertura)+parseFloat(totaldinero)}}</h3>
+                                    <h3 class="font-weight-bold text-dark mb-0 ">{{(parseFloat(montoapertura)+parseFloat(totaldinero)).toFixed(2)}}</h3>
                                 </div>
                             </div>
                         </div>
@@ -239,11 +249,28 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <p class="mb-0 mt-2 ">Total {{totaldinero}}
+                                <p class="mb-0 mt-2 ">Total {{totaldinero.toFixed(2)}}
                                 </p>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!--reporte de caja-->
+    <template v-if="reporte==true">
+        <div class="col-sm-12 grid-margin stretch-card ">
+            <div class="card ">
+                <div class="card-body ">
+                    <div class="row ">
+                        <h3 class="font-weight-bold text-dark col-md-12">Reporte de Caja Cerrada</h3><hr>
+                       
+                        <button type="button" class="btn btn-primary" @click="reporteCaja()">Descargar detalle de Caja</button>
+                       
+                        
+                     </div>
                 </div>
             </div>
         </div>
@@ -280,7 +307,9 @@ export default {
             sumapagos:0,
             sumamovimiento:0,
             restamovimiento:0,
-            sumadesembolso:0
+            sumadesembolso:0,
+            reporte:false,
+            reportevisto:true
 
         }
     },
@@ -356,6 +385,7 @@ export default {
                             me.CajasAperturadas();
                             me.cajaabierta=true;
                             me.seleccionarCaja(); 
+                            
                         Swal.fire(
                         'CAJA ABIERTA',
                         'Ya puede registrar operaciones',
@@ -446,9 +476,13 @@ export default {
                   
                 })
                     .then(res => {
-                         me.seleccionarCaja();
-                         me.CajasAperturadas();
-                         me.cajaabierta=false;
+
+                    me.reporte=true;
+                    me.cajaabierta=false;
+                    me.CajasAperturadas();
+                     me.seleccionarCaja();
+                     me.totaldinero=0;
+                   
                     Swal.fire({
                         position: 'top-end',
                         type: 'success',
@@ -467,6 +501,18 @@ export default {
                         })
                     });
 
+            },
+            reporteCaja(){
+                let me=this;               
+                 me.reporte=false;
+                 me.montoinicial;
+                  me.idcajaactual
+                 window.open(me.ruta + '/caja/pdfDetalleCaja/'+me.idcajaactual,'_blank');
+
+            },
+            pdfDetalle(){
+                let me=this;
+                me.idcajaactual
             },
               ActualizarMontoIncial(id){
                 let me=this;

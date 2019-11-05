@@ -120,7 +120,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/caja/CerrarCaja', 'CajaController@CerrarCaja');//cajalista
         Route::put('/caja/ActualizarMontoIncial', 'CajaController@ActualizarMontoIncial');//cajalista
 
-
+        Route::get('/caja/HistorialCajas', 'CajaController@HistorialCajas');//cajalista
+      
 
         Route::get('/persona/selectUsuarios', 'PersonaController@selectUsuarios');
 	    Route::post('/persona/registrar/usercomosocio', 'PersonaController@storeUserComoSocio');
@@ -132,6 +133,12 @@ Route::group(['middleware' => ['auth']], function () {
         
 
         Route::get('/ahorro/reporte', 'CuentaAhorroController@reportes');
+        Route::get('/caja/pdfDetalleCaja/{id}', 'CajaController@pdfDetalleCaja')->name('detallecaja_pdf');
+
+        Route::get('/cajas/pdfReportecajas', 'CajaController@pdfReportecajas')->name('reportecajas_pdf');
+        Route::get('/persona/pdfreportesociosactivos/{id}', 'PersonaController@pdfreportesociosactivos')->name('reportesociosactivos_pdf');
+       // Route::get('/persona/pdfreportesociosinactivos', 'PersonaController@pdfreportesociosinactivos')->name('pdfreportesociosinactivos_pdf');
+
     });  
 
 
@@ -160,8 +167,9 @@ Route::group(['middleware' => ['auth']], function () {
       
            //notifiacion
            Route::get('/notificacion', 'CuotaController@notificacion');//listar creditos
+           Route::get('/caja/pdfDetalleCaja/{id}', 'CajaController@pdfDetalleCaja')->name('detallecaja_pdf');
 
-
+           Route::get('/cajas/pdfReportecajas', 'CajaController@pdfReportecajas')->name('reportecajas_pdf');
     });
 
 
@@ -188,10 +196,27 @@ Route::group(['middleware' => ['auth']], function () {
            //notifiacion
            Route::get('/notificacion', 'CuotaController@notificacion');//listar creditos
 
+           Route::get('/cajas/pdfReportecajas', 'CajaController@pdfReportecajas')->name('reportecajas_pdf');
+
+
+           // CUENTA AHORROS
+        Route::get('/ahorro/listar', 'CuentaAhorroController@index');
+        Route::get('/ahorro/detalle/', 'CuentaAhorroController@detalleCuentaAhorro');
+        Route::get('/ahorro/selectsocio', 'CuentaAhorroController@selectSocio');
+        Route::post('/cuentaahorros/crear', 'CuentaAhorroController@store');
+        Route::get('/ahorro/movimiento/imprimirboucher', 'MovimientoController@imprimirBoucherMovimiento');
+        Route::get('/ahorro/cuenta/imprimirdetalle', 'CuentaAhorroController@imprimirDetalleCuenta');
+        //MOVIMIENTOS
+        Route::get('/movimiento/selectCuenta', 'MovimientoController@selectCuenta');
+        Route::post('/movimiento/registrar', 'MovimientoController@store');
+
+        Route::get('/caja/pdfDetalleCaja/{id}', 'CajaController@pdfDetalleCaja')->name('detallecaja_pdf');
+
+
     });
 
 
-//CREDITOS
+
 
 
 });

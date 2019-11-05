@@ -224,6 +224,128 @@
          <!--fin seccion 4-->
 <!--fin cuentas de ahorro-->
 
+<!--Cajas-->
+    <template>
+        <div class="row">
+            <div class="col-md-12 card bg bg-info">
+                <h2 class="text-white">Cajas</h2>
+            </div>
+        </div>
+        <!--seccion 02-->
+        <div class="row  mt-4">
+             
+            <div class="col-lg-4 grid-margin stretch-card ">
+                <div class="card ">
+                    <div class="card-body pb-0 ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h2 class="text-success font-weight-bold ">{{totalcajas}}</h2>
+                             <button class="btn btn-danger" @click="TodaslasCajas()">Detalle Pdf</button>
+                            <i class="mdi mdi-account-outline mdi-18px text-dark "></i>                           
+                        </div>
+                         <p class="text-dark font-weight-bold">Total de Cajas</p>
+                    </div>     
+                </div>
+            </div>
+            <div class="col-lg-4 grid-margin stretch-card ">
+                <div class="card ">
+                    <div class="card-body pb-0 ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h2 class="text-danger font-weight-bold ">{{cajasabiertas}}</h2>                           
+                            <i class="mdi mdi-refresh mdi-18px text-dark "></i>
+                        </div>
+                        <p class="text-dark font-weight-bold">Cajas Abiertas</p>                   </div>                  
+                    
+                </div>
+            </div>   
+         
+        </div>
+       
+         <!--fin seccion 2-->
+
+        <!-- Sesccion 3
+        <div class="row ">
+            <div class="col-sm-6 grid-margin grid-margin-md-0 stretch-card ">
+                <div class="card ">
+                    <div class="card-body ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h4 class="card-title ">Desembolsos de Créditos por Mes</h4>
+                            <h4 class="text-success font-weight-bold ">Año<span class="text-dark ml-3 ">{{ano}}</span></h4>
+                        </div>
+                        <div id="support-tracker-legend " class="support-tracker-legend "></div>
+                        <canvas id="desembolsos"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 grid-margin grid-margin-md-0 stretch-card ">
+                <div class="card ">
+                    <div class="card-body ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h4 class="card-title ">Canitdad de Desembolsos de Créditos por Mes</h4>
+                            <h4 class="text-success font-weight-bold ">Año<span class="text-dark ml-3 ">{{ano}}</span></h4>
+                        </div>
+                        <div id="support-tracker-legend " class="support-tracker-legend "></div>
+                        <canvas id="desembolsospormes"></canvas>
+                    </div>
+                </div>
+            </div>
+         
+        </div>
+         fin seccion 3-->
+    </template>
+<!--FIN cajas-->
+<!--SOcios-->
+  <template>
+        <div class="row">
+            <div class="col-md-12 card bg bg-info">
+                <h2 class="text-white">Socios</h2>
+            </div>
+        </div>
+        <!--seccion 02-->
+        <div class="row  mt-4">
+             
+            <div class="col-lg-4 grid-margin stretch-card ">
+                <div class="card ">
+                    <div class="card-body pb-0 ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h2 class="text-success font-weight-bold ">{{sociosactivos}}</h2>
+                               <button class="btn btn-danger" @click="SociosPdf(1)">Detalle Pdf</button>
+                           
+                               <i class="mdi mdi-account-outline mdi-18px text-dark "></i>                           
+                        </div>
+                         <p class="text-dark font-weight-bold">Socios Activos</p>
+                    </div>     
+                </div>
+            </div>
+            <div class="col-lg-4 grid-margin stretch-card ">
+                <div class="card ">
+                    <div class="card-body pb-0 ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h2 class="text-danger font-weight-bold ">{{sociosinactivos}}</h2>                           
+                            <i class="mdi mdi-refresh mdi-18px text-dark "></i>
+                              <button class="btn btn-danger" @click="SociosPdf(0)">Detalle Pdf</button>
+                           
+                        </div>
+                        <p class="text-dark font-weight-bold">Socios Inactivos</p>
+                                           </div>                  
+                    
+                </div>
+            </div>   
+                <div class="col-lg-4 grid-margin stretch-card ">
+                <div class="card ">
+                    <div class="card-body pb-0 ">
+                        <div class="d-flex align-items-center justify-content-between ">
+                            <h2 class="text-danger font-weight-bold ">{{sociosconcreditos}}</h2>                           
+                            <i class="mdi mdi-refresh mdi-18px text-dark "></i>
+                        </div>
+                        <p class="text-dark font-weight-bold">Socios con Crédito</p>                   </div>                  
+                    
+                </div>
+            </div>
+         
+        </div>
+    </template>
+<!--fin socios-->
+
  </main> 
 </template>
 
@@ -265,11 +387,21 @@
                 interes_ganado_ahorros: 0,
 
                 montos_plazofijo: 0,
-                interes_ganado_plazofijo: 0
+                interes_ganado_plazofijo: 0,
 
 
 
 
+                //cajas
+                totalcajas:0,
+                cajasabiertas:0,
+
+                //socios
+                sociosactivos:0,
+                sociosinactivos:0,
+                sociosconcreditos:0,
+                sociosconcreditosatrasados:0,
+                
             }
         },
         methods:{
@@ -294,11 +426,19 @@
 
                      //para el grafico de monto desembolsos por mes
                      me.desembolsos=respuesta.desembolsos;
-                     me.ano=respuesta.ano
-
+                    
                      //para el grafico de cantidad de desembolsos por mes
                      me.cdesembolsos=respuesta.creditospormes;
                      me.ano=respuesta.ano
+
+                     //cajas
+                     me.totalcajas=respuesta.totalcajas;
+                     me.cajasabiertas=respuesta.cajasabiertas;
+
+                     //socios
+                     me.sociosactivos=respuesta.sociosactivos;
+                     me.sociosinactivos=respuesta.sociosinactivos;
+                     me.sociosconcreditos=respuesta.sociosconcreditos;
 
                      //cargamos los datos al chart
                      me.loadDesembolsos();
@@ -363,6 +503,17 @@
             
             
             
+            },
+            TodaslasCajas(){
+                  let me=this;
+                  window.open(me.ruta + '/cajas/pdfReportecajas','_blank');
+
+         
+            },
+            SociosPdf(id){
+                 let me=this; 
+                  window.open(me.ruta + '/persona/pdfreportesociosactivos/'+id,'_blank');
+
             },
             loadCreditpsporMes(){
                  let me=this;

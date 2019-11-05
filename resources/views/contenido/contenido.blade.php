@@ -46,7 +46,7 @@
                         <registrarpersona :key="2" :ruta='ruta' :tipo="0" :registrar="1"></registrarpersona>
                     </template>
                     <template v-if="menu==4">
-                        <aportes :ruta="ruta"></aportes>
+                        <aportes :ruta="ruta" :idrol="1"></aportes>
                     </template>
                     {{-- FIN SOCIOS --}}
                     
@@ -120,7 +120,7 @@
                         <registrarpersona :key="2" :ruta='ruta' :tipo="0" :registrar="1"></registrarpersona>
                     </template>
                     <template v-if="menu==4">
-                        <aportes :ruta="ruta"></aportes>
+                        <aportes :ruta="ruta" :idrol="2"></aportes>
                     </template>
                     {{-- FIN SOCIOS --}}
                     
@@ -158,15 +158,18 @@
                     <template v-if="menu==100">
                             <pagar :ruta="ruta"></pagar>
                     </template>
-                    
                     {{-- INICIO MENU AHORROS --}}
                     <template v-if="menu==70">
                         <registrarmovimiento :ruta="ruta"/>
                     </template>
-                   
+                    <template v-if="menu==71">
+                        <crearcuentaahorro :ruta="ruta"></crearcuentaahorro>
+                    </template>
                     <template v-if="menu==72">
                         <listarcuentas :ruta="ruta"></listarcuentas>
                     </template>
+                    {{-- FIN AHORROS --}}
+                   
                     {{-- FIN AHORROS --}}
                     
                     
@@ -176,7 +179,7 @@
                     </template>
                    
                     <template v-if="menu==4">
-                        <aportes :ruta="ruta"></aportes>
+                        <aportes :ruta="ruta" :idrol="3"></aportes>
                     </template>
                     {{-- FIN SOCIOS --}}
                     

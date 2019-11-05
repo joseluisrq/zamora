@@ -75,7 +75,7 @@ Vue.component('reportes', require('./components/Reportes.vue').default);
 const app = new Vue({
     el: '#app',
     data: {
-        menu: 16,
+        menu: 0,
         ruta: 'http://localhost/zamora/public',
 
     },

@@ -19,7 +19,7 @@
                     </a>
                     <div class="submenu">
                         <ul>
-                            <li @click="menu=100" class="nav-item"><a class="nav-link" href="#">Pagar Cuota</a></li>
+                         <!--   <li @click="menu=100" class="nav-item"><a class="nav-link" href="#">Pagar Cuota</a></li>-->
                             <li  @click="menu=30" class="nav-item"><a class="nav-link" href="#">Agregar Credito</a></li>
                             <li @click="menu=40"><a class="nav-link" href="#">Historial de Creditos</a></li>
                             <li @click="menu=31"><a class="nav-link" href="#">Simulador de Creditos</a></li>
@@ -37,8 +37,8 @@
                     </a>
                     <div class="submenu">
                           <ul>
-                            <li class="nav-item" @click="menu=70"><a class="nav-link"  href="#">Registrar movimientos</a></li>
-                            <li class="nav-item" @click="menu=71"><a class="nav-link"  href="#">Crear cuenta de Ahorros</a></li>
+                          <!--  <li class="nav-item" @click="menu=70"><a class="nav-link"  href="#">Registrar movimientos</a></li>-->
+                           <!-- <li class="nav-item" @click="menu=71"><a class="nav-link"  href="#">Crear cuenta de Ahorros</a></li>-->
                             <li class="nav-item" @click="menu=72"><a class="nav-link"  href="#">Historial de Ahorros</a></li>
                          
                           </ul>

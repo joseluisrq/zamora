@@ -97,7 +97,7 @@
         <template v-if="showlista">
             <div class="row">
                 <div class="col-lg-12">
-                    <button class="btn btn-success mr-2" @click="mostrarComponente(true, false, false)">Registrar Aporte</button>
+                    <button v-if="idrol==3" class="btn btn-success mr-2" @click="mostrarComponente(true, false, false)">Registrar Aporte</button>
                 </div>
                 <div class="col-lg-12 grid-margin stretch-card">
                     <div class="card">
@@ -176,7 +176,7 @@
     import vSelect from 'vue-select'
 
     export default {
-        props:['ruta'],
+        props:['ruta','idrol'],
         data: function(){
             return {
                 idsocio: 0,

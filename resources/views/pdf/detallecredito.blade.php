@@ -125,7 +125,7 @@ td, th {
                 </tr>
                 <tr>
                     <td style="width:35%">Tasa de Interes (Especificar si es Fija/Sobre Saldo/No aplicable)</td>
-                    <td style="width:15%">Fija {{$c->tasa}} % anual</td>
+                    <td style="width:15%">Fija {{$c->tasa}} % mensual</td>
                     <td style="width:35%">Fecha de vencimiento</td>
                     <td style="width:15%"> 
                     <?php $fecha='';?>

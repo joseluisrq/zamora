@@ -321,6 +321,7 @@ export default {
                 let date = new Date()
                 let day = date.getDate(); let month = date.getMonth() + 1;let year = date.getFullYear();
                 if (month < 10)this.hoy = year + '-0' + month + '-' + day
+                 if (day < 10)this.hoy = year + '-' + month + '-0' + day
                 else this.hoy = year + '-' + month + '-' + day
             },
     },

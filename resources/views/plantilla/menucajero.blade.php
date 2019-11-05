@@ -36,7 +36,8 @@
                     <div class="submenu">
                           <ul>
                             <li class="nav-item" @click="menu=70"><a class="nav-link"  href="#">Registrar movimientos</a></li>
-                              <li class="nav-item" @click="menu=72"><a class="nav-link"  href="#">Historial de Ahorros</a></li>
+                            <li class="nav-item" @click="menu=71"><a class="nav-link"  href="#">Crear cuenta de Ahorros</a></li>
+                            <li class="nav-item" @click="menu=72"><a class="nav-link"  href="#">Historial de Ahorros</a></li>
                          
                           </ul>
                       </div>

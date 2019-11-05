@@ -67,11 +67,29 @@ class ReportesController extends Controller
         $totalcreditos=DB::table('creditos')    
        ->count();
 
+       //CAJAS
+       $totalcajas=DB::table('cajas as c')       
+       ->count();
+
+       $cajasabiertas=DB::table('cajas as c')
+       ->where('c.estado','1')       
+       ->count();
 
 
+       //socios
+       $sociosactivos=DB::table('socios')
+       ->where('socios.estado','1')    
+       ->count();
 
+        //socios
+        $sociosinactivos=DB::table('socios')
+        ->where('socios.estado','0')    
+        ->count();
 
-
+        $sociosconcreditos=DB::table('socios')
+        ->where('socios.estadocredito','1')    
+        ->count();
+        
 
         return [
             'desembolsos'=>$desembolsos,
@@ -85,6 +103,17 @@ class ReportesController extends Controller
 
             'creditoDes'=>$creditoDes,
             'creditoporDes'=>$creditoporDes,
+
+            //cajas
+            'totalcajas'=>$totalcajas,
+            'cajasabiertas'=>$cajasabiertas,
+
+            'sociosactivos'=>$sociosactivos,
+            'sociosinactivos'=>$sociosinactivos,
+            'sociosconcreditos'=>$sociosconcreditos,
+           
+
+
             'ano'=>$ano
         ];
     }

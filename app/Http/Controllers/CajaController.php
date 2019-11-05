@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Caja;
 use App\DetalleCaja;
+use App\Movimiento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -72,6 +73,29 @@ class CajaController extends Controller
             'cajas'=>$cajas,
         ];
     }
+    public function HistorialCajas(Request $request){
+   
+        $historialCajas=Caja::join('personas','cajas.idusuario','personas.id')
+        ->select(
+            'cajas.id',
+            'cajas.idusuario',
+            'cajas.estado',
+
+            'cajas.montoinicial',
+            'cajas.montorecaudado',
+            'cajas.fechaapertura',
+            'cajas.fechacierre',
+
+            'personas.nombre',
+            'personas.apellidos')
+        ->orderBy('cajas.fechaapertura', 'DESC')
+        ->get();
+
+        return [
+           
+            'historialCajas'=>$historialCajas,
+        ];
+    }
     public function abrirCaja(Request $request)
     {
         $mytime= Carbon::now('America/Lima');
@@ -116,4 +140,88 @@ class CajaController extends Controller
        
        
     }
+    public function pdfDetalleCaja(Request $request, $id)
+    {
+        $detallecaja=DetalleCaja::
+        join('cajas as c' ,'detallecaja.idcaja','c.id')      
+        ->select(
+            'detallecaja.monto',
+            'detallecaja.idmovimiento',
+            'detallecaja.fecha',
+            'detallecaja.tipo',
+            'detallecaja.estado',
+            )
+          ->where('c.id','=',$id)->get();
+        
+          $cantidaddemovimmientos=DetalleCaja::
+          join('cajas as c' ,'detallecaja.idcaja','c.id')        
+            ->where('c.id','=',$id)->count();
+        
+        $caja=Caja::    
+        join('personas','cajas.idusuario','personas.id')
+        ->select(
+            'cajas.id',
+            'cajas.montoinicial',
+            'cajas.montorecaudado',
+            'cajas.fechaapertura',
+            'cajas.fechacierre',
+
+            'personas.nombre',
+            'personas.apellidos'
+
+            )
+          ->where('cajas.id','=',$id)->take(1)->get();
+
+        $numeroCaja=Caja::select('id')
+          ->where('id',$id)->get();
+
+        
+          $pdf= \PDF::loadView('pdf.detallecaja',[
+              'detallecaja'=>$detallecaja,
+              'caja'=>$caja,
+              'cantidaddemovimmientos'=>$cantidaddemovimmientos,
+              ]);
+          return $pdf->download('DetalleCaja-'.$numeroCaja[0]->id.'.pdf');
+      
+  }
+  public function pdfReportecajas(Request $request)
+    {
+               
+
+        $sumamonto=DB::table('cajas as c')
+        ->select(
+            DB::raw('SUM(c.montorecaudado) as MontoRecaudado'),
+        )->get();
+        $inicial=DB::table('cajas as c')
+        ->select(
+            DB::raw('SUM(c.montoinicial) as MontoInicial'),
+        )->get();
+
+
+        $caja=Caja::          
+        join('personas','cajas.idusuario','personas.id')
+        ->select(
+            'cajas.id',
+            'cajas.montoinicial',
+            'cajas.montorecaudado',
+            'cajas.fechaapertura',
+            'cajas.fechacierre',
+
+            'personas.nombre',
+            'personas.apellidos'
+
+            )
+          ->where('cajas.estado','=',0)->get();
+
+        $mytime= Carbon::now('America/Lima');
+      
+        
+          $pdf= \PDF::loadView('pdf.reportecajas',[           
+              'caja'=>$caja ,
+              'sumamonto'=>$sumamonto ,    
+              'inicial'=>$inicial ,           
+              ]);
+          return $pdf->download('Reporte Cajas -'.$mytime.'.pdf');
+      
+  }
 }

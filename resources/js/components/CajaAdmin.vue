@@ -1,7 +1,7 @@
 <template>
 <main>
     <template v-if="verdetallecaja==false">
-         <div class="col-sm-12 grid-margin stretch-card ">
+        <div class="col-sm-12 grid-margin stretch-card ">
             <div class="card ">
                 <div class="card-body ">
                     <div class="row ">
@@ -19,8 +19,65 @@
                         
                      </div>
                 </div>
+            </div>
         </div>
-    </div>
+        <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Historial de Cajas</h4>
+                  <p class="card-description">
+                    Detalle de cajas  <code>.pdf</code>
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>ID Caja</th>
+                          <th>Fecha Apertura</th>
+                          <th>Fecha Cierre</th>
+                          <th>Monto Recaudado</th>
+                          <th>Monto de Apertura</th>
+                          <th>Monto total de Caja</th>
+                          <th>Cajero</th>
+                          <th>Estado</th>
+                           <th>Detalle de Caja</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="h in historialCajas" :key="h.id">
+                          <td>{{h.id}}</td>
+                          <td>{{h.fechaapertura}}</td>
+                          <td>{{h.fechacierre}}</td>
+                          <td>{{h.montorecaudado}}</td>
+                          <td>{{h.montoinicial}}</td>
+                          <td>{{parseFloat(h.montoinicial)+parseFloat(h.montorecaudado)}}</td>
+                          <td>{{h.nombre}} {{h.apellidos}}</td>
+                          
+                          <td v-if="h.estado==0"><label class="badge badge-primary">Cerrada</label></td>
+                          <td v-else><label class="badge badge-success">Abierta</label></td>
+                          <td v-if="h.estado==0"> <button type="button" @click="reporteCaja(h.id)" class="btn btn-danger">Descargar</button></td>
+                          <td v-else></td>
+                        </tr>
+                        
+                      </tbody>
+                    </table>
+                     <nav>
+                                    <ul class="pagination">
+                                        <li class="page-item" v-if="pagination.current_page > 1">
+                                            <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1)">Anterior</a>
+                                        </li>
+                                        <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                                            <a class="page-link" href="#" @click.prevent="cambiarPagina(page)" v-text="page"></a>
+                                        </li>
+                                        <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                            <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1)">Siguiente</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                  </div>
+                </div>
+              </div>
+            </div>
     </template>
 
 
@@ -289,11 +346,66 @@ export default {
             restamovimiento:0,
             sumadesembolso:0,
 
-            verdetallecaja:false
+            verdetallecaja:false,
+
+            historialCajas:[],
+
+
+            
+            //Paginacion
+            pagination : 
+            {
+                    'total' : 0,
+                    'current_page' : 0,
+                    'per_page' : 0,
+                    'last_page' : 0,
+                    'from' : 0,
+                    'to' : 0,
+            },
+            //busqueda
+            offset : 3,
+            criterio : 'numeroprestamo', 
+            buscar : '',
 
         }
     },
+     computed:
+    {
+            isActived: function(){
+                return this.pagination.current_page;
+            },
+            //Calcula los elementos de la paginación
+            pagesNumber: function() {
+                if(!this.pagination.to) {
+                    return [];
+                }
+                
+                var from = this.pagination.current_page - this.offset; 
+                if(from < 1) {
+                    from = 1;
+                }
+
+                var to = from + (this.offset * 2); 
+                if(to >= this.pagination.last_page){
+                    to = this.pagination.last_page;
+                }  
+
+                var pagesArray = [];
+                while(from <= to) {
+                    pagesArray.push(from);
+                    from++;
+                }
+                return pagesArray;             
+
+            }
+    },
     methods:{
+           cambiarPagina(page)
+            {   let me = this;
+                me.pagination.current_page = page;
+                me.HistorialCajas(page);
+            },
+
         verdetalleCaja(id){
             let me=this;
             me.verdetallecaja=true;
@@ -302,6 +414,11 @@ export default {
 
             me.MovimientosCaja(id)
         },
+             reporteCaja(id){
+               let me=this;
+                 window.open(me.ruta + '/caja/pdfDetalleCaja/'+id,'_blank');
+
+            },
            CajasAperturadas ()
         {   
                 let me=this;   
@@ -310,6 +427,21 @@ export default {
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.cajasAperturadas = respuesta.cajas;              
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+         },
+        HistorialCajas()
+          {   
+                let me=this;   
+                me.datosactuales(); 
+
+                var url= me.ruta+'/caja/HistorialCajas';
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.historialCajas = respuesta.historialCajas;
+                    //  me.pagination= respuesta.pagination;              
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -478,7 +610,7 @@ export default {
                 me.movimientos=0,
                 me.montoapertura=0,
                 me.totaldinero=0,
-                me.datosCaja.length=0
+                me.datosCaja=0
             },
               ActualizarMontoIncial(id){
                 let me=this;
@@ -515,6 +647,7 @@ export default {
         
      // this.seleccionarCaja();
       this.CajasAperturadas();
+      this.HistorialCajas();
       
     }
 }
